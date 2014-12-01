@@ -20,11 +20,17 @@ let game_from_data game_data =
                         (* Youngster, upon challenging a stranger to battle *)
 
 let handle_step g ra ba =
-	failwith 
-    "Remember my super cool Rattata? My Rattata is different from regular 
-    Rattata. It’s like my Rattata is in the top percentage of all Rattata."
-
-                        (* Youngster Joey, about his Raticate *)
+  match (ra, ba) with 
+  | (Action red_action, Action blue_action) ->
+      let red_request = match red_action with
+      | SendTeamName red_name -> send_update 
+      | _ -> () in
+      let blue_request = match blue_action with
+      | _ -> () in
+      (None, (game_datafication game), red_request, blue_request)
+      
+  (*Ignore any other command.*)
+  | _ -> (None, (game_datafication game), None, None)
 
 let init_game () =
   (* Loading moves list and Steammon list *)
