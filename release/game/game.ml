@@ -24,9 +24,20 @@ let handle_step g ra ba =
   | (Action red_action, Action blue_action) ->
       let red_request = match red_action with
       | SendTeamName red_name -> send_update 
-      | _ -> () in
+      | SelectStarter startermon ->
+      | PickSteammon mon ->
+      | PickInventory inv -> 
+      | SwitchSteammon mon ->
+      | UseItem (i, iname) ->
+      | UseMove move -> in
       let blue_request = match blue_action with
-      | _ -> () in
+      | SendTeamName red_name -> send_update 
+      | SelectStarter startermon ->
+      | PickSteammon mon ->
+      | PickInventory inv -> 
+      | SwitchSteammon mon ->
+      | UseItem (i, iname) ->
+      | UseMove move -> in
       (None, (game_datafication game), red_request, blue_request)
       
   (*Ignore any other command.*)
