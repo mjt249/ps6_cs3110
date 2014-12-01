@@ -1,4 +1,4 @@
-module type STATE = sig 
+module GameState : sig 
   type state
 
   val initial_state: unit -> state

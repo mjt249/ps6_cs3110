@@ -4,7 +4,8 @@ open Constants
 open Netgraphics
 
 (* You have to implement this. Change it from int to yout own state type*)
-type game = State.state
+module GameState = State.GameState
+type game = GameState.state
 
 let game_datafication g =
 	failwith 
@@ -23,30 +24,30 @@ let handle_step g ra ba =
   match (ra, ba) with 
   | (Action red_action, Action blue_action) ->
       let red_request = match red_action with
-      | SendTeamName red_name -> send_update 
-      | SelectStarter startermon ->
-      | PickSteammon mon ->
-      | PickInventory inv -> 
-      | SwitchSteammon mon ->
-      | UseItem (i, iname) ->
-      | UseMove move -> in
+      | SendTeamName red_name -> DoNothing
+      | SelectStarter startermon -> DoNothing
+      | PickSteammon mon -> DoNothing
+      | PickInventory inv ->  DoNothing
+      | SwitchSteammon mon -> DoNothing
+      | UseItem (i, iname) -> DoNothing
+      | UseMove move -> DoNothing in
       let blue_request = match blue_action with
-      | SendTeamName red_name -> send_update 
-      | SelectStarter startermon ->
-      | PickSteammon mon ->
-      | PickInventory inv -> 
-      | SwitchSteammon mon ->
-      | UseItem (i, iname) ->
-      | UseMove move -> in
-      (None, (game_datafication game), red_request, blue_request)
+      | SendTeamName red_name -> DoNothing
+      | SelectStarter startermon -> DoNothing
+      | PickSteammon mon -> DoNothing
+      | PickInventory inv ->  DoNothing
+      | SwitchSteammon mon -> DoNothing
+      | UseItem (i, iname) -> DoNothing
+      | UseMove move -> DoNothing in
+      (None, (game_datafication g), Some red_request, Some blue_request)
       
   (*Ignore any other command.*)
-  | _ -> (None, (game_datafication game), None, None)
+  | _ -> (None, (game_datafication g), None, None)
 
 let init_game () =
   (* Loading moves list and Steammon list *)
   Initialization.init_pool "moves.csv" "steammon.csv";
   let mvs = hash_to_list Initialization.move_table in
   let mons = hash_to_list Initialization.mon_table in
-  let init_state = State.initial_state () in
+  let init_state = GameState.initial_state () in
   (init_state, TeamNameRequest, TeamNameRequest, mvs, mons)
