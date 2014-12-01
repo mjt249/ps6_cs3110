@@ -1,5 +1,3 @@
 type state
 
-val initial_state: () -> state
-
-
+val initial_state: unit -> state

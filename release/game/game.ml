@@ -4,7 +4,7 @@ open Constants
 open Netgraphics
 
 (* You have to implement this. Change it from int to yout own state type*)
-type game = int 
+type game = State.state
 
 let game_datafication g =
 	failwith 
@@ -27,7 +27,9 @@ let handle_step g ra ba =
                         (* Youngster Joey, about his Raticate *)
 
 let init_game () =
-	failwith
-    "We need Pokéballs! P-O-K-accent E balls!"
-
-                        (* Barry, rival in Steammon Diamond/Pearl/Platinum *)
+  (* Loading moves list and Steammon list *)
+  Initialization.init_pool "moves.csv" "steammon.csv";
+  let mvs = hash_to_list Initialization.move_table in
+  let mons = hash_to_list Initialization.mon_table in
+  let init_state = State.initial_state () in
+  (init_state, TeamNameRequest, TeamNameRequest, mvs, mons)
