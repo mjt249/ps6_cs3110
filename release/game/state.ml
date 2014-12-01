@@ -1,3 +1,5 @@
-type state = int
+module State = struct
+  type state = int
 
-let initial_state () = 42
+  let initial_state () = 42
+end

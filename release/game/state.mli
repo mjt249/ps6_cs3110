@@ -1,3 +1,5 @@
-type state
+module type STATE = sig 
+  type state
 
-val initial_state: unit -> state
+  val initial_state: unit -> state
+end
