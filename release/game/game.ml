@@ -22,9 +22,11 @@ let game_from_data game_data =
 
 let handle_step g ra ba =
   match (ra, ba) with 
+  | (Action (SendTeamName red_name), Action (SendTeamName blue_name)) ->
+      Netgraphics.send_update (InitGraphics (red_name, blue_name));
+      (None, (game_datafication g), None, None)
   | (Action red_action, Action blue_action) ->
       let red_request = match red_action with
-      | SendTeamName red_name -> DoNothing
       | SelectStarter startermon -> DoNothing
       | PickSteammon mon -> DoNothing
       | PickInventory inv ->  DoNothing
@@ -32,7 +34,6 @@ let handle_step g ra ba =
       | UseItem (i, iname) -> DoNothing
       | UseMove move -> DoNothing in
       let blue_request = match blue_action with
-      | SendTeamName red_name -> DoNothing
       | SelectStarter startermon -> DoNothing
       | PickSteammon mon -> DoNothing
       | PickInventory inv ->  DoNothing
