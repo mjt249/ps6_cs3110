@@ -47,7 +47,7 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
   (*Ignore any other command.*)
   | _ -> (None, (game_datafication g), None, None)
 
-let init_game () =
+let init_game () : game * request * request * move list * steammon list =
   (* Loading moves list and Steammon list *)
   Initialization.init_pool "moves.csv" "steammon.csv";
   let mvs = hash_to_list Initialization.move_table in
