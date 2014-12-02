@@ -21,14 +21,27 @@ let game_from_data (game_data:game_status_data) : game =
 
                         (* Youngster, upon challenging a stranger to battle *)
 
-let action_handler (g:game) (c:color) (a:action) : command = 
-  match a with
-  | SelectStarter startermon -> DoNothing
-  | PickSteammon mon -> DoNothing
-  | PickInventory inv ->  DoNothing
-  | SwitchSteammon mon -> DoNothing
-  | UseItem (i, iname) -> DoNothing
-  | UseMove move -> DoNothing 
+(* If an invalid message or a message is missing, this 
+ * method performs the default expected action and returns a 
+ * game_output and a game_result if exists *)
+let default_action (g:game) (c:color) : action = 
+  match c with
+  | Red -> GameState.get_red_exp g
+  | Blue -> GameState.get_blue_exp g
+
+(* Given the two actions, completes the action of the player 
+ * running first and then completes the second. Returns a tuple
+ * of command for red palyer, command for blue player and a result *)
+let action_handler (g:game) (ra:action) (ba: action) : 
+  command * command * game_result option = 
+  (*TODO*)
+  match ra with
+  | SelectStarter startermon -> (DoNothing, DoNothing, None)
+  | PickSteammon mon -> (DoNothing, DoNothing, None)
+  | PickInventory inv -> (DoNothing, DoNothing, None)
+  | SwitchSteammon mon -> (DoNothing, DoNothing, None)
+  | UseItem (i, iname) -> (DoNothing, DoNothing, None)
+  | UseMove move -> (DoNothing, DoNothing, None)
   | SendTeamName _ -> failwith "Both team names updated already."
 
 let handle_step (g:game) (ra:command) (ba:command) : game_output =
@@ -37,22 +50,35 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
   (*Initial team name response to update the GUI *)
   | (Action (SendTeamName red_name), Action (SendTeamName blue_name)) ->
       Netgraphics.send_update (InitGraphics (red_name, blue_name));
+      (*TODO*)
       (None, (game_datafication g), None, None)
 
   (* Both players respond with an action *)
   | (Action red_action, Action blue_action) ->
-      let red_request = action_handler g Red red_action in
-      let blue_request = action_handler g Blue blue_action in
-      (None, (game_datafication g), Some red_request, Some blue_request)
+      let (red_request, blue_request, result) = 
+        action_handler g red_action blue_action in
+      (result, (game_datafication g), Some red_request, Some blue_request)
 
   (* Only one player responded with an action *)
-  | (DoNothing, Action blue_action) -> 
-      (None, (game_datafication g), None, None)
-  | (Action red_action, DoNothing) -> 
-      (None, (game_datafication g), None, None)
+  | (_, Action blue_action) -> 
+      let red_action = default_action g Red in
+      let (red_request, blue_request, result) = 
+        action_handler g red_action blue_action in
+      (result, (game_datafication g), Some red_request, Some blue_request)
+  | (Action red_action, _) -> 
+      let blue_action = default_action g Blue in
+      let (red_request, blue_request, result) = 
+        action_handler g red_action blue_action in
+      (result, (game_datafication g), Some red_request, Some blue_request)
 
-  (*Ignore any other command.*)
-  | _ -> (None, (game_datafication g), None, None)
+  (* Any other command should make the game run the default action
+   * as defined by 4.6 in write-up *)
+  | _ -> 
+      let blue_action = default_action g Blue in
+      let red_action = default_action g Red in
+      let (red_request, blue_request, result) = 
+        action_handler g red_action blue_action in
+      (result, (game_datafication g), Some red_request, Some blue_request)
 
 let init_game () : game * request * request * move list * steammon list =
   (* Loading moves list and Steammon list *)
@@ -71,6 +97,11 @@ let init_game () : game * request * request * move list * steammon list =
  
 
 (*Function that responds to SendTeamName calls draft_phase*)
-let draft_phase g r b = 
+let draft_phase g r b : game_output= 
+  let red_pick_req = Some PickRequest(Red, g, GameState.get_move_list(g), GameState.get_steammon_list(g)) in
+  let blue_pick_req = Some PickRequest(Blue, g, GameState.get_move_list(g), GameState.get_steammon_list(g)) in
+  Some (GameState.get_game_result(g), GameState.get_game_status_data(g), red_pick_req, blue_pick_req)
+  
   
 
+let handle_num_picks g r b = 42
