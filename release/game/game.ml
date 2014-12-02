@@ -2,6 +2,7 @@ open Definitions
 open Util
 open Constants
 open Netgraphics
+open State
 
 (* You have to implement this. Change it from int to yout own state type*)
 module GameState = State.GameState
@@ -51,3 +52,10 @@ let init_game () =
   let mons = hash_to_list Initialization.mon_table in
   let init_state = GameState.initial_state () in
   (init_state, TeamNameRequest, TeamNameRequest, mvs, mons)
+
+ 
+
+(*Function that responds to SendTeamName calls draft_phase*)
+let draft_phase g r b = 
+  
+
