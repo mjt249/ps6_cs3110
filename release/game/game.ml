@@ -24,9 +24,7 @@ let game_from_data (game_data:game_status_data) : game =
  * method performs the default expected action and returns a 
  * game_output and a game_result if exists *)
 let default_action (g:game) (c:color) : action = 
-  match c with
-  | Red -> GameState.get_red_exp g
-  | Blue -> GameState.get_blue_exp g
+  GameState.get_exp g c
 
 (* Given the two actions, completes the action of the player 
  * running first and then completes the second. Returns a tuple
@@ -49,7 +47,8 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
   (*Initial team name response to update the GUI *)
   | (Action (SendTeamName red_name), Action (SendTeamName blue_name)) ->
       Netgraphics.send_update (InitGraphics (red_name, blue_name));
-      (*TODO*)
+      GameState.set_exp g Red (PickSteammon "");
+      GameState.set_exp g Blue (PickSteammon "");
       (None, (game_datafication g), None, None)
 
   (* Both players respond with an action *)

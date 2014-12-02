@@ -20,6 +20,7 @@ module GameState = struct
     mutable mons : steammon list;
     mutable red : player;
     mutable blue : player;
+    mutable first : color;
   }
 
   let init_red () = {
@@ -41,25 +42,38 @@ module GameState = struct
     mons = [];
     red = init_red ();
     blue = init_blue ();
+    first = Red;
   }
 
-  let get_red_name s = s.red_name
-  let get_blue_name s = s.blue_name
+  let get_name s c = 
+    match c with 
+    | Red -> s.red_name 
+    | Blue -> s.blue_name
   let get_move_list s = s.mvs
   let get_steammon_list s = s.mons
-  let get_red_inv s = s.red.inv
-  let get_blue_inv s = s.blue.inv
-  let get_red_exp s = s.red.expected_action
-  let get_blue_exp s = s.blue.expected_action
+  let get_inv s c = 
+    match c with
+    | Red -> s.red.inv
+    | Blue -> s.blue.inv
+  let get_exp s c = 
+    match c with
+    | Red -> s.red.expected_action
+    | Blue -> s.blue.expected_action
 
-  let set_red_name s name = s.red_name <- (Some name)
-  let set_blue_name s name = s.blue_name <- (Some name)
+  let set_name s c name = 
+    match c with
+    | Red -> s.red_name <- (Some name)
+    | Blue -> s.blue_name <- (Some name)
   let set_move_list s mv_list = s.mvs <- mv_list
   let set_steammon_list s mon_list = s.mons <- mon_list
-  let set_red_inv s inv = s.red.inv <- inv
-  let set_blue_inv s inv = s.blue.inv <- inv
-  let set_red_exp s a = s.red.expected_action <- a
-  let set_blue_exp s a = s.blue.expected_action <- a
+  let set_inv s c inv = 
+    match c with
+    | Red -> s.red.inv <- inv
+    | Blue -> s.blue.inv <- inv
+  let set_exp s c a = 
+    match c with
+    | Red -> s.red.expected_action <- a
+    | blue -> s.blue.expected_action <- a
 
   (* Comparing the constructors for the actions to determine 
    * whether the expected action matches the responded action *)
