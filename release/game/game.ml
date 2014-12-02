@@ -24,7 +24,9 @@ let game_from_data (game_data:game_status_data) : game =
  * method performs the default expected action and returns a 
  * game_output and a game_result if exists *)
 let default_action (g:game) (c:color) : action = 
-  SendTeamName ("Red") (* TODO *)
+  match c with
+  | Red -> GameState.get_red_exp g
+  | Blue -> GameState.get_blue_exp g
 
 (* Given the two actions, completes the action of the player 
  * running first and then completes the second. Returns a tuple

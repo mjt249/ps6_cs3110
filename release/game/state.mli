@@ -13,6 +13,8 @@ module GameState : sig
   val get_steammon_list: state -> steammon list
   val get_red_inv: state -> inventory
   val get_blue_inv: state -> inventory
+  val get_red_exp: state -> action
+  val get_blue_exp: state -> action
 
   val set_red_name: state -> string -> unit
   val set_blue_name: state -> string -> unit
@@ -20,4 +22,6 @@ module GameState : sig
   val set_steammon_list: state -> steammon list -> unit
   val set_red_inv: state -> inventory -> unit
   val set_blue_inv: state -> inventory -> unit
+  val set_red_exp: state -> action -> unit
+  val set_blue_exp: state -> action -> unit
 end
