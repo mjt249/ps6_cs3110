@@ -7,12 +7,16 @@ open Netgraphics
 module GameState = State.GameState
 type game = GameState.state
 
-let game_datafication g =
-	failwith 
-		"This is my grandson. He’s been your rival since you were a baby. 
-		…Erm, what is his name again?"
-
-                        (* Professor Oak, Steammon researcher extraordinaire *)
+let game_datafication (g:game) : game_status_data =
+  let r_mons = GameState.get_player_steammons g Red in
+  let r_inv = GameState.get_inv g Red in
+  let r_creds = GameState.get_creds g Red in
+  let r_team = (r_mons, r_inv, r_creds) in
+  let b_mons = GameState.get_player_steammons g Blue in
+  let b_inv = GameState.get_inv g Blue in
+  let b_creds = GameState.get_creds g Blue in
+  let b_team = (b_mons, b_inv, b_creds) in
+  (r_team, b_team)
 	
 let game_from_data (game_data:game_status_data) : game = 
 	failwith 

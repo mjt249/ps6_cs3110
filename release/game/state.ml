@@ -58,6 +58,10 @@ module GameState = struct
     | Blue -> s.blue_name
   let get_move_list s = s.mvs
   let get_steammon_list s = s.mons
+  let get_player_steammons s c = 
+    match c with
+    | Red -> s.red.steammons
+    | Blue -> s.blue.steammons
   let get_inv s c = 
     match c with
     | Red -> s.red.inv
@@ -66,6 +70,10 @@ module GameState = struct
     match c with
     | Red -> s.red.expected_action
     | Blue -> s.blue.expected_action
+  let get_creds s c = 
+    match c with
+    | Red -> s.red.credits
+    | Blue -> s.blue.credits
 
   let set_name s c name = 
     match c with
@@ -73,6 +81,10 @@ module GameState = struct
     | Blue -> s.blue_name <- (Some name)
   let set_move_list s mv_list = s.mvs <- mv_list
   let set_steammon_list s mon_list = s.mons <- mon_list
+  let set_player_steammons s c l = 
+    match c with
+    | Red -> s.red.steammons <- l
+    | Blue -> s.blue.steammons <- l
   let set_inv s c inv = 
     match c with
     | Red -> s.red.inv <- inv
@@ -80,7 +92,11 @@ module GameState = struct
   let set_exp s c a = 
     match c with
     | Red -> s.red.expected_action <- a
-    | blue -> s.blue.expected_action <- a
+    | Blue -> s.blue.expected_action <- a
+  let set_creds s c m = 
+    match c with
+    | Red -> s.red.credits <- m
+    | Blue -> s.blue.credits <- m
 
   (* Comparing the constructors for the actions to determine 
    * whether the expected action matches the responded action *)
