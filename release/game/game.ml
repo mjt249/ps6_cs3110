@@ -14,13 +14,13 @@ let game_datafication g =
 
                         (* Professor Oak, Steammon researcher extraordinaire *)
 	
-let game_from_data game_data = 
+let game_from_data (game_data:game_status_data) : game = 
 	failwith 
     "I like shorts! They're comfy and easy to wear!"
 
                         (* Youngster, upon challenging a stranger to battle *)
 
-let handle_step g ra ba =
+let handle_step (g:game) (ra:command) (ba:command) : game_output =
   match (ra, ba) with 
   | (Action (SendTeamName red_name), Action (SendTeamName blue_name)) ->
       Netgraphics.send_update (InitGraphics (red_name, blue_name));
@@ -32,14 +32,16 @@ let handle_step g ra ba =
       | PickInventory inv ->  DoNothing
       | SwitchSteammon mon -> DoNothing
       | UseItem (i, iname) -> DoNothing
-      | UseMove move -> DoNothing in
+      | UseMove move -> DoNothing 
+      | SendTeamName _ -> DoNothing in
       let blue_request = match blue_action with
       | SelectStarter startermon -> DoNothing
       | PickSteammon mon -> DoNothing
       | PickInventory inv ->  DoNothing
       | SwitchSteammon mon -> DoNothing
       | UseItem (i, iname) -> DoNothing
-      | UseMove move -> DoNothing in
+      | UseMove move -> DoNothing 
+      | SendTeamName _ -> DoNothing in
       (None, (game_datafication g), Some red_request, Some blue_request)
       
   (*Ignore any other command.*)
@@ -51,4 +53,6 @@ let init_game () =
   let mvs = hash_to_list Initialization.move_table in
   let mons = hash_to_list Initialization.mon_table in
   let init_state = GameState.initial_state () in
+  GameState.set_move_list init_state mvs;
+  GameState.set_steammon_list init_state mons;
   (init_state, TeamNameRequest, TeamNameRequest, mvs, mons)
