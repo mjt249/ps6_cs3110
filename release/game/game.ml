@@ -100,7 +100,7 @@ let init_game () : game * request * request * move list * steammon list =
 let draft_phase g r b : game_output= 
   let red_pick_req = Some PickRequest(Red, g, GameState.get_move_list(g), GameState.get_steammon_list(g)) in
   let blue_pick_req = Some PickRequest(Blue, g, GameState.get_move_list(g), GameState.get_steammon_list(g)) in
-  Some (GameState.get_game_result(g), GameState.get_game_status_data(g), red_pick_req, blue_pick_req)
+  Some (GameState.get_game_result(g), game_from_data, red_pick_req, blue_pick_req)
   
   
 

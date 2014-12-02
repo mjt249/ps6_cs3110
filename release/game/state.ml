@@ -64,7 +64,7 @@ module GameState = struct
 
   (*Needed for requests*)
   let get_game_result s = 42
-  let get_game_status_data s = 42
+  
 
   let set_red_name s name = s.red_name <- (Some name)
   let set_blue_name s name = s.blue_name <- (Some name)
