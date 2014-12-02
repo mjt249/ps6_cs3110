@@ -36,8 +36,8 @@ let game_from_data (game_data:game_status_data) : game =
   GameState.set_creds !game_instance Blue b_creds;
   !game_instance
 
-let draft_phase g ra ba = (DoNothing, DoNothing, None)
-let stocking_inventory g ra ba = (DoNothing, DoNothing, None)
+let draft_phase g ra ba = failwith "Implement draft_phase"
+let stocking_inventory g ra ba = failwith "Implement inventory phase"
 let battle_phase g ra ba = failwith "Implement battle_phase"
 
 (* If an invalid message or a message is missing, this 
@@ -50,7 +50,7 @@ let default_action (g:game) (c:color) : action =
  * running first and then completes the second. Returns a tuple
  * of command for red palyer, command for blue player and a result *)
 let action_handler (g:game) (ra:action) (ba: action) : 
-  command * command * game_result option = 
+  command option * command option * game_result option = 
   let current_phase = GameState.get_phase g in
   match current_phase with
   | GameState.TeamName -> failwith "Both team names updated already."
@@ -110,19 +110,19 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
   | (Action red_action, Action blue_action) ->
       let (red_request, blue_request, result) = 
         action_handler g red_action blue_action in
-      (result, (game_datafication g), Some red_request, Some blue_request)
+      (result, (game_datafication g), red_request, blue_request)
 
   (* Only one player responded with an action *)
   | (_, Action blue_action) -> 
       let red_action = default_action g Red in
       let (red_request, blue_request, result) = 
         action_handler g red_action blue_action in
-      (result, (game_datafication g), Some red_request, Some blue_request)
+      (result, (game_datafication g), red_request, blue_request)
   | (Action red_action, _) -> 
       let blue_action = default_action g Blue in
       let (red_request, blue_request, result) = 
         action_handler g red_action blue_action in
-      (result, (game_datafication g), Some red_request, Some blue_request)
+      (result, (game_datafication g), red_request, blue_request)
 
   (* Any other command should make the game run the default action
    * as defined by 4.6 in write-up *)
@@ -131,7 +131,7 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
       let red_action = default_action g Red in
       let (red_request, blue_request, result) = 
         action_handler g red_action blue_action in
-      (result, (game_datafication g), Some red_request, Some blue_request)
+      (result, (game_datafication g), red_request, blue_request)
 
 let init_game () : game * request * request * move list * steammon list =
   (* Loading moves list and Steammon list *)
