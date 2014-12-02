@@ -1,4 +1,5 @@
 open Definitions
+open Constants
 
 module GameState = struct
   (* State is represented as a record with mutable fields
@@ -11,6 +12,8 @@ module GameState = struct
     mutable inv : inventory;
     mutable active_steammon : steammon option;
     mutable expected_action : action;
+    mutable steammons : steammon list;
+    mutable credits : int;
   }
 
   type state = { 
@@ -27,12 +30,16 @@ module GameState = struct
     inv = []; 
     active_steammon = None;
     expected_action = SendTeamName "Red";
+    steammons = [];
+    credits = cSTEAMMON_CREDITS; 
   }
 
   let init_blue () = {
     inv = []; 
     active_steammon = None;
     expected_action = SendTeamName "Blue";
+    steammons = [];
+    credits = cSTEAMMON_CREDITS; 
   }
 
   let initial_state () = {

@@ -49,7 +49,13 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
       Netgraphics.send_update (InitGraphics (red_name, blue_name));
       GameState.set_exp g Red (PickSteammon "");
       GameState.set_exp g Blue (PickSteammon "");
-      (None, (game_datafication g), None, None)
+      let r_pick_req = 
+        Request (PickRequest (Red, (game_datafication g), 
+        (GameState.get_move_list g), (GameState.get_steammon_list g))) in
+      let b_pick_req = 
+        Request (PickRequest (Blue, (game_datafication g), 
+        (GameState.get_move_list g), (GameState.get_steammon_list g))) in
+      (None, (game_datafication g), Some r_pick_req, Some b_pick_req)
 
   (* Both players respond with an action *)
   | (Action red_action, Action blue_action) ->
