@@ -43,7 +43,41 @@ let action_handler (g:game) (ra:action) (ba: action) :
   | UseMove move -> (DoNothing, DoNothing, None)
   | SendTeamName _ -> failwith "Both team names updated already."
 
+(* check if fainted, need blue counterpart, fix orderings, maybe what I should
+   do is return a new list of steammon and take the head and make it the new active
+   and the rest the remaining ones *)
+let handle_beginning_status_red (g: game) (steammon: steammon list): unit = 
+  let fate = Random.int 101 in
+  match steammon with
+  | [] -> ()
+  | hd::tl when hd.status = None -> handle_beginning_status g tl
+  | hd::tl when hd.status = Some Paralyzed -> 
+     ignore(if is_active_red hd then 
+	      if fate <= cPARALYSIS_CHANCE then set_can_use_moves_red g false
+	      else set_effective_speed_red g ((get_red_eff_speed g) / cPARALYSIS_SLOW)
+	    else ())
+     handle_beginning_status tl
+  | hd::tl when hd.status = Some Asleep ->
+     ignore(if is_active_red hd then 
+	      if fate <= cWAKE_UP_CHANCE then hd.status <- (*make new copy *)
+	      else set_can_use_moves_red false
+	    else ())
+     handle_beginning_status tl
+  | hd::tl when hd.status = Some Frozen ->
+     ignore(if is_active_red hd then 
+	      if fate <= cDEFROST_CHANCE then hd.status <- (*make new copy *)
+	      else set_can_use_moves_red false
+	    else ())
+     handle_beginning_status tl
+  | hd::tl when hd.status = Some Confused ->
+  | hd::tl when hd.status = Some Poisoned ->
+  | hd::tl when hd.status = Some Burned ->     
+	      
+
 let handle_step (g:game) (ra:command) (ba:command) : game_output =
+  (* Handle status effects that occur at beginning of turn *)
+  let steammon_list = GameState.get_steammon_list in
+
   match (ra, ba) with 
 
   (*Initial team name response to update the GUI *)

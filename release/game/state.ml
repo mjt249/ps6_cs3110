@@ -11,6 +11,9 @@ module GameState = struct
     mutable inv : inventory;
     mutable active_steammon : steammon option;
     mutable expected_action : action;
+    mutable can_use_moves: boolean;
+    mutable effective_speed : int;
+    mutable remaining_steammon: steammon option list
   }
 
   type state = { 
@@ -26,12 +29,16 @@ module GameState = struct
     inv = []; 
     active_steammon = None;
     expected_action = SendTeamName "Red";
+    can_use_moves = true;
+    effective_speed = 0;
   }
 
   let init_blue () = {
     inv = []; 
     active_steammon = None;
     expected_action = SendTeamName "Blue";
+    can_use_moves = true;
+    effective_speed = 0;
   }
 
   let initial_state () = {
@@ -46,11 +53,25 @@ module GameState = struct
   let get_red_name s = s.red_name
   let get_blue_name s = s.blue_name
   let get_move_list s = s.mvs
+
   let get_steammon_list s = s.mons
   let get_red_inv s = s.red.inv
   let get_blue_inv s = s.blue.inv
   let get_red_exp s = s.red.expected_action
   let get_blue_exp s = s.blue.expected_action
+  let get_red_steam s = s.red.active_steammon::s.red.remaining_steammon
+  let get_blue_steam s = s.blue.active_steammon::s.blue.remaining_steammon
+  let get_red_eff_speed s = s.red.effective_speed
+  let get_blue_eff_speed s = s.blue.effective_speed
+
+  let is_active_red (s: state) (steam: steammon) = 
+    match s.red.active_steammon with
+    | None -> false
+    | Some mon -> steam.species = mon.species
+    let is_active_blue (s: state) (steam: steammon) = 
+    match s.blue.active_steammon with
+    | None -> false
+    | Some mon -> steam.species = mon.species
 
   let set_red_name s name = s.red_name <- (Some name)
   let set_blue_name s name = s.blue_name <- (Some name)
@@ -60,6 +81,10 @@ module GameState = struct
   let set_blue_inv s inv = s.blue.inv <- inv
   let set_red_exp s a = s.red.expected_action <- a
   let set_blue_exp s a = s.blue.expected_action <- a
+  let set_can_use_moves_red s bool = s.red.can_use_moves <- bool
+  let set_can_use_moves_blue s bool = s.blue.can_use_moves <- bool
+  let set_effective_speed_red s speed = s.red.effective_speed <- speed
+  let set_effective_speed_blue s speed = s.blue.effective_speed <- speed
 
   (* Comparing the constructors for the actions to determine 
    * whether the expected action matches the responded action *)
