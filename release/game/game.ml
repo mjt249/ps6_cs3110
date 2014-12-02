@@ -20,30 +20,36 @@ let game_from_data (game_data:game_status_data) : game =
 
                         (* Youngster, upon challenging a stranger to battle *)
 
+let action_handler (g:game) (c:color) (a:action) : command = 
+  match a with
+  | SelectStarter startermon -> DoNothing
+  | PickSteammon mon -> DoNothing
+  | PickInventory inv ->  DoNothing
+  | SwitchSteammon mon -> DoNothing
+  | UseItem (i, iname) -> DoNothing
+  | UseMove move -> DoNothing 
+  | SendTeamName _ -> failwith "Both team names updated already."
+
 let handle_step (g:game) (ra:command) (ba:command) : game_output =
   match (ra, ba) with 
+
+  (*Initial team name response to update the GUI *)
   | (Action (SendTeamName red_name), Action (SendTeamName blue_name)) ->
       Netgraphics.send_update (InitGraphics (red_name, blue_name));
       (None, (game_datafication g), None, None)
+
+  (* Both players respond with an action *)
   | (Action red_action, Action blue_action) ->
-      let red_request = match red_action with
-      | SelectStarter startermon -> DoNothing
-      | PickSteammon mon -> DoNothing
-      | PickInventory inv ->  DoNothing
-      | SwitchSteammon mon -> DoNothing
-      | UseItem (i, iname) -> DoNothing
-      | UseMove move -> DoNothing 
-      | SendTeamName _ -> DoNothing in
-      let blue_request = match blue_action with
-      | SelectStarter startermon -> DoNothing
-      | PickSteammon mon -> DoNothing
-      | PickInventory inv ->  DoNothing
-      | SwitchSteammon mon -> DoNothing
-      | UseItem (i, iname) -> DoNothing
-      | UseMove move -> DoNothing 
-      | SendTeamName _ -> DoNothing in
+      let red_request = action_handler g Red red_action in
+      let blue_request = action_handler g Blue blue_action in
       (None, (game_datafication g), Some red_request, Some blue_request)
-      
+
+  (* Only one player responded with an action *)
+  | (DoNothing, Action blue_action) -> 
+      (None, (game_datafication g), None, None)
+  | (Action red_action, DoNothing) -> 
+      (None, (game_datafication g), None, None)
+
   (*Ignore any other command.*)
   | _ -> (None, (game_datafication g), None, None)
 
