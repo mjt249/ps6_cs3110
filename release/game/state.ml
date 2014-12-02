@@ -9,10 +9,17 @@ module GameState = struct
    * happen should get updated using setters. All reads should 
    * be performed via getters. *)
   type phase = TeamName | Draft | Inventory | Battle
+  exception NO_ACTIVE_STEAMMON
+
+  type active_steammon = {
+    mutable mon : steammon;
+    mutable can_use_moves : bool;
+    mutable effective_speed : int;
+  }
 
   type player = {
     mutable inv : inventory;
-    mutable active_steammon : steammon option;
+    mutable active_mon : active_steammon option;
     mutable expected_action : action;
     mutable steammons : steammon list;
     mutable credits : int;
@@ -31,7 +38,7 @@ module GameState = struct
 
   let init_red () = {
     inv = []; 
-    active_steammon = None;
+    active_mon = None;
     expected_action = SendTeamName "Red";
     steammons = [];
     credits = cSTEAMMON_CREDITS; 
@@ -39,7 +46,7 @@ module GameState = struct
 
   let init_blue () = {
     inv = []; 
-    active_steammon = None;
+    active_mon = None;
     expected_action = SendTeamName "Blue";
     steammons = [];
     credits = cSTEAMMON_CREDITS; 
@@ -61,11 +68,29 @@ module GameState = struct
     | Red -> s.red_name 
     | Blue -> s.blue_name
   let get_move_list s = s.mvs
+
   let get_steammon_list s = s.mons
-  let get_player_steammons s c = 
+
+  (* ************************* *)
+  (* might not need 
+  let is_active_red (s: state) (steam: steammon) = 
+    match s.red.active_steammon with
+    | None -> false
+    | Some mon -> steam.species = mon.species
+  let is_active_blue (s: state) (steam: steammon) = 
+    match s.blue.active_steammon with
+    | None -> false
+    | Some mon -> steam.species = mon.species
+   *)
+
+  let get_player_steammons s c  = 
     match c with
-    | Red -> s.red.steammons
-    | Blue -> s.blue.steammons
+    | Red -> (match s.red.active_mon with
+	     | None -> s.red.steammons
+	     | Some x -> x.mon::s.red.steammons)
+    | Blue -> match s.blue.active_mon with
+	     | None -> s.blue.steammons
+	     | Some x -> x.mon::s.blue.steammons
   let get_inv s c = 
     match c with
     | Red -> s.red.inv
@@ -80,6 +105,15 @@ module GameState = struct
     | Blue -> s.blue.credits
   let get_phase s = 
     s.phase
+
+  let get_eff_speed s c = 
+    match c with
+    | Red -> (match s.red.active_mon with
+	     | None -> 0
+	     | Some x -> x.effective_speed)
+    | Blue -> match s.blue.active_mon with
+	     | None -> 0
+	     | Some x -> x.effective_speed
 
   let set_name s c name = 
     match c with
@@ -105,6 +139,22 @@ module GameState = struct
     | Blue -> s.blue.credits <- m
   let set_phase s p =
     s.phase <- p
+  let set_can_use_moves s c boolean = 
+    match c with
+    | Red -> (match s.red.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON
+	     | Some x -> x.can_use_moves <- boolean)
+    | Blue -> match s.blue.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON
+	     | Some x -> x.can_use_moves <- boolean
+  let set_eff_speed s c speed = 
+    match c with
+    | Red -> (match s.red.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON
+	     | Some x -> x.effective_speed <- speed)
+    | Blue -> match s.blue.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON
+	     | Some x -> x.effective_speed <- speed
 
   (* Comparing the constructors for the actions to determine 
    * whether the expected action matches the responded action *)
