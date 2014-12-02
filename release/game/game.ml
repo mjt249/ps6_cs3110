@@ -36,6 +36,10 @@ let game_from_data (game_data:game_status_data) : game =
   GameState.set_creds !game_instance Blue b_creds;
   !game_instance
 
+let draft_phase g ra ba = (DoNothing, DoNothing, None)
+let stocking_inventory g ra ba = (DoNothing, DoNothing, None)
+let battle_phase g ra ba = (DoNothing, DoNothing, None)
+
 (* If an invalid message or a message is missing, this 
  * method performs the default expected action and returns a 
  * game_output and a game_result if exists *)
@@ -47,15 +51,12 @@ let default_action (g:game) (c:color) : action =
  * of command for red palyer, command for blue player and a result *)
 let action_handler (g:game) (ra:action) (ba: action) : 
   command * command * game_result option = 
-  (*TODO*)
-  match ra with
-  | SelectStarter startermon -> (DoNothing, DoNothing, None)
-  | PickSteammon mon -> (DoNothing, DoNothing, None)
-  | PickInventory inv -> (DoNothing, DoNothing, None)
-  | SwitchSteammon mon -> (DoNothing, DoNothing, None)
-  | UseItem (i, iname) -> (DoNothing, DoNothing, None)
-  | UseMove move -> (DoNothing, DoNothing, None)
-  | SendTeamName _ -> failwith "Both team names updated already."
+  let current_phase = GameState.get_phase g in
+  match current_phase with
+  | GameState.TeamName -> failwith "Both team names updated already."
+  | GameState.Draft -> draft_phase g ra ba
+  | GameState.Inventory -> stocking_inventory g ra ba
+  | GameState.Battle -> battle_phase g ra ba
 
 let handle_step (g:game) (ra:command) (ba:command) : game_output =
   match (ra, ba) with 

@@ -2,6 +2,7 @@ open Definitions
 
 module GameState : sig 
   type state
+  type phase = TeamName | Draft | Inventory | Battle
 
   (* Create a blank state with all needed state variables 
    * initialized to begin the draft phase of the game *)
@@ -14,6 +15,7 @@ module GameState : sig
   val get_inv: state -> color -> inventory
   val get_exp: state -> color -> action
   val get_creds: state -> color -> int
+  val get_phase: state -> phase
 
   val set_name: state -> color -> string -> unit
   val set_move_list: state -> move list -> unit
@@ -22,4 +24,5 @@ module GameState : sig
   val set_inv: state -> color -> inventory -> unit
   val set_exp: state -> color -> action -> unit
   val set_creds: state -> color -> int -> unit
+  val set_phase: state -> phase -> unit
 end

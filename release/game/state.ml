@@ -8,6 +8,8 @@ module GameState = struct
    * all internal mutating of the fields when game actions
    * happen should get updated using setters. All reads should 
    * be performed via getters. *)
+  type phase = TeamName | Draft | Inventory | Battle
+
   type player = {
     mutable inv : inventory;
     mutable active_steammon : steammon option;
@@ -24,6 +26,7 @@ module GameState = struct
     mutable red : player;
     mutable blue : player;
     mutable first : color;
+    mutable phase : phase;
   }
 
   let init_red () = {
@@ -50,6 +53,7 @@ module GameState = struct
     red = init_red ();
     blue = init_blue ();
     first = Red;
+    phase = TeamName;
   }
 
   let get_name s c = 
@@ -74,6 +78,8 @@ module GameState = struct
     match c with
     | Red -> s.red.credits
     | Blue -> s.blue.credits
+  let get_phase s = 
+    s.phase
 
   let set_name s c name = 
     match c with
@@ -97,6 +103,8 @@ module GameState = struct
     match c with
     | Red -> s.red.credits <- m
     | Blue -> s.blue.credits <- m
+  let set_phase s p =
+    s.phase <- p
 
   (* Comparing the constructors for the actions to determine 
    * whether the expected action matches the responded action *)
