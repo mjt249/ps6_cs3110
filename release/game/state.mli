@@ -7,21 +7,23 @@ module GameState : sig
    * initialized to begin the draft phase of the game *)
   val initial_state: unit -> state
 
-  val get_red_name: state -> string option
-  val get_blue_name: state -> string option
+  val get_name: state -> color -> string option
   val get_move_list: state -> move list
   val get_steammon_list: state -> steammon list
-  val get_red_inv: state -> inventory
-  val get_blue_inv: state -> inventory
-  val get_red_exp: state -> action
-  val get_blue_exp: state -> action
 
-  val set_red_name: state -> string -> unit
-  val set_blue_name: state -> string -> unit
+  val get_player_steammons: state -> color -> steammon list
+  val get_inv: state -> color -> inventory
+  val get_exp: state -> color -> action
+  val get_creds: state -> color -> int
+
+
+  val set_name: state -> color -> string -> unit
   val set_move_list: state -> move list -> unit
   val set_steammon_list: state -> steammon list -> unit
-  val set_red_inv: state -> inventory -> unit
-  val set_blue_inv: state -> inventory -> unit
-  val set_red_exp: state -> action -> unit
-  val set_blue_exp: state -> action -> unit
+
+  val set_player_steammons: state -> color -> steammon list -> unit
+  val set_inv: state -> color -> inventory -> unit
+  val set_exp: state -> color -> action -> unit
+  val set_creds: state -> color -> int -> unit
+
 end
