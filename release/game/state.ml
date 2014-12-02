@@ -1,6 +1,12 @@
 open Definitions
 
 module GameState = struct
+  (* State is represented as a record with mutable fields
+   * to store mutating game state. The 'game' type used by 
+   * server and game should be set to GameState.state and
+   * all internal mutating of the fields when game actions
+   * happen should get updated using setters. All reads should 
+   * be performed via getters. *)
   type state = { 
     mutable red_name : string option;
     mutable blue_name : string option;

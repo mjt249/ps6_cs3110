@@ -52,7 +52,11 @@ let init_game () =
   Initialization.init_pool "moves.csv" "steammon.csv";
   let mvs = hash_to_list Initialization.move_table in
   let mons = hash_to_list Initialization.mon_table in
+
+  (* Creating a blank state for the beginning of the game *)
   let init_state = GameState.initial_state () in
+
+  (* Setting the move list and the Steammon list for the game *)
   GameState.set_move_list init_state mvs;
   GameState.set_steammon_list init_state mons;
   (init_state, TeamNameRequest, TeamNameRequest, mvs, mons)

@@ -3,6 +3,8 @@ open Definitions
 module GameState : sig 
   type state
 
+  (* Create a blank state with all needed state variables 
+   * initialized to begin the draft phase of the game *)
   val initial_state: unit -> state
 
   val get_red_name: state -> string option
