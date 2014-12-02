@@ -38,7 +38,7 @@ let game_from_data (game_data:game_status_data) : game =
 
 let draft_phase g ra ba = (DoNothing, DoNothing, None)
 let stocking_inventory g ra ba = (DoNothing, DoNothing, None)
-let battle_phase g ra ba = (DoNothing, DoNothing, None)
+let battle_phase g ra ba = failwith "Implement battle_phase"
 
 (* If an invalid message or a message is missing, this 
  * method performs the default expected action and returns a 
