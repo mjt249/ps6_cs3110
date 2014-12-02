@@ -60,4 +60,21 @@ module GameState = struct
   let set_blue_inv s inv = s.blue.inv <- inv
   let set_red_exp s a = s.red.expected_action <- a
   let set_blue_exp s a = s.blue.expected_action <- a
+
+  (* Comparing the constructors for the actions to determine 
+   * whether the expected action matches the responded action *)
+  let compare_expected_action (s:state) (c:color) (ac:action) : bool =
+    let exp_action = match c with
+    | Red -> s.red.expected_action
+    | Blue -> s.blue.expected_action in
+
+    match (ac, exp_action) with
+    | (SendTeamName _, SendTeamName _) -> true      
+    | (SelectStarter _, SelectStarter _) -> true
+    | (PickSteammon _, PickSteammon _) -> true
+    | (PickInventory _, PickInventory _) -> true
+    | (SwitchSteammon _, SwitchSteammon _) -> true
+    | (UseItem _, UseItem _) -> true
+    | (UseMove _, UseMove _) -> true
+    | _ -> false
 end
