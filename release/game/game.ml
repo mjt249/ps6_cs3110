@@ -37,8 +37,25 @@ let game_from_data (game_data:game_status_data) : game =
   !game_instance
 
 let draft_phase g ra ba = failwith "Implement draft_phase"
-let stocking_inventory g ra ba = failwith "Implement inventory phase"
-
+let stock_inventories g rc bc =
+  let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 
+                  cCOST_XATTACK; cCOST_XDEFEND; cCOST_XSPEED] in
+  let default_inv = [cNUM_ETHER; cNUM_MAX_POTION; cNUM_REVIVE; cNUM_FULL_HEAL; 
+                     cNUM_XATTACK; cNUM_XDEFENSE; cNUM_XSPEED] in
+  let stock_inventory_of (c: color) (inv: inventory) = 
+    let cost = List.fold_left2 (fun worth item total -> worth*item + total) 0 cost_lst inv in
+    if cost > cINITIAL_CASH then 
+      GameState.set_inv g c default_inv
+    else
+      GameState.set_inv g c inv in
+  let error_wrapper (c: color) = function
+    | Action (PickInventory inv) -> stock_inventory_of c inv
+    | DoNothing -> stock_inventory_of c default_inv
+    | _ -> failwith "Neither PickInventory nor DoNothing" in
+  error_wrapper Red rc;
+  error_wrapper Blue bc;
+  GameState.set_phase g GameState.Battle;
+  (None, game_datafication g, Some (Request (StarterRequest (game_datafication g))), Some (Request (StarterRequest (game_datafication g))))
 
 (* status effects are only applied to the active Steammon *)
 let handle_beginning_status (g: game) (mon: steammon) (team: color): unit = 
@@ -180,7 +197,7 @@ let handle_step (g:game) (rc:command) (bc:command) : game_output =
   match current_phase with
   | GameState.TeamName -> team_phase g rc bc
   | GameState.Draft -> draft_phase g rc bc
-  | GameState.Inventory -> stocking_inventory g rc bc
+  | GameState.Inventory -> stock_inventories g rc bc
   | GameState.Starter -> battle_starter g rc bc
   | GameState.Battle -> battle_phase g rc bc	      
 
