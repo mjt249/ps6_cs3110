@@ -89,7 +89,10 @@ let battle_starter g c ac : game_result option =
       | (_, None) -> None
       | (_, _) -> failwith "Starter invariant failure 2"
 
-let battle_phase g ra ba = 
+let battle_phase g ra ba :
+  command option * command option * game_result option = 
+  (* Apply the status effects, handle the outstanding actions and
+   * then send out requests depending on whose turn it is *)
   match (GameState.get_active_mon g Red) with
   | _ -> (None, None, None)
 
