@@ -32,7 +32,7 @@ module GameState : sig
   val set_inv: state -> color -> inventory -> unit
   val set_creds: state -> color -> int -> unit
   val set_phase: state -> phase -> unit
-  val set_active_mon: state -> color -> steammon -> unit
+  val set_active_mon: state -> color -> steammon option -> unit
   val set_can_use_moves: state -> color -> bool -> unit
   val set_will_attack_self: state -> color -> bool -> unit
   val set_eff_speed: state -> color -> steammon -> int -> unit
