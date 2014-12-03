@@ -89,6 +89,33 @@ let battle_starter g c ac : game_result option =
       | (_, None) -> None
       | (_, _) -> failwith "Starter invariant failure 2"
 
+(* status effects are only applied to the active Steammon *)
+let handle_beginning_status (g: game) (mon: steammon) (team: color): unit = 
+  let fate = Random.int 100 in
+  let fate2 = Random.int 100 in
+  match mon.status with
+  | None -> ()
+  | Some Paralyzed -> if fate < cPARALYSIS_CHANCE then 
+			GameState.set_can_use_moves g team false
+		      else (GameState.set_eff_speed g team mon 
+			     ((GameState.get_eff_speed g team) / cPARALYSIS_SLOW))
+  | Some Asleep -> if fate < cWAKE_UP_CHANCE then GameState.set_status g team mon None
+		     else GameState.set_can_use_moves g team false
+  | Some Frozen -> if fate < cDEFROST_CHANCE then GameState.set_status g team mon None
+		     else GameState.set_can_use_moves g team false
+  | Some Confused -> if fate < cSNAP_OUT_OF_CONFUSION then 
+		       GameState.set_status g team mon None
+		     else if fate2 < cSELF_ATTACK_CHANCE then 
+		       GameState.set_will_attack_self g team true
+		     else ()
+  | Some Poisoned -> ()
+  | Some Burned -> () (* burn weakness should be checked by seeing if 
+                         status == burned when calculating damage *)
+
+let handle_end_status g mon team : unit =
+  () 
+
+
 let battle_phase g ra ba :
   command option * command option * game_result option = 
   (* Apply the status effects, handle the outstanding actions and
@@ -114,39 +141,7 @@ let action_handler (g:game) (ra:action) (ba: action) :
   | GameState.TeamName -> failwith "Both team names updated already."
   | GameState.Draft -> draft_phase g ra ba
   | GameState.Inventory -> stocking_inventory g ra ba
-  | GameState.Battle -> battle_phase g ra ba
-
-(* check if fainted, need blue counterpart, fix orderings, maybe what I should
-   do is return a new list of steammon and take the head and make it the new active
-   and the rest the remaining ones *)
-(*
-let handle_beginning_status_red (g: game) (steammon: steammon list): unit = 
-  let fate = Random.int 101 in
-  match steammon with
-  | [] -> ()
-  | hd::tl when hd.status = None -> handle_beginning_status g tl
-  | hd::tl when hd.status = Some Paralyzed -> 
-     ignore(if is_active_red hd then 
-	      if fate <= cPARALYSIS_CHANCE then set_can_use_moves_red g false
-	      else set_effective_speed_red g ((get_red_eff_speed g) / cPARALYSIS_SLOW)
-	    else ())
-     handle_beginning_status tl
-  | hd::tl when hd.status = Some Asleep ->
-     ignore(if is_active_red hd then 
-	      if fate <= cWAKE_UP_CHANCE then hd.status <- (*make new copy *)
-	      else set_can_use_moves_red false
-	    else ())
-     handle_beginning_status tl
-  | hd::tl when hd.status = Some Frozen ->
-     ignore(if is_active_red hd then 
-	      if fate <= cDEFROST_CHANCE then hd.status <- (*make new copy *)
-	      else set_can_use_moves_red false
-	    else ())
-     handle_beginning_status tl
-  | hd::tl when hd.status = Some Confused ->
-  | hd::tl when hd.status = Some Poisoned ->
-  | hd::tl when hd.status = Some Burned ->     
- *)	      
+  | GameState.Battle -> battle_phase g ra ba	      
 
 let handle_step (g:game) (ra:command) (ba:command) : game_output =
   (* Handle status effects that occur at end of turn *)

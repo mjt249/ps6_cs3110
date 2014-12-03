@@ -15,6 +15,7 @@ module GameState = struct
   type active_steammon = {
     mutable mon : steammon;
     mutable can_use_moves : bool;
+    mutable will_attack_self : bool;
   }
 
   type player = {
@@ -118,14 +119,15 @@ module GameState = struct
     | Blue -> s.blue.credits
   let get_phase s = 
     s.phase
-  (*let get_eff_speed s c = *)
-    (*match c with*)
-    (*| Red -> (match s.red.active_mon with*)
-			 (*| None -> 0*)
-			 (*| Some x -> x.effective_speed)*)
-    (*| Blue -> match s.blue.active_mon with*)
-			 (*| None -> 0*)
-			 (*| Some x -> x.effective_speed*)
+  (* eff speed of active steammon *)
+  let get_eff_speed s c = 
+    match c with
+    | Red -> (match s.red.active_mon with
+			 | None -> 0
+			 | Some x -> x.mon.speed)
+    | Blue -> match s.blue.active_mon with
+			 | None -> 0
+			 | Some x -> x.mon.speed
   let get_active_mon s c =
     let player = match c with
     | Red -> s.red
@@ -133,6 +135,7 @@ module GameState = struct
     match player.active_mon with
     | None -> None
     | Some active_mon -> Some (active_mon.mon)
+
 
   let set_name s c name = 
     match c with
@@ -160,14 +163,66 @@ module GameState = struct
     | Blue -> match s.blue.active_mon with
 	     | None -> raise NO_ACTIVE_STEAMMON
 	     | Some x -> x.can_use_moves <- boolean
-  (*let set_eff_speed s c speed = *)
-    (*match c with*)
-    (*| Red -> (match s.red.active_mon with*)
-			 (*| None -> raise NO_ACTIVE_STEAMMON*)
-			 (*| Some x -> x.effective_speed <- speed)*)
-    (*| Blue -> match s.blue.active_mon with*)
-			 (*| None -> raise NO_ACTIVE_STEAMMON*)
-			 (*| Some x -> x.effective_speed <- speed*)
+  let set_will_attack_self s c boolean = 
+    match c with
+    | Red -> (match s.red.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON
+	     | Some x -> x.will_attack_self <- boolean)
+    | Blue -> match s.blue.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON
+	     | Some x -> x.will_attack_self <- boolean
+  let set_eff_speed s c mon eff_speed: unit = 
+    let new_mon = { species = mon.species; 
+		    curr_hp = mon.curr_hp; 
+		    max_hp = mon.max_hp;
+		    first_type = mon.first_type;
+		    second_type = mon.second_type;
+		    first_move = mon.first_move;
+		    second_move = mon.second_move;
+		    third_move = mon.third_move;
+		    fourth_move = mon.fourth_move;
+		    attack = mon.attack;
+		    spl_attack = mon.spl_attack;
+		    defense = mon.defense;
+		    spl_defense = mon.spl_defense;
+		    speed = eff_speed;
+		    status = mon.status;
+		    mods = mon.mods;
+		    cost = mon.cost } in
+    match c with
+    | Red -> (match s.red.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON 
+	     | Some x -> x.mon <- new_mon)
+    | Blue -> match s.blue.active_mon with
+	      | None -> raise NO_ACTIVE_STEAMMON
+	      | Some x -> x.mon <- new_mon
+  (* applies to currently active steammon *)
+  let set_status s c mon stat : unit = 
+    let new_mon = { species = mon.species; 
+		    curr_hp = mon.curr_hp; 
+		    max_hp = mon.max_hp;
+		    first_type = mon.first_type;
+		    second_type = mon.second_type;
+		    first_move = mon.first_move;
+		    second_move = mon.second_move;
+		    third_move = mon.third_move;
+		    fourth_move = mon.fourth_move;
+		    attack = mon.attack;
+		    spl_attack = mon.spl_attack;
+		    defense = mon.defense;
+		    spl_defense = mon.spl_defense;
+		    speed = mon.speed;
+		    status = stat;
+		    mods = mon.mods;
+		    cost = mon.cost } in
+    match c with
+    | Red -> (match s.red.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON 
+	     | Some x -> x.mon <- new_mon)
+    | Blue -> match s.blue.active_mon with
+	      | None -> raise NO_ACTIVE_STEAMMON
+	      | Some x -> x.mon <- new_mon
+
   let set_active_mon s c m =
     (* Update ALL FIELDS OF THE ACTIVE STEAMMON *)
     let player = match c with
@@ -175,7 +230,8 @@ module GameState = struct
     | Blue -> s.blue in
     match player.active_mon with
     | Some active_mon -> active_mon.mon <- m
-    | None -> player.active_mon <- (Some ({mon = m; can_use_moves = true;}))
+    | None -> player.active_mon <- (Some ({mon = m; can_use_moves = true; 
+					   will_attack_self = false}))
 
   let add_reserve_steammon s c m = 
     let player = match c with
@@ -203,7 +259,8 @@ module GameState = struct
     match player.active_mon with
     | None -> 
         remove_reserve_steammon s c m;
-        player.active_mon <- (Some ({mon = m; can_use_moves = true;}))
+        player.active_mon <- (Some ({mon = m; can_use_moves = true; 
+				     will_attack_self = false;}))
     | Some active_mon -> 
         remove_reserve_steammon s c m;
         add_reserve_steammon s c active_mon.mon;
