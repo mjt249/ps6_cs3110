@@ -36,9 +36,26 @@ let game_from_data (game_data:game_status_data) : game =
   GameState.set_creds !game_instance Blue b_creds;
   !game_instance
 
-let draft_phase g ra ba = failwith "Implement draft_phase"
-let stocking_inventory g ra ba = failwith "Implement inventory phase"
-
+let draft_phase g ra ba = failwith "Implement draft_phase"  
+let stock_inventories g rc bc =
+  let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 
+                  cCOST_XATTACK; cCOST_XDEFEND; cCOST_XSPEED] in
+  let default_inv = [cNUM_ETHER; cNUM_MAX_POTION; cNUM_REVIVE; cNUM_FULL_HEAL; 
+                     cNUM_XATTACK; cNUM_XDEFENSE; cNUM_XSPEED] in
+  let stock_inventory_of (c: color) (inv: inventory) = 
+    let cost = List.fold_left2 (fun worth item total -> worth*item + total) 0 cost_lst inv in
+    if cost > cSTEAMMON_CREDITS then 
+      GameState.set_inv g c default_inv
+    else
+      GameState.set_inv g c inv in
+  let error_wrapper (c: color) = function
+    | Action (PickInventory inv) -> stock_inventory_of c inv
+    | DoNothing -> stock_inventory_of c default_inv
+    | _ -> failwith "Neither PickInventory nor DoNothing" in
+  error_wrapper Red rc;
+  error_wrapper Blue bc;
+  (Some (Request (StarterRequest (game_datafication g))),
+    Some (Request (StarterRequest (game_datafication g))), None) 
 (* steammon if there exists at least one steammon that has not fainted,
  * None otherwise *)
 let rec faint_check (lst:steammon list) : steammon option =
@@ -89,32 +106,30 @@ let battle_starter g c ac : game_result option =
       | (_, None) -> None
       | (_, _) -> failwith "Starter invariant failure 2"
 
-let battle_phase g ra ba :
+let battle_phase g rc bc :
   command option * command option * game_result option = 
   (* Apply the status effects, handle the outstanding actions and
    * then send out requests depending on whose turn it is *)
   match (GameState.get_active_mon g Red) with
   | _ -> (None, None, None)
 
-(* If an invalid message or a message is missing, this 
- * method performs the default expected action and returns a 
- * game_output and a game_result if exists *)
+(*no more expected_action in state
 let default_action (g:game) (c:color) : action = 
-  GameState.get_exp g c
+  GameState.get_exp g c *)
 
 (* Given the two actions, completes the action of the player 
  * running first and then completes the second. Returns a tuple
  * of command for red palyer, command for blue player and a result 
  * Each function's output called by the action handler should match the 
  * output of the action_handler *)
-let action_handler (g:game) (ra:action) (ba: action) : 
+let action_handler (g:game) (rc: command) (bc: command) : 
   command option * command option * game_result option = 
   let current_phase = GameState.get_phase g in
   match current_phase with
   | GameState.TeamName -> failwith "Both team names updated already."
-  | GameState.Draft -> draft_phase g ra ba
-  | GameState.Inventory -> stocking_inventory g ra ba
-  | GameState.Battle -> battle_phase g ra ba
+  | GameState.Draft -> draft_phase g rc bc
+  | GameState.Inventory -> stock_inventories g rc bc
+  | GameState.Battle -> battle_phase g rc bc
 
 (* check if fainted, need blue counterpart, fix orderings, maybe what I should
    do is return a new list of steammon and take the head and make it the new active
@@ -154,8 +169,8 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
   (*Initial team name response to update the GUI *)
   | (Action (SendTeamName red_name), Action (SendTeamName blue_name)) ->
       Netgraphics.send_update (InitGraphics (red_name, blue_name));
-      GameState.set_exp g Red (PickSteammon "");
-      GameState.set_exp g Blue (PickSteammon "");
+      (*GameState.set_exp g Red (PickSteammon "");
+      GameState.set_exp g Blue (PickSteammon "");*)
       let r_pick_req = 
         Request (PickRequest (Red, (game_datafication g), 
         (GameState.get_move_list g), (GameState.get_steammon_list g Red))) in
@@ -164,12 +179,13 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
         (GameState.get_move_list g), (GameState.get_steammon_list g Red))) in
       (None, (game_datafication g), Some r_pick_req, Some b_pick_req)
 
-  (* Both players respond with an action *)
-  | (Action red_action, Action blue_action) ->
+  (*commands that aren't the init*)
+  | _, _ ->
       let (red_request, blue_request, result) = 
-        action_handler g red_action blue_action in
+        action_handler g ra ba in
       (result, (game_datafication g), red_request, blue_request)
 
+  (*WON'T REACH THESE CASES ANYMORE
   (* Only one player responded with an action *)
   | (_, Action blue_action) -> 
       let red_action = default_action g Red in
@@ -189,7 +205,7 @@ let handle_step (g:game) (ra:command) (ba:command) : game_output =
       let red_action = default_action g Red in
       let (red_request, blue_request, result) = 
         action_handler g red_action blue_action in
-      (result, (game_datafication g), red_request, blue_request)
+      (result, (game_datafication g), red_request, blue_request) *)
 
 let init_game () : game * request * request * move list * steammon list =
   (* Creating a blank state for the beginning of the game *)

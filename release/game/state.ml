@@ -108,10 +108,11 @@ module GameState = struct
     match c with
     | Red -> s.red.inv
     | Blue -> s.blue.inv
+  (*no more expected action in state
   let get_exp s c = 
     match c with
     | Red -> s.red.expected_action
-    | Blue -> s.blue.expected_action
+    | Blue -> s.blue.expected_action *)
   let get_creds s c = 
     match c with
     | Red -> s.red.credits
@@ -142,10 +143,11 @@ module GameState = struct
     match c with
     | Red -> s.red.inv <- inv
     | Blue -> s.blue.inv <- inv
+  (* no more expected action in state
   let set_exp s c a = 
     match c with
     | Red -> s.red.expected_action <- a
-    | Blue -> s.blue.expected_action <- a
+    | Blue -> s.blue.expected_action <- a*)
   let set_creds s c m = 
     match c with
     | Red -> s.red.credits <- m
