@@ -78,16 +78,6 @@ let team_phase g rc bc =
 
 let draft_phase g ra ba = failwith "Implement draft_phase"
 
-
-
-
-
-
-
-
-
-
-
 let stock_inventories g rc bc =
   let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 
                   cCOST_XATTACK; cCOST_XDEFEND; cCOST_XSPEED] in
