@@ -25,7 +25,8 @@ module GameState = struct
     mutable mons : steammon list;
     mutable red : player;
     mutable blue : player;
-    mutable first : color;
+    mutable turn: color;
+
   }
 
   let init_red () = {
@@ -92,6 +93,9 @@ module GameState = struct
     | Red -> s.red.credits
     | Blue -> s.blue.credits
 
+  let get_turn s : color = s.turn
+
+
 
   let set_name s c name = 
     match c with
@@ -116,6 +120,9 @@ module GameState = struct
     match c with
     | Red -> s.red.credits <- m
     | Blue -> s.blue.credits <- m
+
+  let set_turn s c = 
+      s.turn = c
 
 
   (* Comparing the constructors for the actions to determine 
