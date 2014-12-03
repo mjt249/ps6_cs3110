@@ -3,7 +3,7 @@ open Util
 
 module GameState : sig 
   type state
-  type phase = TeamName | Draft | Inventory | Battle
+  type phase = TeamName | Draft | Inventory | Starter | Battle
 
   (* Create a blank state with all needed state variables 
    * initialized to begin the draft phase of the game *)

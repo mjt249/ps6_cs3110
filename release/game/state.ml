@@ -9,7 +9,7 @@ module GameState = struct
    * all internal mutating of the fields when game actions
    * happen should get updated using setters. All reads should 
    * be performed via getters. *)
-  type phase = TeamName | Draft | Inventory | Battle
+  type phase = TeamName | Draft | Inventory | Starter | Battle
   exception NO_ACTIVE_STEAMMON
 
   type active_steammon = {

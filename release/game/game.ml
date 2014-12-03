@@ -117,24 +117,33 @@ let valid_steammon s reserve_pool : bool =
 (*Sets the active steammon from reserve_pool if the active steammon*)
 (*faints or has not been chosen yet. If all reserve steammons are 
  *fainted, a game_result is set.*)
-let battle_starter g c ac : game_result option =
-  let reserve_pool = GameState.get_reserve_pool g c in
-  match ac with
-  | SelectStarter s when (valid_steammon s reserve_pool) ->
-      let mon = Table.find reserve_pool s in
-      GameState.swap_active_steammon g c mon;
-      None
+let battle_starter g rc bc : game_output = 
+  let r_reserve_pool = GameState.get_reserve_pool g Red in
+  let b_reserve_pool = GameState.get_reserve_pool g Blue in
+  (match rc with
+  | Action (SelectStarter rs) when (valid_steammon rs r_reserve_pool) ->
+      let mon = Table.find r_reserve_pool rs in
+      GameState.swap_active_steammon g Red mon
   | _ -> 
-      match (arbitrary_starter g c) with
-      | (None, None) -> failwith "Starter invariant failure"
-      | (None, res) -> res
-      | (_, None) -> None
-      | (_, _) -> failwith "Starter invariant failure 2"
+      match (arbitrary_starter g Red) with
+      | (Some mon, _) -> GameState.swap_active_steammon g Red mon
+      | (_, _) -> failwith "Starter invariant failure. No steammons in player");
+  (match bc with
+  | Action (SelectStarter bs) when (valid_steammon bs b_reserve_pool) ->
+      let mon = Table.find b_reserve_pool bs in
+      GameState.swap_active_steammon g Blue mon
+  | _ -> 
+      match (arbitrary_starter g Blue) with
+      | (Some mon, _) -> GameState.swap_active_steammon g Blue mon
+      | (_, _) -> failwith "Starter invariant failure. No steammons in player");
+  let game_state = game_datafication g in
+  (None, game_state, Some (Request (ActionRequest game_state)), 
+    Some (Request (ActionRequest game_state)))
 
 let battle_phase g rc bc : game_output = 
   (* Apply the status effects, handle the outstanding actions and
    * then send out requests depending on whose turn it is *)
-  match (GameState.get_active_mon g Red) with
+  match (rc, bc) with
   | _ -> (None, (game_datafication g), None, None)
 
 let team_phase g rc bc = 
@@ -172,6 +181,7 @@ let handle_step (g:game) (rc:command) (bc:command) : game_output =
   | GameState.TeamName -> team_phase g rc bc
   | GameState.Draft -> draft_phase g rc bc
   | GameState.Inventory -> stocking_inventory g rc bc
+  | GameState.Starter -> battle_starter g rc bc
   | GameState.Battle -> battle_phase g rc bc	      
 
 let init_game () : game * request * request * move list * steammon list =
