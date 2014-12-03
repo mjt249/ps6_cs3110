@@ -25,6 +25,9 @@ module GameState : sig
   val get_phase: state -> phase
   val get_active_mon: state -> color -> steammon option
   val get_eff_speed: state -> color -> int 
+  val get_curr_hp: state -> color -> int
+  val get_max_hp: state -> color -> int
+  val get_can_use_moves: state -> color -> bool
 
   val set_name: state -> color -> string -> unit
   val set_inv: state -> color -> inventory -> unit
@@ -36,6 +39,7 @@ module GameState : sig
   val set_will_attack_self: state -> color -> bool -> unit
   val set_eff_speed: state -> color -> steammon -> int -> unit
   val set_status: state -> color -> steammon -> status option -> unit
+  val set_hp: state -> color -> steammon -> int -> unit
 
   val add_reserve_steammon: state -> color -> steammon -> unit
   val remove_reserve_steammon: state -> color -> steammon -> unit

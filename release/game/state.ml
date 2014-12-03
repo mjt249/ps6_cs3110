@@ -135,8 +135,31 @@ module GameState = struct
     match player.active_mon with
     | None -> None
     | Some active_mon -> Some (active_mon.mon)
-
-
+  (* eff speed of active steammon *)
+  let get_curr_hp s c = 
+    match c with
+    | Red -> (match s.red.active_mon with
+			 | None -> 0
+			 | Some x -> x.mon.curr_hp)
+    | Blue -> match s.blue.active_mon with
+			 | None -> 0
+			 | Some x -> x.mon.curr_hp
+  let get_max_hp s c = 
+    match c with
+    | Red -> (match s.red.active_mon with
+			 | None -> 0
+			 | Some x -> x.mon.max_hp)
+    | Blue -> match s.blue.active_mon with
+			 | None -> 0
+			 | Some x -> x.mon.max_hp
+  let get_can_use_moves s c = 
+    match c with
+    | Red -> (match s.red.active_mon with
+			 | None -> raise NO_ACTIVE_STEAMMON
+			 | Some x -> x.can_use_moves)
+    | Blue -> match s.blue.active_mon with
+			 | None -> raise NO_ACTIVE_STEAMMON
+			 | Some x -> x.can_use_moves
   let set_name s c name = 
     match c with
     | Red -> s.red_name <- (Some name)
@@ -197,7 +220,32 @@ module GameState = struct
 	      | None -> raise NO_ACTIVE_STEAMMON
 	      | Some x -> x.mon <- new_mon
   (* applies to currently active steammon *)
-  let set_status s c mon stat : unit = 
+  let set_hp s c mon value : unit = 
+    let new_mon = { species = mon.species; 
+		    curr_hp = value; 
+		    max_hp = mon.max_hp;
+		    first_type = mon.first_type;
+		    second_type = mon.second_type;
+		    first_move = mon.first_move;
+		    second_move = mon.second_move;
+		    third_move = mon.third_move;
+		    fourth_move = mon.fourth_move;
+		    attack = mon.attack;
+		    spl_attack = mon.spl_attack;
+		    defense = mon.defense;
+		    spl_defense = mon.spl_defense;
+		    speed = mon.speed;
+		    status = mon.status;
+		    mods = mon.mods;
+		    cost = mon.cost } in
+    match c with
+    | Red -> (match s.red.active_mon with
+	     | None -> raise NO_ACTIVE_STEAMMON 
+	     | Some x -> x.mon <- new_mon)
+    | Blue -> match s.blue.active_mon with
+	      | None -> raise NO_ACTIVE_STEAMMON
+	      | Some x -> x.mon <- new_mon
+  let set_status s c mon stat: unit = 
     let new_mon = { species = mon.species; 
 		    curr_hp = mon.curr_hp; 
 		    max_hp = mon.max_hp;
@@ -222,7 +270,6 @@ module GameState = struct
     | Blue -> match s.blue.active_mon with
 	      | None -> raise NO_ACTIVE_STEAMMON
 	      | Some x -> x.mon <- new_mon
-
   let set_active_mon s c m =
     (* Update ALL FIELDS OF THE ACTIVE STEAMMON *)
     let player = match c with

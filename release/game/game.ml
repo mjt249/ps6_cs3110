@@ -112,9 +112,24 @@ let handle_beginning_status (g: game) (mon: steammon) (team: color): unit =
   | Some Burned -> () (* burn weakness should be checked by seeing if 
                          status == burned when calculating damage *)
 
+(*Need to check still alive after taking poison and burn damage *)
 let handle_end_status g mon team : unit =
-  () 
-
+  match mon.status with 
+  | None -> ()
+  | Some Asleep -> GameState.set_can_use_moves g team true
+  | Some Frozen -> GameState.set_can_use_moves g team true
+  | Some Confused -> GameState.set_will_attack_self g team false
+  | Some Paralyzed -> if GameState.get_can_use_moves g team = true then
+			GameState.set_eff_speed g team mon 
+			   (GameState.get_eff_speed g team * cPARALYSIS_SLOW)
+		      else GameState.set_can_use_moves g team true
+  | Some Poisoned -> GameState.set_hp g team mon (int_of_float ((
+		       float_of_int (GameState.get_curr_hp g team)) -. 
+		       ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE)))
+  | Some Burned -> GameState.set_hp g team mon (int_of_float ((
+		       float_of_int (GameState.get_curr_hp g team)) -. 
+		       ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
+				    
 
 let battle_phase g ra ba :
   command option * command option * game_result option = 
