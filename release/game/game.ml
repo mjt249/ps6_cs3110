@@ -44,7 +44,7 @@ let stock_inventories g rc bc =
                      cNUM_XATTACK; cNUM_XDEFENSE; cNUM_XSPEED] in
   let stock_inventory_of (c: color) (inv: inventory) = 
     let cost = List.fold_left2 (fun worth item total -> worth*item + total) 0 cost_lst inv in
-    if cost > cSTEAMMON_CREDITS then 
+    if cost > cINITIAL_CASH then 
       GameState.set_inv g c default_inv
     else
       GameState.set_inv g c inv in
