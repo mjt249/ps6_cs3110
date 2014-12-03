@@ -14,6 +14,15 @@ type game = GameState.state
  *)
 let game_instance = ref (GameState.initial_state ()) 
 
+let opp_color c =
+  match c with
+  | Red -> Blue
+  | Blue -> Red 
+
+let valid_steammon s reserve_pool : bool = 
+  (Table.mem reserve_pool s) && 
+    ((Table.find reserve_pool s).curr_hp > 0)
+
 let game_datafication (g:game) : game_status_data =
   let r_mons = GameState.get_steammon_list g Red in
   let r_inv = GameState.get_inv g Red in
@@ -38,7 +47,47 @@ let game_from_data (game_data:game_status_data) : game =
   !game_instance
 
 
+let team_phase g rc bc = 
+  let (red_name, blue_name) = match (rc, bc) with
+  (*Initial team name response to update the GUI *)
+  | (Action (SendTeamName r_name), Action (SendTeamName b_name)) ->
+      (r_name, b_name)
+  | (_ , Action (SendTeamName b_name)) ->
+      ("Red", b_name)
+  | (Action (SendTeamName r_name), _) ->
+      (r_name, "Blue")
+  | (_,_) -> 
+      ("Red", "Blue") in
+  Netgraphics.send_update (InitGraphics (red_name, blue_name));
+  let draft_pick = Random.int 2 in
+  let r_pick_req = 
+    (if draft_pick = 0 then
+      Some (Request (PickRequest (Red, (game_datafication g), 
+        (GameState.get_move_list g), (GameState.get_base_mons g))))
+    else 
+      None) in
+  let b_pick_req = 
+    (if draft_pick = 1 then
+      Some (Request (PickRequest (Blue, (game_datafication g), 
+        (GameState.get_move_list g), (GameState.get_base_mons g))))
+    else
+      None) in
+  GameState.set_phase g GameState.Draft;
+  (None, (game_datafication g), r_pick_req, b_pick_req)
+
+
 let draft_phase g ra ba = failwith "Implement draft_phase"
+
+
+
+
+
+
+
+
+
+
+
 let stock_inventories g rc bc =
   let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 
                   cCOST_XATTACK; cCOST_XDEFEND; cCOST_XSPEED] in
@@ -58,6 +107,54 @@ let stock_inventories g rc bc =
   error_wrapper Blue bc;
   GameState.set_phase g GameState.Battle;
   (None, game_datafication g, Some (Request (StarterRequest (game_datafication g))), Some (Request (StarterRequest (game_datafication g))))
+
+
+(****** STARTER PHASE BEGIN ******)
+
+(*Tries to get an arbitrary_starter steammon, if all steammons have*)
+(*fainted, check whether all the opposing steammons have fainted.*)
+(*If so, game is a tie. If not, the opposing team wins. If there is*)
+(*a steammon on the team that has not fainted, return that steammon.*)
+let arbitrary_starter g c : steammon = 
+  let steammon_list = GameState.get_steammon_list g c in
+  let rec get_steammon lst = 
+    match lst with
+    | [] -> failwith "No steammons with player"
+    | h::t -> 
+        if h.curr_hp > 0 
+        then h
+        else get_steammon t in
+  get_steammon steammon_list
+
+(*Sets the active steammon from reserve_pool if the active steammon*)
+(*faints or has not been chosen yet. If all reserve steammons are 
+ *fainted, a game_result is set.*)
+let battle_starter g rc bc : game_output = 
+  let r_reserve_pool = GameState.get_reserve_pool g Red in
+  let b_reserve_pool = GameState.get_reserve_pool g Blue in
+  (match rc with
+  | Action (SelectStarter rs) when (valid_steammon rs r_reserve_pool) ->
+      let mon = Table.find r_reserve_pool rs in
+      GameState.swap_active_steammon g Red mon
+  | _ -> 
+      let r_mon = arbitrary_starter g Red in
+      GameState.swap_active_steammon g Red r_mon);
+  (match bc with
+  | Action (SelectStarter bs) when (valid_steammon bs b_reserve_pool) ->
+      let mon = Table.find b_reserve_pool bs in
+      GameState.swap_active_steammon g Blue mon
+  | _ -> 
+      let b_mon = arbitrary_starter g Blue in
+      GameState.swap_active_steammon g Blue b_mon);
+  let game_state = game_datafication g in
+  (None, game_state, Some (Request (ActionRequest game_state)), 
+    Some (Request (ActionRequest game_state)))
+
+(****** STARTER PHASE END ******)
+
+
+(****** BATTLE PHASE BEGIN *****)
+
 
 (* status effects are only applied to the active Steammon *)
 let handle_beginning_status (g: game) (mon: steammon) (team: color): unit = 
@@ -99,7 +196,13 @@ let handle_end_status g mon team : unit =
   | Some Burned -> GameState.set_hp g team mon (int_of_float ((
 		       float_of_int (GameState.get_curr_hp g team)) -. 
 		       ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
-				    
+
+let use_item g c (i,s) : unit = failwith "Implement item use"
+let use_move g c move : game_result option = failwith "Implement move use"
+let switch_steammon g c mon : game_result option = failwith "Implement steammon switching"
+let switch_active g c mon : game_result option = failwith "Implement active steammon switch"
+let switch_active_arbitrary g c : game_result option = failwith "Implement active steammon switch"
+
 (* steammon if there exists at least one steammon that has not fainted,
  * None otherwise *)
 let rec faint_check (lst:steammon list) : steammon option =
@@ -110,88 +213,73 @@ let rec faint_check (lst:steammon list) : steammon option =
   | h::t when h.curr_hp > 0 -> Some h
   | h::t -> faint_check t
 
-let opp_color c =
-  match c with
-  | Red -> Blue
-  | Blue -> Red 
+(* Checks whether the active steammon fainted by an action immediately
+ * prior. (Status effect, Move, Inv use etc) *)
+let active_faint_check g c : bool = 
+  match (GameState.get_active_mon g c) with
+  | None -> false
+  | Some s -> s.curr_hp <= 0
 
-(*Tries to get an arbitrary_starter steammon, if all steammons have*)
-(*fainted, check whether all the opposing steammons have fainted.*)
-(*If so, game is a tie. If not, the opposing team wins. If there is*)
-(*a steammon on the team that has not fainted, return that steammon.*)
-let arbitrary_starter g c : steammon option * game_result option = 
-  let steammon_list = GameState.get_steammon_list g c in
-  match (faint_check steammon_list) with
+let battle_action g c comm : game_result option = 
+  match (GameState.get_active_mon g c) with
+  (* Active steammon has fainted, require SelectStarter *)
   | None -> 
-      (let opp_steammon_list = GameState.get_steammon_list g (opp_color c) in
-      match (faint_check opp_steammon_list) with
-      | None -> (None, Some Tie)
-      | _ -> (None, Some (Winner (opp_color c))))
-  | Some s -> (Some s, None)
-
-let valid_steammon s reserve_pool : bool = 
-  (Table.mem reserve_pool s) && 
-    ((Table.find reserve_pool s).curr_hp > 0)
-
-(*Sets the active steammon from reserve_pool if the active steammon*)
-(*faints or has not been chosen yet. If all reserve steammons are 
- *fainted, a game_result is set.*)
-let battle_starter g rc bc : game_output = 
-  let r_reserve_pool = GameState.get_reserve_pool g Red in
-  let b_reserve_pool = GameState.get_reserve_pool g Blue in
-  (match rc with
-  | Action (SelectStarter rs) when (valid_steammon rs r_reserve_pool) ->
-      let mon = Table.find r_reserve_pool rs in
-      GameState.swap_active_steammon g Red mon
-  | _ -> 
-      match (arbitrary_starter g Red) with
-      | (Some mon, _) -> GameState.swap_active_steammon g Red mon
-      | (_, _) -> failwith "Starter invariant failure. No steammons in player");
-  (match bc with
-  | Action (SelectStarter bs) when (valid_steammon bs b_reserve_pool) ->
-      let mon = Table.find b_reserve_pool bs in
-      GameState.swap_active_steammon g Blue mon
-  | _ -> 
-      match (arbitrary_starter g Blue) with
-      | (Some mon, _) -> GameState.swap_active_steammon g Blue mon
-      | (_, _) -> failwith "Starter invariant failure. No steammons in player");
-  let game_state = game_datafication g in
-  (None, game_state, Some (Request (ActionRequest game_state)), 
-    Some (Request (ActionRequest game_state)))
+      (match comm with 
+      | Action (SelectStarter s) -> switch_active g c s 
+      | _ -> switch_active_arbitrary g c)
+  | Some _ ->
+      (match comm with
+      | Action (UseItem (i, s)) -> (use_item g c (i,s)); None
+      | Action (UseMove s) -> use_move g c s
+      | Action (SwitchSteammon s) -> switch_steammon g c s
+      | Action (SelectStarter s) -> switch_active g c s
+      | _ -> None)
 
 let battle_phase g rc bc : game_output = 
   (* Apply the status effects, handle the outstanding actions and
    * then send out requests depending on whose turn it is *)
-  match (rc, bc) with
-  | _ -> (None, (game_datafication g), None, None)
+  (match (GameState.get_active_mon g Red) with
+  | Some mon -> handle_beginning_status g mon Red
+  | None -> () );
+  (match (GameState.get_active_mon g Blue) with
+  | Some mon -> handle_beginning_status g mon Blue
+  | None -> () );
+  
+  (* IMPORTANT< If a steammon faints during handling status, 
+   * we have to bypass resolving actions as per 4.4.4 *)
+  let (faster_action, slower_action, faster_color) = 
+    if (GameState.get_eff_speed g Red) > (GameState.get_eff_speed g Blue) 
+    then (rc, bc, Red) 
+    else (bc, rc, Blue) in
 
-let team_phase g rc bc = 
-  let (red_name, blue_name) = match (rc, bc) with
-  (*Initial team name response to update the GUI *)
-  | (Action (SendTeamName r_name), Action (SendTeamName b_name)) ->
-      (r_name, b_name)
-  | (_ , Action (SendTeamName b_name)) ->
-      ("Red", b_name)
-  | (Action (SendTeamName r_name), _) ->
-      (r_name, "Blue")
-  | (_,_) -> 
-      ("Red", "Blue") in
-  Netgraphics.send_update (InitGraphics (red_name, blue_name));
-  let draft_pick = Random.int 2 in
-  let r_pick_req = 
-    (if draft_pick = 0 then
-      Some (Request (PickRequest (Red, (game_datafication g), 
-        (GameState.get_move_list g), (GameState.get_base_mons g))))
-    else 
-      None) in
-  let b_pick_req = 
-    (if draft_pick = 1 then
-      Some (Request (PickRequest (Blue, (game_datafication g), 
-        (GameState.get_move_list g), (GameState.get_base_mons g))))
-    else
-      None) in
-  GameState.set_phase g GameState.Draft;
-  (None, (game_datafication g), r_pick_req, b_pick_req)
+  let result = battle_action g faster_color faster_action in
+  match result with
+  | Some res -> (Some res, (game_datafication g), None, None)
+  | None -> 
+      let result2 = battle_action g (opp_color faster_color) slower_action in
+      match result2 with
+      | Some res -> (Some res, (game_datafication g), None, None)
+      | None ->
+          (match (GameState.get_active_mon g Red) with
+          | Some mon -> handle_end_status g mon Red
+          | None -> () );
+          (match (GameState.get_active_mon g Blue) with
+          | Some mon -> handle_end_status g mon Blue
+          | None -> () );
+          let r_req = 
+            if (active_faint_check g Red) then
+              Request (StarterRequest (game_datafication g))
+            else 
+              Request (ActionRequest (game_datafication g)) in
+          let b_req = 
+            if (active_faint_check g Blue) then
+              Request (StarterRequest (game_datafication g))
+            else 
+              Request (ActionRequest (game_datafication g)) in
+          (None, (game_datafication g), Some r_req, Some b_req)
+
+(****** BATTLE PHASE END   *****)
+
 
 let handle_step (g:game) (rc:command) (bc:command) : game_output =
   (* Handle status effects that occur at end of turn *)
@@ -215,11 +303,7 @@ let init_game () : game * request * request * move list * steammon list =
 
  
 
-(*Function that responds to SendTeamName calls draft_phase*)
-let draft_phase g r b : game_output= 
-  let red_pick_req = Some PickRequest(Red, g, GameState.get_move_list(g), GameState.get_steammon_list(g)) in
-  let blue_pick_req = Some PickRequest(Blue, g, GameState.get_move_list(g), GameState.get_steammon_list(g)) in
-  Some (GameState.get_game_result(g), game_from_data, red_pick_req, blue_pick_req)
+
   
 
 

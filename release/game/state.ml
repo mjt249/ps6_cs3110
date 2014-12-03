@@ -283,15 +283,19 @@ module GameState = struct
     | Blue -> match s.blue.active_mon with
 	      | None -> raise NO_ACTIVE_STEAMMON
 	      | Some x -> x.mon <- new_mon
-  let set_active_mon s c m =
+  let set_active_mon s c mon =
     (* Update ALL FIELDS OF THE ACTIVE STEAMMON *)
     let player = match c with
     | Red -> s.red
     | Blue -> s.blue in
-    match player.active_mon with
-    | Some active_mon -> active_mon.mon <- m
-    | None -> player.active_mon <- (Some ({mon = m; can_use_moves = true; 
-					   will_attack_self = false}))
+    match mon with 
+    | None -> player.active_mon <- None
+    | Some m -> 
+        match player.active_mon with
+        | Some active_mon -> active_mon.mon <- m
+        | None -> player.active_mon <- 
+              (Some ({mon = m; can_use_moves = true; 
+                       will_attack_self = false}))
 
   let add_reserve_steammon s c m = 
     let player = match c with
