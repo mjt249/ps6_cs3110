@@ -20,7 +20,6 @@ module GameState : sig
   val get_reserve_pool: state -> color -> steammon Table.t
 
   val get_inv: state -> color -> inventory
-  val get_exp: state -> color -> action
   val get_creds: state -> color -> int
   val get_phase: state -> phase
   val get_active_mon: state -> color -> steammon option
@@ -31,7 +30,6 @@ module GameState : sig
 
   val set_name: state -> color -> string -> unit
   val set_inv: state -> color -> inventory -> unit
-  val set_exp: state -> color -> action -> unit
   val set_creds: state -> color -> int -> unit
   val set_phase: state -> phase -> unit
   val set_active_mon: state -> color -> steammon -> unit

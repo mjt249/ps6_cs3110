@@ -21,7 +21,6 @@ module GameState = struct
   type player = {
     mutable inv : inventory;
     mutable active_mon : active_steammon option;
-    mutable expected_action : action;
     mutable steammons : steammon Table.t option;
     mutable credits : int;
   }
@@ -40,7 +39,6 @@ module GameState = struct
   let init_red () = {
     inv = []; 
     active_mon = None;
-    expected_action = SendTeamName "Red";
     steammons = None;
     credits = cSTEAMMON_CREDITS; 
   }
@@ -48,7 +46,6 @@ module GameState = struct
   let init_blue () = {
     inv = []; 
     active_mon = None;
-    expected_action = SendTeamName "Blue";
     steammons = None;
     credits = cSTEAMMON_CREDITS; 
   }
@@ -109,10 +106,6 @@ module GameState = struct
     match c with
     | Red -> s.red.inv
     | Blue -> s.blue.inv
-  let get_exp s c = 
-    match c with
-    | Red -> s.red.expected_action
-    | Blue -> s.blue.expected_action
   let get_creds s c = 
     match c with
     | Red -> s.red.credits
@@ -168,10 +161,6 @@ module GameState = struct
     match c with
     | Red -> s.red.inv <- inv
     | Blue -> s.blue.inv <- inv
-  let set_exp s c a = 
-    match c with
-    | Red -> s.red.expected_action <- a
-    | Blue -> s.blue.expected_action <- a
   let set_creds s c m = 
     match c with
     | Red -> s.red.credits <- m
@@ -315,7 +304,7 @@ module GameState = struct
 
 
   (* Comparing the constructors for the actions to determine 
-   * whether the expected action matches the responded action *)
+   * whether the expected action matches the responded action 
   let compare_expected_action (s:state) (c:color) (ac:action) : bool =
     let exp_action = match c with
     | Red -> s.red.expected_action
@@ -329,5 +318,5 @@ module GameState = struct
     | (SwitchSteammon _, SwitchSteammon _) -> true
     | (UseItem _, UseItem _) -> true
     | (UseMove _, UseMove _) -> true
-    | _ -> false
+    | _ -> false *)
 end

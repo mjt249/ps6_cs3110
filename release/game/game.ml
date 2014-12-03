@@ -39,6 +39,48 @@ let game_from_data (game_data:game_status_data) : game =
 let draft_phase g ra ba = failwith "Implement draft_phase"
 let stocking_inventory g ra ba = failwith "Implement inventory phase"
 
+
+(* status effects are only applied to the active Steammon *)
+let handle_beginning_status (g: game) (mon: steammon) (team: color): unit = 
+  let fate = Random.int 100 in
+  let fate2 = Random.int 100 in
+  match mon.status with
+  | None -> ()
+  | Some Paralyzed -> if fate < cPARALYSIS_CHANCE then 
+			GameState.set_can_use_moves g team false
+		      else (GameState.set_eff_speed g team mon 
+			     ((GameState.get_eff_speed g team) / cPARALYSIS_SLOW))
+  | Some Asleep -> if fate < cWAKE_UP_CHANCE then GameState.set_status g team mon None
+		     else GameState.set_can_use_moves g team false
+  | Some Frozen -> if fate < cDEFROST_CHANCE then GameState.set_status g team mon None
+		     else GameState.set_can_use_moves g team false
+  | Some Confused -> if fate < cSNAP_OUT_OF_CONFUSION then 
+		       GameState.set_status g team mon None
+		     else if fate2 < cSELF_ATTACK_CHANCE then 
+		       GameState.set_will_attack_self g team true
+		     else ()
+  | Some Poisoned -> ()
+  | Some Burned -> () (* burn weakness should be checked by seeing if 
+                         status == burned when calculating damage *)
+
+(*Need to check still alive after taking poison and burn damage *)
+let handle_end_status g mon team : unit =
+  match mon.status with 
+  | None -> ()
+  | Some Asleep -> GameState.set_can_use_moves g team true
+  | Some Frozen -> GameState.set_can_use_moves g team true
+  | Some Confused -> GameState.set_will_attack_self g team false
+  | Some Paralyzed -> if GameState.get_can_use_moves g team = true then
+			GameState.set_eff_speed g team mon 
+			   (GameState.get_eff_speed g team * cPARALYSIS_SLOW)
+		      else GameState.set_can_use_moves g team true
+  | Some Poisoned -> GameState.set_hp g team mon (int_of_float ((
+		       float_of_int (GameState.get_curr_hp g team)) -. 
+		       ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE)))
+  | Some Burned -> GameState.set_hp g team mon (int_of_float ((
+		       float_of_int (GameState.get_curr_hp g team)) -. 
+		       ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
+				    
 (* steammon if there exists at least one steammon that has not fainted,
  * None otherwise *)
 let rec faint_check (lst:steammon list) : steammon option =
@@ -89,117 +131,48 @@ let battle_starter g c ac : game_result option =
       | (_, None) -> None
       | (_, _) -> failwith "Starter invariant failure 2"
 
-(* status effects are only applied to the active Steammon *)
-let handle_beginning_status (g: game) (mon: steammon) (team: color): unit = 
-  let fate = Random.int 100 in
-  let fate2 = Random.int 100 in
-  match mon.status with
-  | None -> ()
-  | Some Paralyzed -> if fate < cPARALYSIS_CHANCE then 
-			GameState.set_can_use_moves g team false
-		      else (GameState.set_eff_speed g team mon 
-			     ((GameState.get_eff_speed g team) / cPARALYSIS_SLOW))
-  | Some Asleep -> if fate < cWAKE_UP_CHANCE then GameState.set_status g team mon None
-		     else GameState.set_can_use_moves g team false
-  | Some Frozen -> if fate < cDEFROST_CHANCE then GameState.set_status g team mon None
-		     else GameState.set_can_use_moves g team false
-  | Some Confused -> if fate < cSNAP_OUT_OF_CONFUSION then 
-		       GameState.set_status g team mon None
-		     else if fate2 < cSELF_ATTACK_CHANCE then 
-		       GameState.set_will_attack_self g team true
-		     else ()
-  | Some Poisoned -> ()
-  | Some Burned -> () (* burn weakness should be checked by seeing if 
-                         status == burned when calculating damage *)
-
-(*Need to check still alive after taking poison and burn damage *)
-let handle_end_status g mon team : unit =
-  match mon.status with 
-  | None -> ()
-  | Some Asleep -> GameState.set_can_use_moves g team true
-  | Some Frozen -> GameState.set_can_use_moves g team true
-  | Some Confused -> GameState.set_will_attack_self g team false
-  | Some Paralyzed -> if GameState.get_can_use_moves g team = true then
-			GameState.set_eff_speed g team mon 
-			   (GameState.get_eff_speed g team * cPARALYSIS_SLOW)
-		      else GameState.set_can_use_moves g team true
-  | Some Poisoned -> GameState.set_hp g team mon (int_of_float ((
-		       float_of_int (GameState.get_curr_hp g team)) -. 
-		       ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE)))
-  | Some Burned -> GameState.set_hp g team mon (int_of_float ((
-		       float_of_int (GameState.get_curr_hp g team)) -. 
-		       ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
-				    
-
-let battle_phase g ra ba :
-  command option * command option * game_result option = 
+let battle_phase g rc bc : game_output = 
   (* Apply the status effects, handle the outstanding actions and
    * then send out requests depending on whose turn it is *)
   match (GameState.get_active_mon g Red) with
-  | _ -> (None, None, None)
+  | _ -> (None, (game_datafication g), None, None)
 
-(* If an invalid message or a message is missing, this 
- * method performs the default expected action and returns a 
- * game_output and a game_result if exists *)
-let default_action (g:game) (c:color) : action = 
-  GameState.get_exp g c
+let team_phase g rc bc = 
+  let (red_name, blue_name) = match (rc, bc) with
+  (*Initial team name response to update the GUI *)
+  | (Action (SendTeamName r_name), Action (SendTeamName b_name)) ->
+      (r_name, b_name)
+  | (_ , Action (SendTeamName b_name)) ->
+      ("Red", b_name)
+  | (Action (SendTeamName r_name), _) ->
+      (r_name, "Blue")
+  | (_,_) -> 
+      ("Red", "Blue") in
+  Netgraphics.send_update (InitGraphics (red_name, blue_name));
+  let draft_pick = Random.int 2 in
+  let r_pick_req = 
+    (if draft_pick = 0 then
+      Some (Request (PickRequest (Red, (game_datafication g), 
+        (GameState.get_move_list g), (GameState.get_base_mons g))))
+    else 
+      None) in
+  let b_pick_req = 
+    (if draft_pick = 1 then
+      Some (Request (PickRequest (Blue, (game_datafication g), 
+        (GameState.get_move_list g), (GameState.get_base_mons g))))
+    else
+      None) in
+  GameState.set_phase g GameState.Draft;
+  (None, (game_datafication g), r_pick_req, b_pick_req)
 
-(* Given the two actions, completes the action of the player 
- * running first and then completes the second. Returns a tuple
- * of command for red palyer, command for blue player and a result 
- * Each function's output called by the action handler should match the 
- * output of the action_handler *)
-let action_handler (g:game) (ra:action) (ba: action) : 
-  command option * command option * game_result option = 
+let handle_step (g:game) (rc:command) (bc:command) : game_output =
+  (* Handle status effects that occur at end of turn *)
   let current_phase = GameState.get_phase g in
   match current_phase with
-  | GameState.TeamName -> failwith "Both team names updated already."
-  | GameState.Draft -> draft_phase g ra ba
-  | GameState.Inventory -> stocking_inventory g ra ba
-  | GameState.Battle -> battle_phase g ra ba	      
-
-let handle_step (g:game) (ra:command) (ba:command) : game_output =
-  (* Handle status effects that occur at end of turn *)
-  match (ra, ba) with
-  (*Initial team name response to update the GUI *)
-  | (Action (SendTeamName red_name), Action (SendTeamName blue_name)) ->
-      Netgraphics.send_update (InitGraphics (red_name, blue_name));
-      GameState.set_exp g Red (PickSteammon "");
-      GameState.set_exp g Blue (PickSteammon "");
-      let r_pick_req = 
-        Request (PickRequest (Red, (game_datafication g), 
-        (GameState.get_move_list g), (GameState.get_steammon_list g Red))) in
-      let b_pick_req = 
-        Request (PickRequest (Blue, (game_datafication g), 
-        (GameState.get_move_list g), (GameState.get_steammon_list g Red))) in
-      (None, (game_datafication g), Some r_pick_req, Some b_pick_req)
-
-  (* Both players respond with an action *)
-  | (Action red_action, Action blue_action) ->
-      let (red_request, blue_request, result) = 
-        action_handler g red_action blue_action in
-      (result, (game_datafication g), red_request, blue_request)
-
-  (* Only one player responded with an action *)
-  | (_, Action blue_action) -> 
-      let red_action = default_action g Red in
-      let (red_request, blue_request, result) = 
-        action_handler g red_action blue_action in
-      (result, (game_datafication g), red_request, blue_request)
-  | (Action red_action, _) -> 
-      let blue_action = default_action g Blue in
-      let (red_request, blue_request, result) = 
-        action_handler g red_action blue_action in
-      (result, (game_datafication g), red_request, blue_request)
-
-  (* Any other command should make the game run the default action
-   * as defined by 4.6 in write-up *)
-  | _ -> 
-      let blue_action = default_action g Blue in
-      let red_action = default_action g Red in
-      let (red_request, blue_request, result) = 
-        action_handler g red_action blue_action in
-      (result, (game_datafication g), red_request, blue_request)
+  | GameState.TeamName -> team_phase g rc bc
+  | GameState.Draft -> draft_phase g rc bc
+  | GameState.Inventory -> stocking_inventory g rc bc
+  | GameState.Battle -> battle_phase g rc bc	      
 
 let init_game () : game * request * request * move list * steammon list =
   (* Creating a blank state for the beginning of the game *)
