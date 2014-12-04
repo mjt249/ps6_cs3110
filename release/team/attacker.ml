@@ -47,7 +47,7 @@ let handle_request (c : color) (r : request) : action =
         let (a1,b1) = gs in
         let my_team = if c = Red then a1 else b1 in
         let (mons, pack, credits) = my_team in
-        let sorted = List.fast_sort comp_by_atk mons in
+        let sorted = List.rev(List.fast_sort comp_by_atk mons) in
 	let pick = 
           try List.find(fun x -> x.curr_hp > 0) sorted 
           with _ -> (List.hd mons) in
@@ -56,7 +56,7 @@ let handle_request (c : color) (r : request) : action =
        let (a1,b1) = gs in
        let my_team = if c = Red then a1 else b1 in
        let (mons, pack, credits) = my_team in
-       let sorted = List.fast_sort comp_by_atk sp in
+       let sorted = List.rev(List.fast_sort comp_by_atk sp) in
        let rec pick_mon lst = 
 	 match lst with
 	 | h::[] -> PickSteammon(h.species) (* out of/low on credits *)
@@ -72,13 +72,13 @@ let handle_request (c : color) (r : request) : action =
         (match mons with
         | h::t ->
 	   let mv_lst = [h.first_move;h.second_move;h.third_move;h.fourth_move] in 
-	   let sorted = List.fast_sort comp_by_power mv_lst in
+	   let sorted = List.rev(List.fast_sort comp_by_power mv_lst) in
 	   let rec find_available_move (lst: move list) = 
 	     match lst with 
-	     | hd::[] -> let _ = print_endline (h.species ^ "used " ^ (hd.name)) in
+	     | hd::[] -> let _ = print_endline (h.species ^ " used " ^ (hd.name)) in
 			 UseMove(hd.name)
 	     | hd::tl -> if hd.pp_remaining > 0 then
-			   let _ = print_endline (h.species ^ "used " ^ (hd.name)) in
+			   let _ = print_endline (h.species ^ " used " ^ (hd.name)) in
 			   UseMove(hd.name)
 			 else find_available_move tl 
 	     | _ -> failwith "WHAT HAPPENED TO MY MOVES?????" in

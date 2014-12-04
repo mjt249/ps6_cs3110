@@ -709,7 +709,8 @@ let get_target att def mv c =
 let do_damage g target damage target_color = 
   if damage = 0 then ()
   else
-    let new_hp = min (target.curr_hp - damage) 0 in 
+    let new_hp = max (target.curr_hp - damage) 0 in 
+    let _ = print_endline ("Old HP: " ^ string_of_int(target.curr_hp) ^ " New HP: " ^ (string_of_int new_hp)) in
     GameState.set_hp g target_color target new_hp 
 
 let rec heal_status g color mon lst =
