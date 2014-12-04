@@ -105,7 +105,8 @@ let team_phase g rc bc =
           let poke = Table.find tbl smon in
           let () = Table.remove tbl smon in
           GameState.set_draft_mons s tbl;
-          GameState.add_reserve_steammon s (fst(color_p)) poke;
+          GameState.add_reserve_steammon s (fst(color_p)) poke; 
+          Netgraphics.add_update (UpdateSteammon (poke.species, poke.curr_hp, poke.max_hp, (fst(color_p))));
           let monies = GameState.get_creds s (fst(color_p)) in
           if (not(monies = 0)) then GameState.set_creds s (fst(color_p)) (monies - poke.cost);
           
