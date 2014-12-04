@@ -1,6 +1,9 @@
+
+open Constants
 open Definitions
 open Constants
 open Util
+
 
 module GameState = struct
   (* State is represented as a record with mutable fields
@@ -20,9 +23,11 @@ module GameState = struct
 
   type player = {
     mutable inv : inventory;
+
     mutable active_mon : active_steammon option;
     mutable steammons : steammon Table.t option;
     mutable credits : int;
+
   }
 
   type state = { 
@@ -32,8 +37,13 @@ module GameState = struct
     mutable base_mons : steammon Table.t;
     mutable red : player;
     mutable blue : player;
-    mutable first : color;
+    
+    mutable draft_mons : steammon Table.t;
+    mutable turn: color;
+
+
     mutable phase : phase;
+
   }
 
   let init_red () = {
@@ -50,16 +60,19 @@ module GameState = struct
     credits = cSTEAMMON_CREDITS; 
   }
 
+
   let initial_state () =
     Initialization.init_pool "moves.csv" "steammon.csv";
     {
+
     red_name = None;
     blue_name = None;
     mvs = Initialization.move_table;
     base_mons = Initialization.mon_table;
     red = init_red ();
     blue = init_blue ();
-    first = Red;
+    draft_mons = Initialization.mon_table;
+    turn = Red;
     phase = TeamName;
     }
 
@@ -90,6 +103,18 @@ module GameState = struct
     | Some tbl -> tbl
     | None -> failwith "Reserve pool not initialized"
 
+  let get_draft_mons s : steammon Table.t = s.draft_mons
+  
+  let get_draft_finished s : bool = 
+      let r = s.red.steammons in
+      let b = s.blue.steammons in
+      match (r,b) with
+      | (Some tbl_r, Some tbl_b) ->
+       let r_nbr = Table.length tbl_r in
+      let b_nbr = Table.length tbl_b in
+      ((r_nbr + b_nbr) = (cNUM_PICKS * 2))
+      | _ -> failwith "steammons tbl should have been initiated"
+
   (* ************************* *)
   (* might not need 
   let is_active_red (s: state) (steam: steammon) = 
@@ -110,6 +135,11 @@ module GameState = struct
     match c with
     | Red -> s.red.credits
     | Blue -> s.blue.credits
+
+
+  let get_turn s : color = s.turn
+
+
   let get_phase s = 
     s.phase
   (* eff speed of active steammon *)
@@ -153,10 +183,17 @@ module GameState = struct
     | Blue -> match s.blue.active_mon with
 			 | None -> raise NO_ACTIVE_STEAMMON
 			 | Some x -> x.can_use_moves
+
   let set_name s c name = 
     match c with
     | Red -> s.red_name <- (Some name)
     | Blue -> s.blue_name <- (Some name)
+
+  let set_move_list s mv = s.mvs <- mv
+  
+  let set_draft_mons s d = s.draft_mons <- d
+
+
   let set_inv s c inv = 
     match c with
     | Red -> s.red.inv <- inv
@@ -307,6 +344,10 @@ module GameState = struct
         active_mon.mon <- m
 
 
+  let set_turn s c = 
+      s.turn <- c
+
+
   (* Comparing the constructors for the actions to determine 
    * whether the expected action matches the responded action 
   let compare_expected_action (s:state) (c:color) (ac:action) : bool =
@@ -324,3 +365,4 @@ module GameState = struct
     | (UseMove _, UseMove _) -> true
     | _ -> false *)
 end
+

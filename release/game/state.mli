@@ -11,6 +11,7 @@ module GameState : sig
 
   val get_name: state -> color -> string option
   val get_move_list: state -> move list
+
   val get_base_mons: state -> steammon list
 
   (* Returns the list of steammon of the player with the 
@@ -18,6 +19,8 @@ module GameState : sig
   val get_steammon_list: state -> color -> steammon list
 
   val get_reserve_pool: state -> color -> steammon Table.t
+  val get_draft_mons: state -> steammon Table.t
+  val get_draft_finished: state -> bool
 
   val get_inv: state -> color -> inventory
   val get_creds: state -> color -> int
@@ -28,9 +31,14 @@ module GameState : sig
   val get_max_hp: state -> color -> int
   val get_can_use_moves: state -> color -> bool
 
+  val get_turn: state -> color
+
+
   val set_name: state -> color -> string -> unit
+
   val set_inv: state -> color -> inventory -> unit
   val set_creds: state -> color -> int -> unit
+
   val set_phase: state -> phase -> unit
   val set_active_mon: state -> color -> steammon option -> unit
   val set_can_use_moves: state -> color -> bool -> unit
@@ -38,6 +46,9 @@ module GameState : sig
   val set_eff_speed: state -> color -> steammon -> int -> unit
   val set_status: state -> color -> steammon -> status option -> unit
   val set_hp: state -> color -> steammon -> int -> unit
+  
+  val set_draft_mons: state -> steammon Table.t -> unit
+  val set_turn: state -> color -> unit
 
   val add_reserve_steammon: state -> color -> steammon -> unit
   val remove_reserve_steammon: state -> color -> steammon -> unit
@@ -47,4 +58,5 @@ module GameState : sig
    * given steammon is removed from the reserve pool.  If there is 
    * no active steammon, the given steammon is removed from reserve. *)
   val swap_active_steammon: state -> color -> steammon -> unit
+
 end
