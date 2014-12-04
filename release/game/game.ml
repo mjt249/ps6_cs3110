@@ -2,6 +2,7 @@ open Definitions
 open Util
 open Constants
 open Netgraphics
+open State
 
 (* You have to implement this. Change it from int to yout own state type*)
 module GameState = State.GameState
@@ -32,7 +33,7 @@ let game_datafication (g:game) : game_status_data =
   let b_creds = GameState.get_creds g Blue in
   let b_team = (b_mons, b_inv, b_creds) in
   (r_team, b_team)
-	
+  
 let game_from_data (game_data:game_status_data) : game = 
   let (r_team, b_team) = game_data in
   let (r_mons, r_inv, r_creds) = r_team in
@@ -44,6 +45,7 @@ let game_from_data (game_data:game_status_data) : game =
   GameState.set_inv !game_instance Blue b_inv;
   GameState.set_creds !game_instance Blue b_creds;
   !game_instance
+
 
 let team_phase g rc bc = 
   let (red_name, blue_name) = match (rc, bc) with
@@ -73,7 +75,73 @@ let team_phase g rc bc =
   GameState.set_phase g GameState.Draft;
   (None, (game_datafication g), r_pick_req, b_pick_req)
 
-let draft_phase g ra ba = failwith "Implement draft_phase"
+
+ let  draft_phase s r b =    
+(*Returns true if steammon is availible and player has enough money*)
+     let valid_purchace smon color_p tbl : bool = 
+          match (Table.mem tbl smon) with
+          | true -> let poke = Table.find tbl smon in
+              let cost = poke.cost in
+              let monies = GameState.get_creds s (fst(color_p)) in
+              if( monies >= cost) then true
+            else false
+          | false -> false
+      in  
+  
+       let get_lowest_steammon color_p  tbl =
+        let cost_checker (lowest_poke:steammon) (current_poke:steammon) : steammon =
+          if (lowest_poke.cost <= current_poke.cost) then lowest_poke 
+          else current_poke
+        in
+        GameState.set_creds s (fst(color_p)) 0;
+        let lst = hash_to_list tbl in
+          match lst with 
+          hd::tl -> let poke = List.fold_left cost_checker hd lst in
+                poke.species
+          | _ -> failwith "Ran Out of Pokemon"         
+      in 
+
+    let purchace_steammon smon color_p tbl =
+          let poke = Table.find tbl smon in
+          let () = Table.remove tbl smon in
+          GameState.set_draft_mons s tbl;
+          GameState.add_reserve_steammon s (fst(color_p)) poke; 
+          Netgraphics.add_update (UpdateSteammon (poke.species, poke.curr_hp, poke.max_hp, (fst(color_p))));
+          let monies = GameState.get_creds s (fst(color_p)) in
+          if (not(monies = 0)) then GameState.set_creds s (fst(color_p)) (monies - poke.cost);
+          
+          let datafif = game_datafication s in
+          let finished = GameState.get_draft_finished s in
+          match (finished, fst(color_p)) with
+          |(false, Red) -> GameState.set_turn s Blue;
+                          let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+                          (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                          (None, datafif, None, b_req)
+          |(false, Blue) -> GameState.set_turn s Red;
+                          let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+                          (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                          (None, datafif, r_req, None)
+          |(true, _) ->   GameState.set_phase s GameState.Inventory;
+                          let inv_req = Some (Request (PickInventoryRequest(datafif))) in
+                          (None, datafif, inv_req, inv_req)
+       in
+ 
+      let tbl = GameState.get_draft_mons s in
+      let requester = GameState.get_turn s in
+      let color_p =
+        if (requester = Red) then 
+          (Red,r) 
+        else
+          (Blue,b) 
+      in
+      match color_p with      
+      | ( _ ,Action(PickSteammon nm)) -> let str =
+        if (not(valid_purchace nm color_p tbl)) then (get_lowest_steammon color_p tbl) 
+        else nm
+      in
+        (purchace_steammon str color_p tbl)
+      | (_,_) -> (None, (game_datafication s), None, None)
+
 
 let stock_inventories g rc bc =
   let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 
@@ -154,18 +222,18 @@ let handle_beginning_status (g: game) (mon: steammon) (team: color): unit =
   match mon.status with
   | None -> ()
   | Some Paralyzed -> if fate < cPARALYSIS_CHANCE then 
-			GameState.set_can_use_moves g team false
-		      else (GameState.set_eff_speed g team mon 
-			     ((GameState.get_eff_speed g team) / cPARALYSIS_SLOW))
+      GameState.set_can_use_moves g team false
+          else (GameState.set_eff_speed g team mon 
+           ((GameState.get_eff_speed g team) / cPARALYSIS_SLOW))
   | Some Asleep -> if fate < cWAKE_UP_CHANCE then GameState.set_status g team mon None
-		     else GameState.set_can_use_moves g team false
+         else GameState.set_can_use_moves g team false
   | Some Frozen -> if fate < cDEFROST_CHANCE then GameState.set_status g team mon None
-		     else GameState.set_can_use_moves g team false
+         else GameState.set_can_use_moves g team false
   | Some Confused -> if fate < cSNAP_OUT_OF_CONFUSION then 
-		       GameState.set_status g team mon None
-		     else if fate2 < cSELF_ATTACK_CHANCE then 
-		       GameState.set_will_attack_self g team true
-		     else ()
+           GameState.set_status g team mon None
+         else if fate2 < cSELF_ATTACK_CHANCE then 
+           GameState.set_will_attack_self g team true
+         else ()
   | Some Poisoned -> ()
   | Some Burned -> () (* burn weakness should be checked by seeing if 
                          status == burned when calculating damage *)
@@ -178,15 +246,15 @@ let handle_end_status g mon team : unit =
   | Some Frozen -> GameState.set_can_use_moves g team true
   | Some Confused -> GameState.set_will_attack_self g team false
   | Some Paralyzed -> if GameState.get_can_use_moves g team = true then
-			GameState.set_eff_speed g team mon 
-			   (GameState.get_eff_speed g team * cPARALYSIS_SLOW)
-		      else GameState.set_can_use_moves g team true
+      GameState.set_eff_speed g team mon 
+         (GameState.get_eff_speed g team * cPARALYSIS_SLOW)
+          else GameState.set_can_use_moves g team true
   | Some Poisoned -> GameState.set_hp g team mon (int_of_float ((
-		       float_of_int (GameState.get_curr_hp g team)) -. 
-		       ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE)))
+           float_of_int (GameState.get_curr_hp g team)) -. 
+           ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE)))
   | Some Burned -> GameState.set_hp g team mon (int_of_float ((
-		       float_of_int (GameState.get_curr_hp g team)) -. 
-		       ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
+           float_of_int (GameState.get_curr_hp g team)) -. 
+           ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
 
 (*Use item. *)
 let use_item (g: game) (c: color) (i: item) (mon_string: string) =
@@ -350,7 +418,7 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
 
   | XAttack -> let new_inv = List.mapi (fun i a -> if i = 4 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
-    if ((target_mon.curr_hp > 0) && ((List.nth inv 4) > 0)) then
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 4) > 0)) then
       let new_xattack_mon mon = 
         let new_mods mods = 
           let new_attack_mod = max mods.attack_mod 6 in
@@ -378,14 +446,12 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
         mods = new_mods mon.mods;
         cost = mon.cost } in
       let new_mon = new_xattack_mon target_mon in
-      if is_active_mon then GameState.set_active_mon g c (Some new_mon)
-      else let res_pool = GameState.get_reserve_pool g c in
-        Table.replace res_pool mon_string new_mon
+      GameState.set_active_mon g c (Some new_mon)
     else ()
 
   | XDefense -> let new_inv = List.mapi (fun i a -> if i = 5 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
-    if ((target_mon.curr_hp > 0) && ((List.nth inv 5) > 0)) then
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 5) > 0)) then
       let new_xdefense_mon mon = 
         let new_mods mods = 
           let new_defense_mod = max mods.defense_mod 6 in
@@ -413,14 +479,12 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
         mods = new_mods mon.mods;
         cost = mon.cost } in
       let new_mon = new_xdefense_mon target_mon in
-      if is_active_mon then GameState.set_active_mon g c (Some new_mon)
-      else let res_pool = GameState.get_reserve_pool g c in
-        Table.replace res_pool mon_string new_mon
+      GameState.set_active_mon g c (Some new_mon)
     else ()
 
   | XSpeed -> let new_inv = List.mapi (fun i a -> if i = 6 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
-    if ((target_mon.curr_hp > 0) && ((List.nth inv 6) > 0)) then
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 6) > 0)) then
       let new_xspeed_mon mon = 
         let new_mods mods = 
           let new_speed_mod = max mods.speed_mod 6 in
@@ -448,9 +512,7 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
         mods = new_mods mon.mods;
         cost = mon.cost } in
       let new_mon = new_xspeed_mon target_mon in
-      if is_active_mon then GameState.set_active_mon g c (Some new_mon)
-      else let res_pool = GameState.get_reserve_pool g c in
-        Table.replace res_pool mon_string new_mon
+      GameState.set_active_mon g c (Some new_mon)
     else ()
 
 let switch_steammon g c mon : game_result option = failwith "Implement steammon switching"
@@ -767,7 +829,7 @@ let handle_step (g:game) (rc:command) (bc:command) : game_output =
   | GameState.Draft -> draft_phase g rc bc
   | GameState.Inventory -> stock_inventories g rc bc
   | GameState.Starter -> battle_starter g rc bc
-  | GameState.Battle -> battle_phase g rc bc	      
+  | GameState.Battle -> battle_phase g rc bc        
 
 let init_game () : game * request * request * move list * steammon list =
   (* Creating a blank state for the beginning of the game *)
@@ -778,3 +840,11 @@ let init_game () : game * request * request * move list * steammon list =
   let mons = GameState.get_base_mons init_state in
 
   (init_state, TeamNameRequest, TeamNameRequest, mvs, mons)
+
+ 
+
+
+  
+
+
+
