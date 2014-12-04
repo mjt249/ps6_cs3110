@@ -11,6 +11,7 @@ module GameState : sig
 
   val get_name: state -> color -> string option
   val get_move_list: state -> move list
+  val get_moves: state -> move Table.t
   val get_base_mons: state -> steammon list
 
   (* Returns the list of steammon of the player with the 
