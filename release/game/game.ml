@@ -591,28 +591,13 @@ let get_effectiveness sa s1 s2 : effectiveness =
   let (eff, _ ) = calculate_type_matchup sa (s1,s2) in
   eff
 
-let perform_struggle g c mon =
-  let move_table = GameState.get_moves g in
-  let struggle = Table.find move_table "Struggle" in
-  let struggle_result = {
-    name = struggle.name;
-    element = struggle.element;
-    from = c;
-    toward = c;
-    (*Updated proper struggle damage *)
-    damage = 0;
-    hit = Hit;
-    effectiveness = (get_effectiveness struggle.element mon.first_type mon.second_type);
-    (*Update proper struggle dmg*)
-    effects = [((Recoiled 50),c)];
-  } in
-  Netgraphics.add_update (Move struggle_result);
-  None
 
-let update_move (m:move) : move =
-  (*print_string "PP remaining: ";*)
-  (*print_int m.pp_remaining;*)
-  (*print_endline "";*)
+let reduce_move_pp (m:move) : move =
+  print_string m.name;
+  print_string " ";
+  print_string "PP remaining: ";
+  print_int m.pp_remaining;
+  print_endline "";
   {
     name = m.name;
     element = m.element;
@@ -630,13 +615,13 @@ let reduce_pp g c i =
   | Some s -> 
       let (m1,m2,m3,m4) = 
         if i = 1 then
-          ((update_move s.first_move), s.second_move, s.third_move, s.fourth_move)
+          ((reduce_move_pp s.first_move), s.second_move, s.third_move, s.fourth_move)
         else if i = 2 then
-          (s.first_move, (update_move s.second_move), s.third_move, s.fourth_move)
+          (s.first_move, (reduce_move_pp s.second_move), s.third_move, s.fourth_move)
         else if i = 3 then
-          (s.first_move, s.second_move, (update_move s.third_move), s.fourth_move)
+          (s.first_move, s.second_move, (reduce_move_pp s.third_move), s.fourth_move)
         else 
-          (s.first_move, s.second_move, s.third_move, (update_move s.fourth_move))
+          (s.first_move, s.second_move, s.third_move, (reduce_move_pp s.fourth_move))
       in
       let updated_steammon = {
             species = s.species;
@@ -657,8 +642,8 @@ let reduce_pp g c i =
             mods = s.mods;
             cost = s.cost;
       } in 
-    GameState.set_active_mon g c (Some updated_steammon);
-    Netgraphics.add_update (SetChosenSteammon updated_steammon.species)
+    GameState.set_active_mon g c (Some updated_steammon)
+    (*Netgraphics.add_update (SetChosenSteammon updated_steammon.species)*)
 
 let miss_handler g from toward (m:move) =
   let failed_move_result = {
@@ -668,7 +653,7 @@ let miss_handler g from toward (m:move) =
     toward = toward;
     damage = 0;
     hit = Miss;
-    effectiveness = Ineffective;
+    effectiveness = Regular;
     effects = [];
   } in
   Netgraphics.add_update (Move failed_move_result);
@@ -761,6 +746,27 @@ let traverse_effects g (mv:move) att_mon def_mon color damage =
     heal lst
   else []
 
+let perform_struggle g c mon =
+  let move_table = GameState.get_moves g in
+  let struggle = Table.find move_table "Struggle" in
+  let (mult, eff) = calc_multiplier mon mon struggle in
+  let dmg = calculate_damage mon.attack mon.defense struggle.power mult in
+  do_damage g mon dmg c;
+  let effect_list = traverse_effects g struggle mon mon c dmg in
+  let struggle_result = {
+    name = struggle.name;
+    element = struggle.element;
+    from = c;
+    toward = c;
+    damage = dmg;
+    hit = Hit;
+    effectiveness = (get_effectiveness struggle.element mon.first_type mon.second_type);
+    effects = effect_list;
+  } in
+  Netgraphics.add_update (UpdateSteammon (mon.species, mon.curr_hp, mon.max_hp, c));
+  Netgraphics.add_update (Move struggle_result);
+  None
+
 let use_move g c move_str : game_result option =
   match (GameState.get_active_mon g c) with
   | None -> failwith "Called UseMove with no active steammon"
@@ -787,6 +793,11 @@ let use_move g c move_str : game_result option =
                       else if is_special m.element then 
                         calculate_damage mon.spl_attack opp_mon.spl_defense m.power mult
                       else calculate_damage mon.attack opp_mon.defense m.power mult in
+                    print_string "Move: ";
+                    print_string m.name;
+                    print_string " Damage: ";
+                    print_int damage;
+                    print_endline "";
                     let (targ, targ_color) = get_target mon opp_mon m c in
                     do_damage g targ damage targ_color;
                     let effect_list = traverse_effects g m mon opp_mon c damage in
@@ -799,6 +810,7 @@ let use_move g c move_str : game_result option =
                       hit = Hit;
                       effectiveness = eff;
                       effects = effect_list; } in
+                    add_update (UpdateSteammon (mon.species, mon.curr_hp, mon.max_hp, c));
                     add_update (Move move_update);
                     None
               else 
@@ -838,11 +850,11 @@ let active_faint_check g c : unit =
   match (GameState.get_active_mon g c) with
   | None -> ()
   | Some s -> 
-      print_string "Active steammon: ";
-      print_string s.species;
-      print_string " HP: ";
-      print_int s.curr_hp;
-      print_endline "";
+      (*print_string "Active steammon: ";*)
+      (*print_string s.species;*)
+      (*print_string " HP: ";*)
+      (*print_int s.curr_hp;*)
+      (*print_endline "";*)
       if s.curr_hp <= 0 then 
         (let fainted_steammon = {
               species = s.species;
