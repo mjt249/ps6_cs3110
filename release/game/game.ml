@@ -839,14 +839,18 @@ let switch_active_arbitrary g c : game_result option =
       Netgraphics.add_update (SetChosenSteammon new_steammon.species);
       None
 
-
 (* Checks whether the active steammon fainted by an action immediately
  * prior. (Status effect, Move, Inv use etc). Moves the fainted 
  * steammon to the reserve pool after resetting its modifiers.  *)
-let active_faint_check g c : bool = 
+let active_faint_check g c : unit = 
   match (GameState.get_active_mon g c) with
-  | None -> false
+  | None -> ()
   | Some s -> 
+      print_string "Active steammon: ";
+      print_string s.species;
+      print_string " HP: ";
+      print_int s.curr_hp;
+      print_endline "";
       if s.curr_hp <= 0 then 
         (let fainted_steammon = {
               species = s.species;
@@ -874,10 +878,10 @@ let active_faint_check g c : bool =
         GameState.add_reserve_steammon g c fainted_steammon;
         Netgraphics.add_update 
           (UpdateSteammon (fainted_steammon.species, 0, s.max_hp, c));
-        GameState.set_active_mon g c None;
-        true)
+        GameState.set_active_mon g c None
+        )
       else
-        false
+        ()
 
 let failed_move g c mon move_str =
   match (get_move mon move_str) with
@@ -892,7 +896,7 @@ let failed_move g c mon move_str =
         hit = (match mon.status with 
               | None -> failwith "Failing non failing move"
               | Some stat -> (Failed stat));
-        effectiveness = Ineffective;
+        effectiveness = Regular;
         effects = [];
         } in
       Netgraphics.add_update (Move m)
@@ -913,7 +917,6 @@ let battle_action g c comm : game_result option =
           use_move g c s
       | Action (UseMove s) -> (failed_move g c mon s); None
       | Action (SwitchSteammon s) -> switch_steammon g c s
-      | Action (SelectStarter s) -> switch_active g c s
       | _ -> None)
 
 let battle_phase g rc bc : game_output = 
@@ -935,10 +938,12 @@ let battle_phase g rc bc : game_output =
   match result with
   | Some res -> (Some res, (game_datafication g), None, None)
   | None -> 
+      active_faint_check g faster_color;
       let result2 = battle_action g (opp_color faster_color) slower_action in
       match result2 with
       | Some res -> (Some res, (game_datafication g), None, None)
       | None ->
+          active_faint_check g (opp_color faster_color);
           (match (GameState.get_active_mon g Red) with
           | Some mon -> handle_end_status g mon Red
           | None -> () );
@@ -946,12 +951,12 @@ let battle_phase g rc bc : game_output =
           | Some mon -> handle_end_status g mon Blue
           | None -> () );
           let r_req = 
-            if (active_faint_check g Red) then
+            if (GameState.get_active_mon g Red) = None then
               Request (StarterRequest (game_datafication g))
             else 
               Request (ActionRequest (game_datafication g)) in
           let b_req = 
-            if (active_faint_check g Blue) then
+            if (GameState.get_active_mon g Blue) = None then
               Request (StarterRequest (game_datafication g))
             else 
               Request (ActionRequest (game_datafication g)) in
