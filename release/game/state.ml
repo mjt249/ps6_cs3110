@@ -1,4 +1,3 @@
-
 open Constants
 open Definitions
 open Constants
@@ -23,11 +22,9 @@ module GameState = struct
 
   type player = {
     mutable inv : inventory;
-
     mutable active_mon : active_steammon option;
     mutable steammons : steammon Table.t option;
     mutable credits : int;
-
   }
 
   type state = { 
@@ -37,13 +34,9 @@ module GameState = struct
     mutable base_mons : steammon Table.t;
     mutable red : player;
     mutable blue : player;
-    
     mutable draft_mons : steammon Table.t;
     mutable turn: color;
-
-
     mutable phase : phase;
-
   }
 
   let init_red () = {
@@ -64,7 +57,6 @@ module GameState = struct
   let initial_state () =
     Initialization.init_pool "moves.csv" "steammon.csv";
     {
-
     red_name = None;
     blue_name = None;
     mvs = Initialization.move_table;
@@ -310,6 +302,12 @@ module GameState = struct
         | None -> player.active_mon <- 
               (Some ({mon = m; can_use_moves = true; 
                        will_attack_self = false}))
+  let set_steammons s c mons =
+    let player = match c with
+    | Red -> s.red
+    | Blue -> s.blue in
+    let mon_table = List.fold_left (fun tbl mon -> (Table.add tbl mon.species mon); tbl) (Table.create 3) mons in
+    player.steammons <- Some mon_table
 
   let add_reserve_steammon s c m = 
     let player = match c with
@@ -337,7 +335,8 @@ module GameState = struct
     match player.active_mon with
     | None -> 
         remove_reserve_steammon s c m;
-        player.active_mon <- (Some ({mon = m; can_use_moves = true; 
+        player.active_mon <- 
+          (Some ({mon = m; can_use_moves = true; 
 				     will_attack_self = false;}))
     | Some active_mon -> 
         remove_reserve_steammon s c m;
