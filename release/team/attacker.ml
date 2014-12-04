@@ -26,8 +26,8 @@ let comp_by_atk mon1 mon2 =
 
 let creds = ref Constants.cSTEAMMON_CREDITS
 
-let can_purchase mon = 
-  mon.cost <= !creds
+let can_purchase mon cred = 
+  mon.cost <= cred
 
 (* handle_request c r responds to a request r by returning an action. The color c 
  * allows the bot to know what color it is. *)
@@ -38,18 +38,21 @@ let handle_request (c : color) (r : request) : action =
         let (a1,b1) = gs in
         let my_team = if c = Red then a1 else b1 in
         let (mons, pack, credits) = my_team in
-        let pick = 
-          try List.find(fun x -> x.curr_hp > 0) mons 
+        let sorted = List.fast_sort comp_by_atk mons in
+	let pick = 
+          try List.find(fun x -> x.curr_hp > 0) sorted 
           with _ -> (List.hd mons) in
           SelectStarter(pick.species)
-    | PickRequest(_, _, _, sp) ->
+    | PickRequest(_, gs, _, sp) ->
+       let (a1,b1) = gs in
+       let my_team = if c = Red then a1 else b1 in
+       let (mons, pack, credits) = my_team in
        let sorted = List.fast_sort comp_by_atk sp in
        let rec pick_mon lst = 
 	 match lst with
 	 | h::[] -> PickSteammon(h.species) (* out of/low on credits *)
-         | h::t -> if can_purchase h then
-		     ((creds := !creds - h.cost);
-		      PickSteammon(h.species))
+         | h::t -> if can_purchase h credits then
+		      PickSteammon(h.species)
 		   else pick_mon t
          | [] -> failwith "no steammon to pick!" in
        pick_mon sorted
