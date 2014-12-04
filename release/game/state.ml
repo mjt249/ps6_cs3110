@@ -81,6 +81,7 @@ module GameState = struct
     | Red -> s.red_name 
     | Blue -> s.blue_name
   let get_move_list s = hash_to_list s.mvs
+  let get_moves s = s.mvs
   let get_base_mons s = hash_to_list s.base_mons
 
   (* Given a state and a player colour, returns all the

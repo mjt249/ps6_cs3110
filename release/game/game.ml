@@ -33,7 +33,7 @@ let game_datafication (g:game) : game_status_data =
   let b_creds = GameState.get_creds g Blue in
   let b_team = (b_mons, b_inv, b_creds) in
   (r_team, b_team)
-	
+  
 let game_from_data (game_data:game_status_data) : game = 
   let (r_team, b_team) = game_data in
   let (r_mons, r_inv, r_creds) = r_team in
@@ -105,7 +105,8 @@ let team_phase g rc bc =
           let poke = Table.find tbl smon in
           let () = Table.remove tbl smon in
           GameState.set_draft_mons s tbl;
-          GameState.add_reserve_steammon s (fst(color_p)) poke;
+          GameState.add_reserve_steammon s (fst(color_p)) poke; 
+          Netgraphics.add_update (UpdateSteammon (poke.species, poke.curr_hp, poke.max_hp, (fst(color_p))));
           let monies = GameState.get_creds s (fst(color_p)) in
           if (not(monies = 0)) then GameState.set_creds s (fst(color_p)) (monies - poke.cost);
           
@@ -523,8 +524,6 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
       GameState.set_active_mon g c (Some new_mon)
     else ()
 
-
-let use_move g c move : game_result option = failwith "Implement move use"
 let switch_steammon g c mon : game_result option = failwith "Implement steammon switching"
 let switch_active g c mon : game_result option = failwith "Implement active steammon switch"
 let switch_active_arbitrary g c : game_result option = failwith "Implement active steammon switch"
@@ -577,29 +576,172 @@ let switch_steammon g c mon : game_result option =
   else 
     None
 
-let get_move (mon:steammon) (s:string) : move option =
+let get_move (mon:steammon) (s:string) : (move * int) option =
   let f_m = mon.first_move in
   let s_m = mon.second_move in
   let t_m = mon.third_move in
   let r_m = mon.fourth_move in
   if f_m.name = s then
-    Some (f_m)
+    Some (f_m, 1)
   else if s_m.name = s then
-    Some (s_m)
+    Some (s_m, 2)
   else if t_m.name = s then
-    Some (t_m)
+    Some (t_m, 3)
   else if r_m.name = s then
-    Some (r_m)
+    Some (r_m, 4)
   else
     None
 
-let use_move g c move_str : game_result option = 
+let move_fail (m:move) : bool =
+  if m.pp_remaining <= 0 then
+    true
+  else 
+    false
+
+let get_effectiveness sa s1 s2 : effectiveness =
+  let (eff, _ ) = calculate_type_matchup sa (s1,s2) in
+  eff
+
+let perform_struggle g c mon =
+  let move_table = GameState.get_moves g in
+  let struggle = Table.find move_table "Struggle" in
+  let struggle_result = {
+    name = struggle.name;
+    element = struggle.element;
+    from = c;
+    toward = c;
+    (*Updated proper struggle damage *)
+    damage = 0;
+    hit = Hit;
+    effectiveness = (get_effectiveness struggle.element mon.first_type mon.second_type);
+    (*Update proper struggle dmg*)
+    effects = [((Recoiled 50),c)];
+  } in
+  Netgraphics.send_update (Move struggle_result);
+  None
+
+let update_move (m:move) : move =
+  {
+    name = m.name;
+    element = m.element;
+    target = m.target;
+    max_pp = m.max_pp;
+    pp_remaining = (m.pp_remaining - 1);
+    power = m.power;
+    accuracy = m.accuracy;
+    effects = m.effects;
+    }
+
+let reduce_pp g c i =
+  match (GameState.get_active_mon g c) with
+  | None -> failwith "Reducing PP of non existent active steammon."
+  | Some s -> 
+      let (m1,m2,m3,m4) = 
+        if i = 1 then
+          ((update_move s.first_move), s.second_move, s.third_move, s.fourth_move)
+        else if i = 2 then
+          (s.first_move, (update_move s.second_move), s.third_move, s.fourth_move)
+        else if i = 3 then
+          (s.first_move, s.second_move, (update_move s.third_move), s.fourth_move)
+        else 
+          (s.first_move, s.second_move, s.third_move, (update_move s.fourth_move))
+      in
+      let updated_steammon = {
+            species = s.species;
+            curr_hp = s.curr_hp;
+            max_hp = s.max_hp;
+            first_type = s.first_type;
+            second_type = s.second_type;
+            first_move = m1;
+            second_move = m2;
+            third_move = m3;
+            fourth_move = m4;
+            attack = s.attack;
+            spl_attack = s.spl_attack;
+            defense = s.defense;
+            spl_defense = s.spl_defense;
+            speed = s.speed;
+            status = s.status;
+            mods = s.mods;
+            cost = s.cost;
+      } in 
+    GameState.set_active_mon g c (Some updated_steammon);
+    Netgraphics.send_update (SetChosenSteammon updated_steammon.species)
+
+let miss_handler g from toward (m:move) =
+  let failed_move_result = {
+    name = m.name;
+    element = m.element;
+    from = from;
+    toward = toward;
+    damage = 0;
+    hit = Miss;
+    effectiveness = Ineffective;
+    effects = [];
+  } in
+  Netgraphics.send_update (Move failed_move_result);
+  None
+
+let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
+  let stab = 
+    match att_mon.first_type, att_mon.second_type with
+    | None, Some typ when typ = mv.element -> cSTAB_BONUS
+    | Some typ, None when typ = mv.element -> cSTAB_BONUS
+    | Some typ1, Some typ2 when typ1 = mv.element || typ2 = mv.element -> cSTAB_BONUS 
+    | _ -> 1. in
+  let (eff, type_mult) = calculate_type_matchup mv.element (def_mon.first_type, 
+							    def_mon.second_type) in
+  let burn = if att_mon.status = Some Burned then cBURN_WEAKNESS 
+	     else 1. in
+  let rand = 
+    float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
+  stab *. type_mult *. burn *. rand
+
+let opp_color c =
+    match c with
+    | Red -> Blue
+    | Blue -> Red
+
+let move_hits mv = 
+  match mv.target with
+  | User when mv.power = 0 -> true
+  | _ -> (Random.int 100) < mv.accuracy
+
+let use_move g c move_str : game_result option =
   match (GameState.get_active_mon g c) with
   | None -> failwith "Called UseMove with no active steammon"
   | Some mon ->
-      (match (get_move mon move_str) with
+      (match (get_move mon move_str)  with
       | None -> None
-      | Some m -> None) 
+      | Some (m, i) -> 
+          if (move_fail m) then
+            perform_struggle g c mon
+          else
+            (match (GameState.get_active_mon g (opp_color c)) with
+            | None -> None
+            | Some opp_mon ->
+                (reduce_pp g c i; 
+                if move_hits m then
+		  let opp_mon = 
+		    match GameState.get_active_mon g (opp_color c) with 
+		    | None -> failwith "Opponent has no Steammon"
+		    | Some mon -> mon in
+                  let mult = calc_multiplier mon opp_mon m in
+		  let damage = 
+		    if m.power = 0 then 
+		      0 (*non damaging *)
+		    else if is_special m.element then 
+		      calculate_damage mon.spl_attack opp_mon.spl_defense m.power mult
+		    else calculate_damage mon.attack opp_mon.defense m.power mult in
+		  ignore(damage);
+		  ignore(opp_mon);
+		  failwith "Not done"
+		  
+                else 
+                  let targeted = if m.target = User then c else (opp_color c) in
+                  (*let targeted_mon = if targeted = c then mon else opp_mon in*)
+                  (*let eff = weakness mon.element opp_mon.element in *)
+                  miss_handler g c targeted m)))
 
 (*Used to switch a steammon when a steammon has fainted and the given*)
 (*mon is a valid_steammon*)
@@ -674,10 +816,11 @@ let battle_action g c comm : game_result option =
       | Action (SelectStarter s) when valid_steammon s player_reserves -> 
           switch_active g c s 
       | _ -> switch_active_arbitrary g c)
-  | Some _ ->
+  | Some mon ->
       (match comm with
       | Action (UseItem (i, s)) -> (use_item g c i s); None
-      | Action (UseMove s) -> use_move g c s
+      | Action (UseMove s) when (GameState.get_can_use_moves g c) -> 
+          use_move g c s
       | Action (SwitchSteammon s) -> switch_steammon g c s
       | Action (SelectStarter s) -> switch_active g c s
       | _ -> None)
@@ -734,7 +877,7 @@ let handle_step (g:game) (rc:command) (bc:command) : game_output =
   | GameState.Draft -> draft_phase g rc bc
   | GameState.Inventory -> stock_inventories g rc bc
   | GameState.Starter -> battle_starter g rc bc
-  | GameState.Battle -> battle_phase g rc bc	      
+  | GameState.Battle -> battle_phase g rc bc        
 
 let init_game () : game * request * request * move list * steammon list =
   (* Creating a blank state for the beginning of the game *)
