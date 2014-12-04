@@ -39,16 +39,16 @@ let handle_request (c : color) (r : request) : action =
         (match mons with
         | h::t ->
             if (h.first_move).pp_remaining >0 then
-              let _ = print_endline (h.species ^ "used " ^ ((h.first_move).name)) in
+              let _ = print_endline (h.species ^ " used " ^ ((h.first_move).name)) in
                 UseMove((h.first_move).name)
             else if ((h.second_move).pp_remaining > 0) then
-              let _ = print_endline (h.species ^ "used " ^ ((h.second_move).name)) in
+              let _ = print_endline (h.species ^ " used " ^ ((h.second_move).name)) in
                 UseMove((h.second_move).name)
             else if ((h.third_move).pp_remaining >0) then
-              let _ = print_endline (h.species ^ "used " ^ ((h.third_move).name)) in
+              let _ = print_endline (h.species ^ " used " ^ ((h.third_move).name)) in
                 UseMove((h.third_move).name)
             else
-              let _ = print_endline (h.species ^ "used " ^ ((h.fourth_move).name)) in
+              let _ = print_endline (h.species ^ " used " ^ ((h.fourth_move).name)) in
                 UseMove((h.fourth_move).name)
         | _ -> failwith "WHAT IN THE NAME OF ZARDOZ HAPPENED HERE")
 	 | PickInventoryRequest (gr) -> PickInventory(
