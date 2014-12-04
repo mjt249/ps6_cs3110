@@ -697,15 +697,21 @@ let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
     float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
   stab *. type_mult *. burn *. rand
 
-let opp_color c =
-    match c with
-    | Red -> Blue
-    | Blue -> Red
-
 let move_hits mv = 
   match mv.target with
   | User when mv.power = 0 -> true
   | _ -> (Random.int 100) < mv.accuracy
+
+let get_target att def mv c =
+  match mv.target with
+  | User -> (att, c)
+  | Opponent -> (def, opp_color c)
+
+let do_damage g target damage target_color = 
+  if damage = 0 then ()
+  else
+    let new_hp = min (target.curr_hp - damage) 0 in 
+    GameState.set_hp g target_color target new_hp 
 
 let use_move g c move_str : game_result option =
   match (GameState.get_active_mon g c) with
@@ -733,8 +739,9 @@ let use_move g c move_str : game_result option =
 		    else if is_special m.element then 
 		      calculate_damage mon.spl_attack opp_mon.spl_defense m.power mult
 		    else calculate_damage mon.attack opp_mon.defense m.power mult in
-		  ignore(damage);
-		  ignore(opp_mon);
+		  let (targ, targ_color) = get_target mon opp_mon m c in
+		  do_damage g targ damage targ_color;
+
 		  failwith "Not done"
 		  
                 else 
