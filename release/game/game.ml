@@ -350,7 +350,7 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
 
   | XAttack -> let new_inv = List.mapi (fun i a -> if i = 4 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
-    if ((target_mon.curr_hp > 0) && ((List.nth inv 4) > 0)) then
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 4) > 0)) then
       let new_xattack_mon mon = 
         let new_mods mods = 
           let new_attack_mod = max mods.attack_mod 6 in
@@ -378,14 +378,12 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
         mods = new_mods mon.mods;
         cost = mon.cost } in
       let new_mon = new_xattack_mon target_mon in
-      if is_active_mon then GameState.set_active_mon g c (Some new_mon)
-      else let res_pool = GameState.get_reserve_pool g c in
-        Table.replace res_pool mon_string new_mon
+      GameState.set_active_mon g c (Some new_mon)
     else ()
 
   | XDefense -> let new_inv = List.mapi (fun i a -> if i = 5 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
-    if ((target_mon.curr_hp > 0) && ((List.nth inv 5) > 0)) then
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 5) > 0)) then
       let new_xdefense_mon mon = 
         let new_mods mods = 
           let new_defense_mod = max mods.defense_mod 6 in
@@ -413,14 +411,12 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
         mods = new_mods mon.mods;
         cost = mon.cost } in
       let new_mon = new_xdefense_mon target_mon in
-      if is_active_mon then GameState.set_active_mon g c (Some new_mon)
-      else let res_pool = GameState.get_reserve_pool g c in
-        Table.replace res_pool mon_string new_mon
+      GameState.set_active_mon g c (Some new_mon)
     else ()
 
   | XSpeed -> let new_inv = List.mapi (fun i a -> if i = 6 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
-    if ((target_mon.curr_hp > 0) && ((List.nth inv 6) > 0)) then
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 6) > 0)) then
       let new_xspeed_mon mon = 
         let new_mods mods = 
           let new_speed_mod = max mods.speed_mod 6 in
@@ -448,9 +444,7 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
         mods = new_mods mon.mods;
         cost = mon.cost } in
       let new_mon = new_xspeed_mon target_mon in
-      if is_active_mon then GameState.set_active_mon g c (Some new_mon)
-      else let res_pool = GameState.get_reserve_pool g c in
-        Table.replace res_pool mon_string new_mon
+      GameState.set_active_mon g c (Some new_mon)
     else ()
 
 
