@@ -76,7 +76,71 @@ let team_phase g rc bc =
   (None, (game_datafication g), r_pick_req, b_pick_req)
 
 
-let draft_phase g ra ba = failwith "Implement draft_phase"
+ let  draft_phase s r b =    
+(*Returns true if steammon is availible and player has enough money*)
+     let valid_purchace smon color_p tbl : bool = 
+          match (Table.mem tbl smon) with
+          | true -> let poke = Table.find tbl smon in
+              let cost = poke.cost in
+              let monies = GameState.get_creds s (fst(color_p)) in
+              if( monies >= cost) then true
+            else false
+          | false -> false
+      in  
+  
+       let get_lowest_steammon color_p  tbl =
+        let cost_checker (lowest_poke:steammon) (current_poke:steammon) : steammon =
+          if (lowest_poke.cost <= current_poke.cost) then lowest_poke 
+          else current_poke
+        in
+        GameState.set_creds s (fst(color_p)) 0;
+        let lst = hash_to_list tbl in
+          match lst with 
+          hd::tl -> let poke = List.fold_left cost_checker hd lst in
+                poke.species
+          | _ -> failwith "Ran Out of Pokemon"         
+      in 
+
+    let purchace_steammon smon color_p tbl =
+          let poke = Table.find tbl smon in
+          let () = Table.remove tbl smon in
+          GameState.set_draft_mons s tbl;
+          GameState.add_reserve_steammon s (fst(color_p)) poke;
+          let monies = GameState.get_creds s (fst(color_p)) in
+          if (not(monies = 0)) then GameState.set_creds s (fst(color_p)) (monies - poke.cost);
+          
+          let datafif = game_datafication s in
+          let finished = GameState.get_draft_finished s in
+          match (finished, fst(color_p)) with
+          |(false, Red) -> GameState.set_turn s Blue;
+                          let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+                          (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                          (None, datafif, None, b_req)
+          |(false, Blue) -> GameState.set_turn s Red;
+                          let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+                          (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                          (None, datafif, r_req, None)
+          |(true, _) ->   GameState.set_phase s GameState.Inventory;
+                          let inv_req = Some (Request (PickInventoryRequest(datafif))) in
+                          (None, datafif, inv_req, inv_req)
+       in
+ 
+      let tbl = GameState.get_draft_mons s in
+      let requester = GameState.get_turn s in
+      let color_p =
+        if (requester = Red) then 
+          (Red,r) 
+        else
+          (Blue,b) 
+      in
+      match color_p with      
+      | ( _ ,Action(PickSteammon nm)) -> let str =
+        if (not(valid_purchace nm color_p tbl)) then (get_lowest_steammon color_p tbl) 
+        else nm
+      in
+        (purchace_steammon str color_p tbl)
+      | (_,_) -> (None, (game_datafication s), None, None)
+
 
 let stock_inventories g rc bc =
   let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 

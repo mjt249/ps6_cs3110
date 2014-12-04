@@ -37,7 +37,8 @@ module GameState = struct
     mutable base_mons : steammon Table.t;
     mutable red : player;
     mutable blue : player;
-
+    
+    mutable draft_mons : steammon Table.t;
     mutable turn: color;
 
 
@@ -70,8 +71,8 @@ module GameState = struct
     base_mons = Initialization.mon_table;
     red = init_red ();
     blue = init_blue ();
-
-    first = Red;
+    draft_mons = Initialization.mon_table;
+    turn = Red;
     phase = TeamName;
     }
 
@@ -101,6 +102,18 @@ module GameState = struct
     match player.steammons with
     | Some tbl -> tbl
     | None -> failwith "Reserve pool not initialized"
+
+  let get_draft_mons s : steammon Table.t = s.draft_mons
+  
+  let get_draft_finished s : bool = 
+      let r = s.red.steammons in
+      let b = s.blue.steammons in
+      match (r,b) with
+      | (Some tbl_r, Some tbl_b) ->
+       let r_nbr = Table.length tbl_r in
+      let b_nbr = Table.length tbl_b in
+      ((r_nbr + b_nbr) = (cNUM_PICKS * 2))
+      | _ -> failwith "steammons tbl should have been initiated"
 
   (* ************************* *)
   (* might not need 
@@ -178,7 +191,7 @@ module GameState = struct
 
   let set_move_list s mv = s.mvs <- mv
   
-  let set_steammon_list s mon = s.mons <- mon
+  let set_draft_mons s d = s.draft_mons <- d
 
 
   let set_inv s c inv = 
@@ -332,7 +345,7 @@ module GameState = struct
 
 
   let set_turn s c = 
-      s.turn = c
+      s.turn <- c
 
 
   (* Comparing the constructors for the actions to determine 
