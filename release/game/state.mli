@@ -59,5 +59,7 @@ module GameState : sig
    * given steammon is removed from the reserve pool.  If there is 
    * no active steammon, the given steammon is removed from reserve. *)
   val swap_active_steammon: state -> color -> steammon -> unit
+  val set_stat_modifier: state -> color -> steammon -> stat -> int -> unit
+  val set_incr_pp: state -> color -> steammon -> int -> unit
 
 end

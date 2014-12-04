@@ -259,11 +259,12 @@ let handle_end_status g mon team : unit =
   | Some Poisoned -> 
      let damage = int_of_float
        ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE) in 
-     GameState.set_hp g team mon ((GameState.get_curr_hp g team) - damage);
-     add_update (AdditionalEffects [(Damaged damage, team)])
+     GameState.set_hp g team mon (min((GameState.get_curr_hp g team) - damage) 0);
+     add_update (AdditionalEffects [(DamagedByStatus (damage, Poisoned), team)])
   | Some Burned -> 
      let damage = int_of_float((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE) in
-     GameState.set_hp g team mon ((GameState.get_curr_hp g team) - damage) 
+     GameState.set_hp g team mon (min((GameState.get_curr_hp g team) - damage) 0);
+     add_update (AdditionalEffects [(DamagedByStatus (damage, Burned), team)])
 
 (*Use item. *)
 let use_item (g: game) (c: color) (i: item) (mon_string: string) =
@@ -713,6 +714,61 @@ let do_damage g target damage target_color =
     let new_hp = min (target.curr_hp - damage) 0 in 
     GameState.set_hp g target_color target new_hp 
 
+let rec heal_status g color mon lst =
+  match lst with
+  | [] -> None
+  | hd::tl -> match mon.status with
+	      | Some x when x = hd -> GameState.set_status g color mon None;
+				      Some hd
+	      | _ -> heal_status g color mon tl
+
+let handle_effects g (effect: effect) target target_color damage: effect_result option =
+  match effect with
+  | InflictStatus stat -> GameState.set_status g target_color target (Some stat);
+			  Some (InflictedStatus stat)
+  | StatModifier (stat, value) -> GameState.set_stat_modifier g target_color target stat value;
+				  Some (StatModified (stat, value))
+  | RecoverPercent percent -> 
+     let new_hp = min(target.curr_hp + (int_of_float(
+	 (float_of_int target.max_hp) *. (float_of_int percent) *. 0.01))) target.max_hp in
+     GameState.set_hp g target_color target new_hp;
+     Some (Recovered (new_hp - target.curr_hp))
+  | Recoil percent -> 
+     let new_hp = min (target.curr_hp - (int_of_float(
+	 (float_of_int damage) *. (float_of_int percent) *. 0.01))) 0 in
+     GameState.set_hp g target_color target new_hp;
+     Some (Recoiled (target.curr_hp - new_hp))
+  | DamagePercent percent -> 
+    let new_hp = min (target.curr_hp - (int_of_float(
+	 (float_of_int damage) *. (float_of_int percent) *. 0.01))) 0 in
+     GameState.set_hp g target_color target new_hp;
+     Some (Damaged (target.curr_hp - new_hp))
+  | HealStatus lst -> (match heal_status g target_color target lst with
+		      | None -> None
+		      | Some stat -> Some (HealedStatus stat))
+  | RestorePP value -> GameState.set_incr_pp g target_color target value;
+			Some (RestoredPP value)
+
+let traverse_effects g (mv:move) att_mon def_mon color damage = 
+  let fate = Random.int 100 in
+  let (lst, target, prob) = 
+    match mv.effects with 
+    | None -> ([], User, 0)
+    | Some (x, y, z) -> (x,y,z) in
+  let (targ_mon, targ_color) = 
+    match target with
+    | User -> (att_mon, color)
+    | Opponent -> (def_mon, opp_color color) in
+  let rec heal lst2 = 
+    match lst2 with
+    | [] -> []
+    | hd::tl -> match handle_effects g hd targ_mon targ_color damage with
+		| None -> heal tl
+		| Some x -> x::(heal tl) in
+  if fate < prob then
+    heal lst
+  else []
+
 let use_move g c move_str : game_result option =
   match (GameState.get_active_mon g c) with
   | None -> failwith "Called UseMove with no active steammon"
@@ -741,7 +797,8 @@ let use_move g c move_str : game_result option =
 		    else calculate_damage mon.attack opp_mon.defense m.power mult in
 		  let (targ, targ_color) = get_target mon opp_mon m c in
 		  do_damage g targ damage targ_color;
-
+		  let effect_list = traverse_effects g m mon opp_mon c damage in
+		  ignore(effect_list);
 		  failwith "Not done"
 		  
                 else 
