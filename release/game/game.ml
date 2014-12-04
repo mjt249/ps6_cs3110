@@ -189,17 +189,21 @@ let battle_starter g rc bc : game_output =
   (match rc with
   | Action (SelectStarter rs) when (valid_steammon rs r_reserve_pool) ->
       let mon = Table.find r_reserve_pool rs in
-      GameState.swap_active_steammon g Red mon
+      GameState.swap_active_steammon g Red mon;
+      Netgraphics.send_update (SetChosenSteammon mon.species)
   | _ -> 
       let r_mon = arbitrary_starter g Red in
-      GameState.swap_active_steammon g Red r_mon);
+      GameState.swap_active_steammon g Red r_mon;
+      Netgraphics.send_update (SetChosenSteammon r_mon.species));
   (match bc with
   | Action (SelectStarter bs) when (valid_steammon bs b_reserve_pool) ->
       let mon = Table.find b_reserve_pool bs in
-      GameState.swap_active_steammon g Blue mon
+      GameState.swap_active_steammon g Blue mon;
+      Netgraphics.send_update (SetChosenSteammon mon.species)
   | _ -> 
       let b_mon = arbitrary_starter g Blue in
-      GameState.swap_active_steammon g Blue b_mon);
+      GameState.swap_active_steammon g Blue b_mon;
+      Netgraphics.send_update (SetChosenSteammon b_mon.species));
   let game_state = game_datafication g in
   (None, game_state, Some (Request (ActionRequest game_state)), 
     Some (Request (ActionRequest game_state)))
@@ -251,7 +255,266 @@ let handle_end_status g mon team : unit =
 		       float_of_int (GameState.get_curr_hp g team)) -. 
 		       ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
 
-let use_item g c (i,s) : unit = failwith "Implement item use"
+(*Use item. *)
+let use_item (g: game) (c: color) (i: item) (mon_string: string) =
+  let inv = GameState.get_inv g c in
+  let compare_active_mon = function
+    | Some smon -> (smon.species = mon_string)
+    | None -> failwith "use item shouldn't recieve None for active teammon" in
+  let is_active_mon = compare_active_mon (GameState.get_active_mon g c) in
+  let steammon_list = GameState.get_steammon_list g c in
+  let rec get_target_mon (mon_lst: steammon list) (name: string) : steammon option =
+    match mon_lst with
+    | hd::tl -> if (hd.species = name) then (Some hd) else get_target_mon tl name
+    | _ -> None in
+  match (get_target_mon steammon_list mon_string) with
+  (*item used on a mon that isn't on the team.
+    treat as missing message--no changes.*)
+  | None -> () 
+  (*item used on a mon that is on the team.*)
+  | Some target_mon ->
+  (*match item*)
+    match i with 
+
+    | Ether -> let new_inv = List.mapi (fun i a -> if i = 0 then a else (a - 1)) inv in
+      GameState.set_inv g c new_inv;
+      if ((target_mon.curr_hp > 0) && ((List.nth inv 0) > 0)) then
+
+        let use_ether move = 
+          let new_pp = max (move.pp_remaining + 5) move.max_pp in
+          {name = move.name;
+          element = move.element;
+          target = move.target;
+          max_pp = move.max_pp;
+          pp_remaining = new_pp;
+          power = move.power;
+          accuracy = move.accuracy;
+          effects = move.effects} in 
+
+        let new_ether_mon mon = 
+          { species = mon.species; 
+            curr_hp = mon.curr_hp; 
+            max_hp = mon.max_hp;
+            first_type = mon.first_type;
+            second_type = mon.second_type;
+            first_move = (use_ether mon.first_move);
+            second_move = (use_ether mon.second_move);
+            third_move = (use_ether mon.third_move);
+            fourth_move = (use_ether mon.fourth_move);
+            attack = mon.attack;
+            spl_attack = mon.spl_attack;
+            defense = mon.defense;
+            spl_defense = mon.spl_defense;
+            speed = mon.speed;
+            status = mon.status;
+            mods = mon.mods;
+            cost = mon.cost } in
+        let new_mon = new_ether_mon target_mon in
+        Netgraphics.add_update(Item("Ether", RestoredPP 5 , c, mon_string));
+        if is_active_mon then GameState.set_active_mon g c (Some new_mon)
+        else let res_pool = GameState.get_reserve_pool g c in
+          Table.replace res_pool mon_string new_mon
+      else ()
+
+    | MaxPotion -> let new_inv = List.mapi (fun i a -> if i = 1 then a else (a - 1)) inv in
+      GameState.set_inv g c new_inv;
+     (*not fainted. can use max potion*)
+      if ((target_mon.curr_hp > 0) && ((List.nth inv 1) > 0)) then
+        let new_max_potion_mon mon = 
+          (*send CHANGE in health*)
+          Netgraphics.add_update(Item("MaxPotion", Recovered (mon.max_hp - mon.curr_hp) , c, mon_string));
+          Netgraphics.add_update(UpdateSteammon(mon.species, mon.max_hp, mon.max_hp, c));
+          { species = mon.species; 
+            curr_hp = mon.max_hp; 
+            max_hp = mon.max_hp;
+            first_type = mon.first_type;
+            second_type = mon.second_type;
+            first_move = mon.first_move;
+            second_move = mon.second_move;
+            third_move = mon.third_move;
+            fourth_move = mon.fourth_move;
+            attack = mon.attack;
+            spl_attack = mon.spl_attack;
+            defense = mon.defense;
+            spl_defense = mon.spl_defense;
+            speed = mon.speed;
+            status = mon.status;
+            mods = mon.mods;
+            cost = mon.cost } in
+        let new_mon = new_max_potion_mon target_mon in
+        if is_active_mon then GameState.set_active_mon g c (Some new_mon)
+        else let res_pool = GameState.get_reserve_pool g c in
+          Table.replace res_pool mon_string new_mon
+      (*fainted mon. can't use max potion*)
+      else ()
+
+    | Revive -> let new_inv = List.mapi (fun i a -> if i = 2 then a else (a - 1)) inv in
+      GameState.set_inv g c new_inv;
+     (*fainted. can use revive*)
+      if ((target_mon.curr_hp <= 0) && ((List.nth inv 2) > 0)) then
+        let new_revive_mon mon = 
+          let new_hp = mon.max_hp/2 in
+          (*send CHANGE in health*)
+          Netgraphics.add_update(Item("Revive", Recovered new_hp, c, mon_string));
+          Netgraphics.add_update(UpdateSteammon(mon.species, new_hp, mon.max_hp, c));
+          { species = mon.species; 
+            curr_hp = new_hp; 
+            max_hp = mon.max_hp;
+            first_type = mon.first_type;
+            second_type = mon.second_type;
+            first_move = mon.first_move;
+            second_move = mon.second_move;
+            third_move = mon.third_move;
+            fourth_move = mon.fourth_move;
+            attack = mon.attack;
+            spl_attack = mon.spl_attack;
+            defense = mon.defense;
+            spl_defense = mon.spl_defense;
+            speed = mon.speed;
+            status = mon.status;
+            mods = mon.mods;
+            cost = mon.cost } in
+        let new_mon = new_revive_mon target_mon in
+        if is_active_mon then GameState.set_active_mon g c (Some new_mon)
+        else let res_pool = GameState.get_reserve_pool g c in
+          Table.replace res_pool mon_string new_mon
+      (*not fainted. can't use revive*)
+      else ()
+
+
+  | FullHeal -> let new_inv = List.mapi (fun i a -> if i = 3 then a else (a - 1))  inv in
+    GameState.set_inv g c new_inv;
+    if ((target_mon.curr_hp > 0) && ((List.nth inv 3) > 0)) then
+      (match target_mon.status with
+      (*no status to heal from. do nothing*)
+      | None -> ()
+      (*has an inflicted status*)
+      | Some inflicted_status ->
+          Netgraphics.add_update(Item("FullHeal", HealedStatus inflicted_status, c, mon_string));
+          let new_fullheal_mon mon = 
+          { species = mon.species; 
+            curr_hp = mon.curr_hp; 
+            max_hp = mon.max_hp;
+            first_type = mon.first_type;
+            second_type = mon.second_type;
+            first_move = mon.first_move;
+            second_move = mon.second_move;
+            third_move = mon.third_move;
+            fourth_move = mon.fourth_move;
+            attack = mon.attack;
+            spl_attack = mon.spl_attack;
+            defense = mon.defense;
+            spl_defense = mon.spl_defense;
+            speed = mon.speed;
+            status = None;
+            mods = mon.mods;
+            cost = mon.cost } in
+        let new_mon = new_fullheal_mon target_mon in
+        if is_active_mon then GameState.set_active_mon g c (Some new_mon)
+        else let res_pool = GameState.get_reserve_pool g c in
+          Table.replace res_pool mon_string new_mon)
+      else ()
+
+  | XAttack -> let new_inv = List.mapi (fun i a -> if i = 4 then a else (a - 1)) inv in
+    GameState.set_inv g c new_inv;
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 4) > 0)) then
+      let new_xattack_mon mon = 
+        let new_mods mods = 
+          let new_attack_mod = max mods.attack_mod 6 in
+          Netgraphics.add_update(Item("XAttack", StatModified (Atk, (new_attack_mod - mods.attack_mod)), c, mon_string));
+          { attack_mod = new_attack_mod;
+          defense_mod = mods.defense_mod;
+          spl_attack_mod = mods.spl_attack_mod;
+          spl_defense_mod = mods.spl_defense_mod;
+          speed_mod = mods.speed_mod} in
+      { species = mon.species; 
+        curr_hp = mon.curr_hp; 
+        max_hp = mon.max_hp;
+        first_type = mon.first_type;
+        second_type = mon.second_type;
+        first_move = mon.first_move;
+        second_move = mon.second_move;
+        third_move = mon.third_move;
+        fourth_move = mon.fourth_move;
+        attack = mon.attack;
+        spl_attack = mon.spl_attack;
+        defense = mon.defense;
+        spl_defense = mon.spl_defense;
+        speed = mon.speed;
+        status = mon.status;
+        mods = new_mods mon.mods;
+        cost = mon.cost } in
+      let new_mon = new_xattack_mon target_mon in
+      GameState.set_active_mon g c (Some new_mon)
+    else ()
+
+  | XDefense -> let new_inv = List.mapi (fun i a -> if i = 5 then a else (a - 1)) inv in
+    GameState.set_inv g c new_inv;
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 5) > 0)) then
+      let new_xdefense_mon mon = 
+        let new_mods mods = 
+          let new_defense_mod = max mods.defense_mod 6 in
+          Netgraphics.add_update(Item("XDefense", StatModified (Def, (new_defense_mod - mods.defense_mod)), c, mon_string));
+          { attack_mod = mods.attack_mod;
+          defense_mod = new_defense_mod;
+          spl_attack_mod = mods.spl_attack_mod;
+          spl_defense_mod = mods.spl_defense_mod;
+          speed_mod = mods.speed_mod} in
+      { species = mon.species; 
+        curr_hp = mon.curr_hp; 
+        max_hp = mon.max_hp;
+        first_type = mon.first_type;
+        second_type = mon.second_type;
+        first_move = mon.first_move;
+        second_move = mon.second_move;
+        third_move = mon.third_move;
+        fourth_move = mon.fourth_move;
+        attack = mon.attack;
+        spl_attack = mon.spl_attack;
+        defense = mon.defense;
+        spl_defense = mon.spl_defense;
+        speed = mon.speed;
+        status = mon.status;
+        mods = new_mods mon.mods;
+        cost = mon.cost } in
+      let new_mon = new_xdefense_mon target_mon in
+      GameState.set_active_mon g c (Some new_mon)
+    else ()
+
+  | XSpeed -> let new_inv = List.mapi (fun i a -> if i = 6 then a else (a - 1)) inv in
+    GameState.set_inv g c new_inv;
+    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 6) > 0)) then
+      let new_xspeed_mon mon = 
+        let new_mods mods = 
+          let new_speed_mod = max mods.speed_mod 6 in
+          Netgraphics.add_update(Item("XSpeed", StatModified (Spe, (new_speed_mod - mods.speed_mod)), c, mon_string));
+          { attack_mod = mods.attack_mod;
+          defense_mod = mods.defense_mod;
+          spl_attack_mod = mods.spl_attack_mod;
+          spl_defense_mod = mods.spl_defense_mod;
+          speed_mod = new_speed_mod} in
+      { species = mon.species; 
+        curr_hp = mon.curr_hp; 
+        max_hp = mon.max_hp;
+        first_type = mon.first_type;
+        second_type = mon.second_type;
+        first_move = mon.first_move;
+        second_move = mon.second_move;
+        third_move = mon.third_move;
+        fourth_move = mon.fourth_move;
+        attack = mon.attack;
+        spl_attack = mon.spl_attack;
+        defense = mon.defense;
+        spl_defense = mon.spl_defense;
+        speed = mon.speed;
+        status = mon.status;
+        mods = new_mods mon.mods;
+        cost = mon.cost } in
+      let new_mon = new_xspeed_mon target_mon in
+      GameState.set_active_mon g c (Some new_mon)
+    else ()
+
+
 let use_move g c move : game_result option = failwith "Implement move use"
 let switch_steammon g c mon : game_result option = failwith "Implement steammon switching"
 let switch_active g c mon : game_result option = failwith "Implement active steammon switch"
@@ -267,23 +530,144 @@ let rec faint_check (lst:steammon list) : steammon option =
   | h::t when h.curr_hp > 0 -> Some h
   | h::t -> faint_check t
 
+let switch_steammon g c mon : game_result option = 
+  let player_reserves = GameState.get_reserve_pool g c in
+  let s = match (GameState.get_active_mon g c) with
+    | None -> failwith "SwitchSteammon when there is no active steammon"
+    | Some smon -> smon in
+  if valid_steammon mon player_reserves then
+    (let switched_out_steammon = {
+          species = s.species;
+          curr_hp = s.curr_hp;
+          max_hp = s.max_hp;
+          first_type = s.first_type;
+          second_type = s.second_type;
+          first_move = s.first_move;
+          second_move = s.second_move;
+          third_move = s.third_move;
+          fourth_move = s.fourth_move;
+          attack = s.attack;
+          spl_attack = s.spl_attack;
+          defense = s.defense;
+          spl_defense = s.spl_defense;
+          speed = s.speed;
+          status = s.status;
+          mods = { attack_mod= 0;
+                  defense_mod= 0;
+                  spl_attack_mod= 0;
+                  spl_defense_mod= 0;
+                  speed_mod= 0;};
+          cost = s.cost;
+    } in 
+    GameState.add_reserve_steammon g c switched_out_steammon;
+    let new_steammon = Table.find player_reserves mon in
+    GameState.remove_reserve_steammon g c new_steammon;
+    GameState.set_active_mon g c (Some new_steammon);
+    Netgraphics.send_update (SetChosenSteammon new_steammon.species);
+    None)
+  else 
+    None
+
+let get_move (mon:steammon) (s:string) : move option =
+  let f_m = mon.first_move in
+  let s_m = mon.second_move in
+  let t_m = mon.third_move in
+  let r_m = mon.fourth_move in
+  if f_m.name = s then
+    Some (f_m)
+  else if s_m.name = s then
+    Some (s_m)
+  else if t_m.name = s then
+    Some (t_m)
+  else if r_m.name = s then
+    Some (r_m)
+  else
+    None
+
+let use_move g c move_str : game_result option = 
+  match (GameState.get_active_mon g c) with
+  | None -> failwith "Called UseMove with no active steammon"
+  | Some mon ->
+      (match (get_move mon move_str) with
+      | None -> None
+      | Some m -> None) 
+
+(*Used to switch a steammon when a steammon has fainted and the given*)
+(*mon is a valid_steammon*)
+let switch_active g c s : game_result option = 
+  let player_reserves = GameState.get_reserve_pool g c in
+  let new_steammon = Table.find player_reserves s in
+  GameState.remove_reserve_steammon g c new_steammon;
+  GameState.set_active_mon g c (Some new_steammon);
+  Netgraphics.send_update (SetChosenSteammon new_steammon.species);
+  None
+
+(*Used when current steammon has fainted and player sends an invalid*)
+(*steammon to switch to. Game result maybe decided here.*)
+let switch_active_arbitrary g c : game_result option = 
+  match (faint_check (GameState.get_steammon_list g c)) with
+  | None -> 
+      (match (faint_check (GameState.get_steammon_list g (opp_color c))) with
+      | None -> Some Tie 
+      | Some _ -> Some (Winner (opp_color c)))
+  | Some new_steammon ->
+      GameState.remove_reserve_steammon g c new_steammon;
+      GameState.set_active_mon g c (Some new_steammon);
+      Netgraphics.send_update (SetChosenSteammon new_steammon.species);
+      None
+
+
 (* Checks whether the active steammon fainted by an action immediately
- * prior. (Status effect, Move, Inv use etc) *)
+ * prior. (Status effect, Move, Inv use etc). Moves the fainted 
+ * steammon to the reserve pool after resetting its modifiers.  *)
 let active_faint_check g c : bool = 
   match (GameState.get_active_mon g c) with
   | None -> false
-  | Some s -> s.curr_hp <= 0
+  | Some s -> 
+      if s.curr_hp <= 0 then 
+        (let fainted_steammon = {
+              species = s.species;
+              curr_hp = 0;
+              max_hp = s.max_hp;
+              first_type = s.first_type;
+              second_type = s.second_type;
+              first_move = s.first_move;
+              second_move = s.second_move;
+              third_move = s.third_move;
+              fourth_move = s.fourth_move;
+              attack = s.attack;
+              spl_attack = s.spl_attack;
+              defense = s.defense;
+              spl_defense = s.spl_defense;
+              speed = s.speed;
+              status = s.status;
+              mods = { attack_mod= 0;
+                      defense_mod= 0;
+                      spl_attack_mod= 0;
+                      spl_defense_mod= 0;
+                      speed_mod= 0;};
+              cost = s.cost;
+        } in 
+        GameState.add_reserve_steammon g c fainted_steammon;
+        Netgraphics.send_update 
+          (UpdateSteammon (fainted_steammon.species, 0, s.max_hp, c));
+        GameState.set_active_mon g c None;
+        true)
+      else
+        false
 
 let battle_action g c comm : game_result option = 
+  let player_reserves = GameState.get_reserve_pool g c in
   match (GameState.get_active_mon g c) with
   (* Active steammon has fainted, require SelectStarter *)
   | None -> 
       (match comm with 
-      | Action (SelectStarter s) -> switch_active g c s 
+      | Action (SelectStarter s) when valid_steammon s player_reserves -> 
+          switch_active g c s 
       | _ -> switch_active_arbitrary g c)
   | Some _ ->
       (match comm with
-      | Action (UseItem (i, s)) -> (use_item g c (i,s)); None
+      | Action (UseItem (i, s)) -> (use_item g c i s); None
       | Action (UseMove s) -> use_move g c s
       | Action (SwitchSteammon s) -> switch_steammon g c s
       | Action (SelectStarter s) -> switch_active g c s
@@ -299,13 +683,11 @@ let battle_phase g rc bc : game_output =
   | Some mon -> handle_beginning_status g mon Blue
   | None -> () );
   
-  (* IMPORTANT< If a steammon faints during handling status, 
-   * we have to bypass resolving actions as per 4.4.4 *)
   let (faster_action, slower_action, faster_color) = 
     if (GameState.get_eff_speed g Red) > (GameState.get_eff_speed g Blue) 
     then (rc, bc, Red) 
     else (bc, rc, Blue) in
-
+  Netgraphics.send_update (SetFirstAttacker faster_color);
   let result = battle_action g faster_color faster_action in
   match result with
   | Some res -> (Some res, (game_datafication g), None, None)
