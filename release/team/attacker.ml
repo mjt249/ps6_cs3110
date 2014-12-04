@@ -24,6 +24,15 @@ let comp_by_atk mon1 mon2 =
   else if mon1.attack > mon2.attack then 1
   else -1
 
+(* compares first by power, then by accuracy *)
+let comp_by_power mv1 mv2 =
+  if mv1.power = mv2.power then
+    if mv1.accuracy = mv2.accuracy then 0
+    else if mv1.accuracy > mv2.accuracy then 1
+    else 0
+  else if mv1.power > mv2.power then 1
+  else -1
+
 let creds = ref Constants.cSTEAMMON_CREDITS
 
 let can_purchase mon cred = 
@@ -62,20 +71,20 @@ let handle_request (c : color) (r : request) : action =
         let (mons, pack, credits) = my_team in
         (match mons with
         | h::t ->
-            if (h.first_move).pp_remaining >0 then
-              let _ = print_endline (h.species ^ "used " ^ ((h.first_move).name)) in
-                UseMove((h.first_move).name)
-            else if ((h.second_move).pp_remaining > 0) then
-              let _ = print_endline (h.species ^ "used " ^ ((h.second_move).name)) in
-                UseMove((h.second_move).name)
-            else if ((h.third_move).pp_remaining >0) then
-              let _ = print_endline (h.species ^ "used " ^ ((h.third_move).name)) in
-                UseMove((h.third_move).name)
-            else
-              let _ = print_endline (h.species ^ "used " ^ ((h.fourth_move).name)) in
-                UseMove((h.fourth_move).name)
-        | _ -> failwith "WHAT IN THE NAME OF ZARDOZ HAPPENED HERE")
-	 | PickInventoryRequest (gr) -> PickInventory(
-					[cNUM_ETHER;cNUM_MAX_POTION;cNUM_REVIVE;cNUM_FULL_HEAL;
-	 				 cNUM_XATTACK;cNUM_XDEFENSE;cNUM_XSPEED])
+	   let mv_lst = [h.first_move;h.second_move;h.third_move;h.fourth_move] in 
+	   let sorted = List.fast_sort comp_by_power mv_lst in
+	   let rec find_available_move (lst: move list) = 
+	     match lst with 
+	     | hd::[] -> let _ = print_endline (h.species ^ "used " ^ (hd.name)) in
+			 UseMove(hd.name)
+	     | hd::tl -> if hd.pp_remaining > 0 then
+			   let _ = print_endline (h.species ^ "used " ^ (hd.name)) in
+			   UseMove(hd.name)
+			 else find_available_move tl 
+	     | _ -> failwith "WHAT HAPPENED TO MY MOVES?????" in
+	   find_available_move sorted
+	| _ -> failwith "WHAT IN THE NAME OF ZARDOZ HAPPENED HERE")
+    | PickInventoryRequest (gr) -> PickInventory(
+				       [cNUM_ETHER;cNUM_MAX_POTION;cNUM_REVIVE;cNUM_FULL_HEAL;
+	 				cNUM_XATTACK;cNUM_XDEFENSE;cNUM_XSPEED])
 let () = run_bot handle_request
