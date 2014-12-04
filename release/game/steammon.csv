@@ -27,10 +27,10 @@ Pikachu,Electric,N/A,211,146,96,136,116,216,Thunderbolt,Surf,SweetKiss,ThunderWa
 Raichu,Electric,N/A,261,216,146,216,196,236,Thunderbolt,Surf,SweetKiss,ThunderWave,190
 Sandshrew,Ground,N/A,241,186,206,76,96,116,Earthquake,RockSlide,SwordsDance,Return,55
 Sandslash,Ground,N/A,291,236,256,126,146,166,Earthquake,RockSlide,SwordsDance,Return,160
-Nidoran♀,Poison,N/A,251,130,140,116,116,118,Crunch,IceBeam,Thunderbolt,Surf,20
+#Nidoran♀,Poison,N/A,251,130,140,116,116,118,Crunch,IceBeam,Thunderbolt,Surf,20
 Nidorina,Poison,N/A,281,160,170,146,146,148,Crunch,IceBeam,Thunderbolt,Surf,75
 Nidoqueen,Poison,Ground,321,200,210,186,206,188,Crunch,IceBeam,Thunderbolt,Surf,290
-Nidoran♂,Poison,N/A,233,150,116,116,116,136,Earthquake,RockSlide,Megahorn,SludgeBomb,20
+#Nidoran♂,Poison,N/A,233,150,116,116,116,136,Earthquake,RockSlide,Megahorn,SludgeBomb,20
 Nidorino,Poison,N/A,263,180,150,146,146,166,Earthquake,RockSlide,Megahorn,SludgeBomb,75
 Nidoking,Poison,Ground,303,220,190,206,186,206,Earthquake,RockSlide,Megahorn,SludgeBomb,300
 Clefairy,Normal,N/A,281,126,132,156,166,106,Moonlight,CalmMind,Thunderbolt,IceBeam,75
@@ -120,7 +120,7 @@ Goldeen,Water,N/A,231,170,156,106,136,162,Megahorn,Return,HydroPump,Blizzard,50
 Seaking,Water,N/A,301,220,166,166,196,172,Megahorn,Return,HydroPump,Blizzard,120
 Staryu,Water,N/A,201,126,146,176,146,206,Surf,Thunderbolt,IceBeam,Recover,85
 Starmie,Water,Psychic,261,186,206,236,206,266,Surf,Thunderbolt,IceBeam,Recover,510
-Mr. Mime,Psychic,N/A,221,126,166,236,276,216,Psychic,CalmMind,ThunderWave,Thunderbolt,170
+#Mr. Mime,Psychic,N/A,221,126,166,236,276,216,Psychic,CalmMind,ThunderWave,Thunderbolt,170
 Scyther,Bug,Flying,281,256,196,146,196,246,SilverWind,SwordsDance,Agility,AerialAce,350
 Jynx,Ice,Psychic,271,136,106,266,226,226,Rest,IceBeam,CalmMind,Psychic,160
 Electabuzz,Electric,N/A,271,202,150,226,206,246,Thunderbolt,CrossChop,IcePunch,FirePunch,250
@@ -384,7 +384,7 @@ Kyogre,Water,N/A,341,236,216,336,316,216,Surf,IceBeam,Thunder,CalmMind,860
 Groudon,Ground,N/A,341,336,316,236,216,216,Earthquake,RockSlide,BulkUp,FireBlast,860
 Rayquaza,Dragon,Flying,351,336,216,336,216,226,Earthquake,DragonDance,IceBeam,Thunderbolt,910
 Jirachi,Steel,Psychic,341,236,236,236,236,236,Psychic,Thunderbolt,CalmMind,ShadowBall,790
-Deoxys_A,Psychic,N/A,241,396,76,396,76,336,ShadowBall,RockSlide,Superpower,PsychoBoost,740
-Deoxys_D,Psychic,N/A,241,176,356,176,356,216,Recover,CalmMind,Psychic,IceBeam,740
-Deoxys_N,Psychic,N/A,241,336,136,336,136,336,Thunderbolt,IceBeam,Psychic,PsychoBoost,740
-Deoxys_S,Psychic,N/A,241,226,216,226,216,396,IronDefense,Amnesia,Recover,Psychic,740
+#Deoxys_A,Psychic,N/A,241,396,76,396,76,336,ShadowBall,RockSlide,Superpower,PsychoBoost,740
+#Deoxys_D,Psychic,N/A,241,176,356,176,356,216,Recover,CalmMind,Psychic,IceBeam,740
+#Deoxys_N,Psychic,N/A,241,336,136,336,136,336,Thunderbolt,IceBeam,Psychic,PsychoBoost,740
+#Deoxys_S,Psychic,N/A,241,226,216,226,216,396,IronDefense,Amnesia,Recover,Psychic,740
