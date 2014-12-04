@@ -32,40 +32,13 @@ let game_datafication (g:game) : game_status_data =
   let b_inv = GameState.get_inv g Blue in
   let b_creds = GameState.get_creds g Blue in
   let b_team = (b_mons, b_inv, b_creds) in
+  game_instance := g;
   (r_team, b_team)
-  
-  (*  type state = { 
-    mutable red_name : string option;
-    mutable blue_name : string option;
-    mutable mvs : move Table.t;
-    mutable base_mons : steammon Table.t;
-    mutable red : player;
-    mutable blue : player;
-    
-    mutable draft_mons : steammon Table.t;
-    mutable turn: color;
-
-
-    mutable phase : phase;
-
-  }*)
 
 (*from team_data tuple.
   team_data: steammon list * inventory * int*)
 let game_from_data (game_data:game_status_data) : game = 
-  let (r_team, b_team) = game_data in
-  let (r_mons, r_inv, r_creds) = r_team in
-  let (b_mons, b_inv, b_creds) = b_team in
-  GameState.set_inv !game_instance Red r_inv;
-  GameState.set_creds !game_instance Red r_creds;
-  GameState.set_active_mon !game_instance Red (Some (List.hd r_mons));
-  GameState.set_steammons !game_instance Red (List.tl r_mons);
-  GameState.set_inv !game_instance Blue b_inv;
-  GameState.set_creds !game_instance Blue b_creds;
-  GameState.set_active_mon !game_instance Blue (Some (List.hd b_mons));
-  GameState.set_steammons !game_instance Blue (List.tl b_mons);
   !game_instance
-
 
 let team_phase g rc bc = 
   let (red_name, blue_name) = match (rc, bc) with
@@ -279,11 +252,11 @@ let handle_end_status g mon team : unit =
   | Some Poisoned -> 
      let damage = int_of_float
        ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE) in 
-     GameState.set_hp g team mon (min((GameState.get_curr_hp g team) - damage) 0);
+     GameState.set_hp g team mon (max((GameState.get_curr_hp g team) - damage) 0);
      add_update (AdditionalEffects [(DamagedByStatus (damage, Poisoned), team)])
   | Some Burned -> 
      let damage = int_of_float((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE) in
-     GameState.set_hp g team mon (min((GameState.get_curr_hp g team) - damage) 0);
+     GameState.set_hp g team mon (max((GameState.get_curr_hp g team) - damage) 0);
      add_update (AdditionalEffects [(DamagedByStatus (damage, Burned), team)])
 
 (*Use item. *)
@@ -753,12 +726,12 @@ let handle_effects g (effect: effect) target target_color damage: effect_result 
      GameState.set_hp g target_color target new_hp;
      Some (Recovered (new_hp - target.curr_hp))
   | Recoil percent -> 
-     let new_hp = min (target.curr_hp - (int_of_float(
+     let new_hp = max (target.curr_hp - (int_of_float(
 	 (float_of_int damage) *. (float_of_int percent) *. 0.01))) 0 in
      GameState.set_hp g target_color target new_hp;
      Some (Recoiled (target.curr_hp - new_hp))
   | DamagePercent percent -> 
-    let new_hp = min (target.curr_hp - (int_of_float(
+    let new_hp = max (target.curr_hp - (int_of_float(
 	 (float_of_int damage) *. (float_of_int percent) *. 0.01))) 0 in
      GameState.set_hp g target_color target new_hp;
      Some (Damaged (target.curr_hp - new_hp))
