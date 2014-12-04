@@ -302,6 +302,12 @@ module GameState = struct
         | None -> player.active_mon <- 
               (Some ({mon = m; can_use_moves = true; 
                        will_attack_self = false}))
+  let set_steammons s c mons =
+    let player = match c with
+    | Red -> s.red
+    | Blue -> s.blue in
+    let mon_table = List.fold_left (fun tbl mon -> (Table.add tbl mon.species mon); tbl) (Table.create 3) mons in
+    player.steammons <- Some mon_table
 
   let add_reserve_steammon s c m = 
     let player = match c with
