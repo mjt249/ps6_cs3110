@@ -278,11 +278,11 @@ let handle_end_status g mon team : unit =
   | Some Poisoned -> 
      let damage = int_of_float
        ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE) in 
-     GameState.set_hp g team mon (min((GameState.get_curr_hp g team) - damage) 0);
+     GameState.set_hp g team mon (max((GameState.get_curr_hp g team) - damage) 0);
      add_update (AdditionalEffects [(DamagedByStatus (damage, Poisoned), team)])
   | Some Burned -> 
      let damage = int_of_float((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE) in
-     GameState.set_hp g team mon (min((GameState.get_curr_hp g team) - damage) 0);
+     GameState.set_hp g team mon (max((GameState.get_curr_hp g team) - damage) 0);
      add_update (AdditionalEffects [(DamagedByStatus (damage, Burned), team)])
 
 (*Use item. *)
@@ -753,12 +753,12 @@ let handle_effects g (effect: effect) target target_color damage: effect_result 
      GameState.set_hp g target_color target new_hp;
      Some (Recovered (new_hp - target.curr_hp))
   | Recoil percent -> 
-     let new_hp = min (target.curr_hp - (int_of_float(
+     let new_hp = max (target.curr_hp - (int_of_float(
 	 (float_of_int damage) *. (float_of_int percent) *. 0.01))) 0 in
      GameState.set_hp g target_color target new_hp;
      Some (Recoiled (target.curr_hp - new_hp))
   | DamagePercent percent -> 
-    let new_hp = min (target.curr_hp - (int_of_float(
+    let new_hp = max (target.curr_hp - (int_of_float(
 	 (float_of_int damage) *. (float_of_int percent) *. 0.01))) 0 in
      GameState.set_hp g target_color target new_hp;
      Some (Damaged (target.curr_hp - new_hp))
