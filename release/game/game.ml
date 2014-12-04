@@ -222,14 +222,19 @@ let handle_beginning_status (g: game) (mon: steammon) (team: color): unit =
   | None -> ()
   | Some Paralyzed -> if fate < cPARALYSIS_CHANCE then 
 			GameState.set_can_use_moves g team false
-		      else (GameState.set_eff_speed g team mon 
-			     ((GameState.get_eff_speed g team) / cPARALYSIS_SLOW))
-  | Some Asleep -> if fate < cWAKE_UP_CHANCE then GameState.set_status g team mon None
-		     else GameState.set_can_use_moves g team false
-  | Some Frozen -> if fate < cDEFROST_CHANCE then GameState.set_status g team mon None
-		     else GameState.set_can_use_moves g team false
-  | Some Confused -> if fate < cSNAP_OUT_OF_CONFUSION then 
-		       GameState.set_status g team mon None
+		      else let new_speed = (GameState.get_eff_speed g team) / cPARALYSIS_SLOW in
+                           GameState.set_eff_speed g team mon new_speed;
+			   add_update (AdditionalEffects 
+					 [(StatModified (Spe, new_speed), team)])
+  | Some Asleep -> if fate < cWAKE_UP_CHANCE then (GameState.set_status g team mon None;
+ 		     add_update (AdditionalEffects [(HealedStatus Asleep, team)])) 
+		   else GameState.set_can_use_moves g team false
+  | Some Frozen -> if fate < cDEFROST_CHANCE then (GameState.set_status g team mon None;
+		     add_update (AdditionalEffects [(HealedStatus Frozen, team)])) 
+		   else GameState.set_can_use_moves g team false
+  | Some Confused -> if fate < cSNAP_OUT_OF_CONFUSION then (
+		       GameState.set_status g team mon None;
+		       add_update (AdditionalEffects [(HealedStatus Confused, team)]) )
 		     else if fate2 < cSELF_ATTACK_CHANCE then 
 		       GameState.set_will_attack_self g team true
 		     else ()
@@ -245,15 +250,19 @@ let handle_end_status g mon team : unit =
   | Some Frozen -> GameState.set_can_use_moves g team true
   | Some Confused -> GameState.set_will_attack_self g team false
   | Some Paralyzed -> if GameState.get_can_use_moves g team = true then
-			GameState.set_eff_speed g team mon 
-			   (GameState.get_eff_speed g team * cPARALYSIS_SLOW)
+			let new_speed = (GameState.get_eff_speed g team * cPARALYSIS_SLOW) in
+			GameState.set_eff_speed g team mon new_speed;
+			add_update (AdditionalEffects 
+					 [(StatModified (Spe, new_speed), team)])
 		      else GameState.set_can_use_moves g team true
-  | Some Poisoned -> GameState.set_hp g team mon (int_of_float ((
-		       float_of_int (GameState.get_curr_hp g team)) -. 
-		       ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE)))
-  | Some Burned -> GameState.set_hp g team mon (int_of_float ((
-		       float_of_int (GameState.get_curr_hp g team)) -. 
-		       ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
+  | Some Poisoned -> 
+     let damage = int_of_float
+       ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE) in 
+     GameState.set_hp g team mon ((GameState.get_curr_hp g team) - damage);
+     add_update (AdditionalEffects [(Damaged damage, team)])
+  | Some Burned -> 
+     let damage = int_of_float((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE) in
+     GameState.set_hp g team mon ((GameState.get_curr_hp g team) - damage) 
 
 (*Use item. *)
 let use_item (g: game) (c: color) (i: item) (mon_string: string) =
