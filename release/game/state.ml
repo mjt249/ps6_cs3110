@@ -49,14 +49,14 @@ module GameState = struct
   let init_red () = {
     inv = []; 
     active_mon = None;
-    steammons = None;
+    steammons = Some (Table.create 1);
     credits = cSTEAMMON_CREDITS; 
   }
 
   let init_blue () = {
     inv = []; 
     active_mon = None;
-    steammons = None;
+    steammons = Some (Table.create 1);
     credits = cSTEAMMON_CREDITS; 
   }
 
@@ -348,7 +348,163 @@ module GameState = struct
   let set_turn s c = 
       s.turn <- c
 
+  let set_stat_modifier s c mon stat value = 
+    match stat with 
+    | Atk -> let new_mon = { species = mon.species; 
+			     curr_hp = mon.curr_hp; 
+			     max_hp = mon.max_hp;
+			     first_type = mon.first_type;
+			     second_type = mon.second_type;
+			     first_move = mon.first_move;
+			     second_move = mon.second_move;
+			     third_move = mon.third_move;
+			     fourth_move = mon.fourth_move;
+			     attack = value;
+			     spl_attack = mon.spl_attack;
+			     defense = mon.defense;
+			     spl_defense = mon.spl_defense;
+			     speed = mon.speed;
+			     status = mon.status;
+			     mods = mon.mods;
+			     cost = mon.cost } in
+	     (match c with
+	     | Red -> (match s.red.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON 
+		       | Some x -> x.mon <- new_mon)
+	     | Blue -> match s.blue.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON
+		       | Some x -> x.mon <- new_mon)
+    | Def -> let new_mon = { species = mon.species; 
+			     curr_hp = mon.curr_hp; 
+			     max_hp = mon.max_hp;
+			     first_type = mon.first_type;
+			     second_type = mon.second_type;
+			     first_move = mon.first_move;
+			     second_move = mon.second_move;
+			     third_move = mon.third_move;
+			     fourth_move = mon.fourth_move;
+			     attack = mon.attack;
+			     spl_attack = mon.spl_attack;
+			     defense = value;
+			     spl_defense = mon.spl_defense;
+			     speed = mon.speed;
+			     status = mon.status;
+			     mods = mon.mods;
+			     cost = mon.cost } in
+	     (match c with
+	     | Red -> (match s.red.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON 
+		       | Some x -> x.mon <- new_mon)
+	     | Blue -> match s.blue.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON
+		       | Some x -> x.mon <- new_mon)
+    | SpA -> let new_mon = { species = mon.species; 
+			     curr_hp = mon.curr_hp; 
+			     max_hp = mon.max_hp;
+			     first_type = mon.first_type;
+			     second_type = mon.second_type;
+			     first_move = mon.first_move;
+			     second_move = mon.second_move;
+			     third_move = mon.third_move;
+			     fourth_move = mon.fourth_move;
+			     attack = mon.attack;
+			     spl_attack = value;
+			     defense = mon.defense;
+			     spl_defense = mon.spl_defense;
+			     speed = mon.speed;
+			     status = mon.status;
+			     mods = mon.mods;
+			     cost = mon.cost } in
+	     (match c with
+	     | Red -> (match s.red.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON 
+		       | Some x -> x.mon <- new_mon)
+	     | Blue -> match s.blue.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON
+		       | Some x -> x.mon <- new_mon)
+    | SpD -> let new_mon = { species = mon.species; 
+			     curr_hp = mon.curr_hp; 
+			     max_hp = mon.max_hp;
+			     first_type = mon.first_type;
+			     second_type = mon.second_type;
+			     first_move = mon.first_move;
+			     second_move = mon.second_move;
+			     third_move = mon.third_move;
+			     fourth_move = mon.fourth_move;
+			     attack = mon.attack;
+			     spl_attack = mon.spl_attack;
+			     defense = mon.defense;
+			     spl_defense = value;
+			     speed = mon.speed;
+			     status = mon.status;
+			     mods = mon.mods;
+			     cost = mon.cost } in
+	     (match c with
+	     | Red -> (match s.red.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON 
+		       | Some x -> x.mon <- new_mon)
+	     | Blue -> match s.blue.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON
+		       | Some x -> x.mon <- new_mon)
+    | Spe -> let new_mon = { species = mon.species; 
+			     curr_hp = mon.curr_hp; 
+			     max_hp = mon.max_hp;
+			     first_type = mon.first_type;
+			     second_type = mon.second_type;
+			     first_move = mon.first_move;
+			     second_move = mon.second_move;
+			     third_move = mon.third_move;
+			     fourth_move = mon.fourth_move;
+			     attack = mon.attack;
+			     spl_attack = mon.spl_attack;
+			     defense = mon.defense;
+			     spl_defense = mon.spl_defense;
+			     speed = value;
+			     status = mon.status;
+			     mods = mon.mods;
+			     cost = mon.cost } in
+	     (match c with
+	     | Red -> (match s.red.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON 
+		       | Some x -> x.mon <- new_mon)
+	     | Blue -> match s.blue.active_mon with
+		       | None -> raise NO_ACTIVE_STEAMMON
+		       | Some x -> x.mon <- new_mon)
 
+  let set_incr_pp s c mon incr =
+    let incr_pp (mv:move): move = { name = mv.name;
+			     element = mv.element;
+			     target = mv.target;
+			     max_pp = mv.max_pp;
+			     pp_remaining = (min (mv.pp_remaining + incr) mv.max_pp);
+			     power = mv.power;
+			     accuracy = mv.accuracy;
+		       effects = mv.effects; } in 
+    let new_mon = { species = mon.species; 
+		    curr_hp = mon.curr_hp; 
+		    max_hp = mon.max_hp;
+		    first_type = mon.first_type;
+		    second_type = mon.second_type;
+		    first_move = incr_pp mon.first_move;
+		    second_move = incr_pp mon.second_move;
+		    third_move = incr_pp mon.third_move;
+		    fourth_move = incr_pp mon.fourth_move;
+		    attack = mon.attack;
+		    spl_attack = mon.spl_attack;
+		    defense = mon.defense;
+		    spl_defense = mon.spl_defense;
+		    speed = mon.speed;
+		    status = mon.status;
+		    mods = mon.mods;
+		    cost = mon.cost } in
+    (match c with
+     | Red -> (match s.red.active_mon with
+	       | None -> raise NO_ACTIVE_STEAMMON 
+	       | Some x -> x.mon <- new_mon)
+     | Blue -> match s.blue.active_mon with
+	       | None -> raise NO_ACTIVE_STEAMMON
+	       | Some x -> x.mon <- new_mon)
+      
   (* Comparing the constructors for the actions to determine 
    * whether the expected action matches the responded action 
   let compare_expected_action (s:state) (c:color) (ac:action) : bool =

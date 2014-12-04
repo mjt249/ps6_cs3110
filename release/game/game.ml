@@ -76,71 +76,71 @@ let team_phase g rc bc =
   (None, (game_datafication g), r_pick_req, b_pick_req)
 
 
- let  draft_phase s r b =    
+let  draft_phase s r b =    
 (*Returns true if steammon is availible and player has enough money*)
-     let valid_purchace smon color_p tbl : bool = 
-          match (Table.mem tbl smon) with
-          | true -> let poke = Table.find tbl smon in
-              let cost = poke.cost in
-              let monies = GameState.get_creds s (fst(color_p)) in
-              if( monies >= cost) then true
-            else false
-          | false -> false
-      in  
-  
-       let get_lowest_steammon color_p  tbl =
-        let cost_checker (lowest_poke:steammon) (current_poke:steammon) : steammon =
-          if (lowest_poke.cost <= current_poke.cost) then lowest_poke 
-          else current_poke
-        in
-        GameState.set_creds s (fst(color_p)) 0;
-        let lst = hash_to_list tbl in
-          match lst with 
-          hd::tl -> let poke = List.fold_left cost_checker hd lst in
-                poke.species
-          | _ -> failwith "Ran Out of Pokemon"         
-      in 
+  let valid_purchace smon color_p tbl : bool = 
+      match (Table.mem tbl smon) with
+      | true -> let poke = Table.find tbl smon in
+        let cost = poke.cost in
+        let monies = GameState.get_creds s (fst(color_p)) in
+          if( monies >= cost) then true
+          else false
+      | false -> false
+  in  
 
-    let purchace_steammon smon color_p tbl =
-          let poke = Table.find tbl smon in
-          let () = Table.remove tbl smon in
-          GameState.set_draft_mons s tbl;
-          GameState.add_reserve_steammon s (fst(color_p)) poke; 
-          Netgraphics.add_update (UpdateSteammon (poke.species, poke.curr_hp, poke.max_hp, (fst(color_p))));
-          let monies = GameState.get_creds s (fst(color_p)) in
-          if (not(monies = 0)) then GameState.set_creds s (fst(color_p)) (monies - poke.cost);
-          
-          let datafif = game_datafication s in
-          let finished = GameState.get_draft_finished s in
-          match (finished, fst(color_p)) with
-          |(false, Red) -> GameState.set_turn s Blue;
-                          let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
-                          (GameState.get_move_list s), (GameState.get_base_mons s)))) in
-                          (None, datafif, None, b_req)
-          |(false, Blue) -> GameState.set_turn s Red;
-                          let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
-                          (GameState.get_move_list s), (GameState.get_base_mons s)))) in
-                          (None, datafif, r_req, None)
-          |(true, _) ->   GameState.set_phase s GameState.Inventory;
-                          let inv_req = Some (Request (PickInventoryRequest(datafif))) in
-                          (None, datafif, inv_req, inv_req)
-       in
- 
-      let tbl = GameState.get_draft_mons s in
-      let requester = GameState.get_turn s in
-      let color_p =
-        if (requester = Red) then 
-          (Red,r) 
-        else
-          (Blue,b) 
-      in
-      match color_p with      
-      | ( _ ,Action(PickSteammon nm)) -> let str =
-        if (not(valid_purchace nm color_p tbl)) then (get_lowest_steammon color_p tbl) 
-        else nm
-      in
-        (purchace_steammon str color_p tbl)
-      | (_,_) -> (None, (game_datafication s), None, None)
+  let get_lowest_steammon color_p  tbl =
+    let cost_checker (lowest_poke:steammon) (current_poke:steammon) : steammon =
+      if (lowest_poke.cost <= current_poke.cost) then lowest_poke 
+      else current_poke
+    in
+    GameState.set_creds s (fst(color_p)) 0;
+    let lst = hash_to_list tbl in
+      match lst with 
+      hd::tl -> let poke = List.fold_left cost_checker hd lst in
+              poke.species
+      | _ -> failwith "Ran Out of Pokemon"         
+    in 
+
+  let purchace_steammon smon color_p tbl =
+    let poke = Table.find tbl smon in
+      let () = Table.remove tbl smon in
+      GameState.set_draft_mons s tbl;
+      GameState.add_reserve_steammon s (fst(color_p)) poke; 
+      Netgraphics.add_update (UpdateSteammon (poke.species, poke.curr_hp, poke.max_hp, (fst(color_p))));
+      let monies = GameState.get_creds s (fst(color_p)) in
+        if (not(monies = 0)) then GameState.set_creds s (fst(color_p)) (monies - poke.cost);
+        
+      let datafif = game_datafication s in
+      let finished = GameState.get_draft_finished s in
+        match (finished, fst(color_p)) with
+        |(false, Red) -> GameState.set_turn s Blue;
+                        let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, None, b_req)
+        |(false, Blue) -> GameState.set_turn s Red;
+                        let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, r_req, None)
+        |(true, _) ->   GameState.set_phase s GameState.Inventory;
+                        let inv_req = Some (Request (PickInventoryRequest(datafif))) in
+                        (None, datafif, inv_req, inv_req)
+     in
+
+    let tbl = GameState.get_draft_mons s in
+    let requester = GameState.get_turn s in
+    let color_p =
+      if (requester = Red) then 
+        (Red,r) 
+      else
+        (Blue,b) 
+    in
+    match color_p with      
+    | ( _ ,Action(PickSteammon nm)) -> let str =
+      if (not(valid_purchace nm color_p tbl)) then (get_lowest_steammon color_p tbl) 
+      else nm
+    in
+      (purchace_steammon str color_p tbl)
+    | (_,_) -> (None, (game_datafication s), None, None)
 
 
 let stock_inventories g rc bc =
@@ -191,20 +191,20 @@ let battle_starter g rc bc : game_output =
   | Action (SelectStarter rs) when (valid_steammon rs r_reserve_pool) ->
       let mon = Table.find r_reserve_pool rs in
       GameState.swap_active_steammon g Red mon;
-      Netgraphics.send_update (SetChosenSteammon mon.species)
+      Netgraphics.add_update (SetChosenSteammon mon.species)
   | _ -> 
       let r_mon = arbitrary_starter g Red in
       GameState.swap_active_steammon g Red r_mon;
-      Netgraphics.send_update (SetChosenSteammon r_mon.species));
+      Netgraphics.add_update (SetChosenSteammon r_mon.species));
   (match bc with
   | Action (SelectStarter bs) when (valid_steammon bs b_reserve_pool) ->
       let mon = Table.find b_reserve_pool bs in
       GameState.swap_active_steammon g Blue mon;
-      Netgraphics.send_update (SetChosenSteammon mon.species)
+      Netgraphics.add_update (SetChosenSteammon mon.species)
   | _ -> 
       let b_mon = arbitrary_starter g Blue in
       GameState.swap_active_steammon g Blue b_mon;
-      Netgraphics.send_update (SetChosenSteammon b_mon.species));
+      Netgraphics.add_update (SetChosenSteammon b_mon.species));
   let game_state = game_datafication g in
   (None, game_state, Some (Request (ActionRequest game_state)), 
     Some (Request (ActionRequest game_state)))
@@ -222,18 +222,23 @@ let handle_beginning_status (g: game) (mon: steammon) (team: color): unit =
   match mon.status with
   | None -> ()
   | Some Paralyzed -> if fate < cPARALYSIS_CHANCE then 
-      GameState.set_can_use_moves g team false
-          else (GameState.set_eff_speed g team mon 
-           ((GameState.get_eff_speed g team) / cPARALYSIS_SLOW))
-  | Some Asleep -> if fate < cWAKE_UP_CHANCE then GameState.set_status g team mon None
-         else GameState.set_can_use_moves g team false
-  | Some Frozen -> if fate < cDEFROST_CHANCE then GameState.set_status g team mon None
-         else GameState.set_can_use_moves g team false
-  | Some Confused -> if fate < cSNAP_OUT_OF_CONFUSION then 
-           GameState.set_status g team mon None
-         else if fate2 < cSELF_ATTACK_CHANCE then 
-           GameState.set_will_attack_self g team true
-         else ()
+			GameState.set_can_use_moves g team false
+		      else let new_speed = (GameState.get_eff_speed g team) / cPARALYSIS_SLOW in
+                           GameState.set_eff_speed g team mon new_speed;
+			   add_update (AdditionalEffects 
+					 [(StatModified (Spe, new_speed), team)])
+  | Some Asleep -> if fate < cWAKE_UP_CHANCE then (GameState.set_status g team mon None;
+ 		     add_update (AdditionalEffects [(HealedStatus Asleep, team)])) 
+		   else GameState.set_can_use_moves g team false
+  | Some Frozen -> if fate < cDEFROST_CHANCE then (GameState.set_status g team mon None;
+		     add_update (AdditionalEffects [(HealedStatus Frozen, team)])) 
+		   else GameState.set_can_use_moves g team false
+  | Some Confused -> if fate < cSNAP_OUT_OF_CONFUSION then (
+		       GameState.set_status g team mon None;
+		       add_update (AdditionalEffects [(HealedStatus Confused, team)]) )
+		     else if fate2 < cSELF_ATTACK_CHANCE then 
+		       GameState.set_will_attack_self g team true
+		     else ()
   | Some Poisoned -> ()
   | Some Burned -> () (* burn weakness should be checked by seeing if 
                          status == burned when calculating damage *)
@@ -246,15 +251,20 @@ let handle_end_status g mon team : unit =
   | Some Frozen -> GameState.set_can_use_moves g team true
   | Some Confused -> GameState.set_will_attack_self g team false
   | Some Paralyzed -> if GameState.get_can_use_moves g team = true then
-      GameState.set_eff_speed g team mon 
-         (GameState.get_eff_speed g team * cPARALYSIS_SLOW)
-          else GameState.set_can_use_moves g team true
-  | Some Poisoned -> GameState.set_hp g team mon (int_of_float ((
-           float_of_int (GameState.get_curr_hp g team)) -. 
-           ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE)))
-  | Some Burned -> GameState.set_hp g team mon (int_of_float ((
-           float_of_int (GameState.get_curr_hp g team)) -. 
-           ((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE)))
+			let new_speed = (GameState.get_eff_speed g team * cPARALYSIS_SLOW) in
+			GameState.set_eff_speed g team mon new_speed;
+			add_update (AdditionalEffects 
+					 [(StatModified (Spe, new_speed), team)])
+		      else GameState.set_can_use_moves g team true
+  | Some Poisoned -> 
+     let damage = int_of_float
+       ((float_of_int(GameState.get_max_hp g team)) *. cPOISON_DAMAGE) in 
+     GameState.set_hp g team mon (min((GameState.get_curr_hp g team) - damage) 0);
+     add_update (AdditionalEffects [(DamagedByStatus (damage, Poisoned), team)])
+  | Some Burned -> 
+     let damage = int_of_float((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE) in
+     GameState.set_hp g team mon (min((GameState.get_curr_hp g team) - damage) 0);
+     add_update (AdditionalEffects [(DamagedByStatus (damage, Burned), team)])
 
 (*Use item. *)
 let use_item (g: game) (c: color) (i: item) (mon_string: string) =
@@ -515,10 +525,6 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
       GameState.set_active_mon g c (Some new_mon)
     else ()
 
-let switch_steammon g c mon : game_result option = failwith "Implement steammon switching"
-let switch_active g c mon : game_result option = failwith "Implement active steammon switch"
-let switch_active_arbitrary g c : game_result option = failwith "Implement active steammon switch"
-
 (* steammon if there exists at least one steammon that has not fainted,
  * None otherwise *)
 let rec faint_check (lst:steammon list) : steammon option =
@@ -562,7 +568,7 @@ let switch_steammon g c mon : game_result option =
     let new_steammon = Table.find player_reserves mon in
     GameState.remove_reserve_steammon g c new_steammon;
     GameState.set_active_mon g c (Some new_steammon);
-    Netgraphics.send_update (SetChosenSteammon new_steammon.species);
+    Netgraphics.add_update (SetChosenSteammon new_steammon.species);
     None)
   else 
     None
@@ -608,10 +614,13 @@ let perform_struggle g c mon =
     (*Update proper struggle dmg*)
     effects = [((Recoiled 50),c)];
   } in
-  Netgraphics.send_update (Move struggle_result);
+  Netgraphics.add_update (Move struggle_result);
   None
 
 let update_move (m:move) : move =
+  (*print_string "PP remaining: ";*)
+  (*print_int m.pp_remaining;*)
+  (*print_endline "";*)
   {
     name = m.name;
     element = m.element;
@@ -657,7 +666,7 @@ let reduce_pp g c i =
             cost = s.cost;
       } in 
     GameState.set_active_mon g c (Some updated_steammon);
-    Netgraphics.send_update (SetChosenSteammon updated_steammon.species)
+    Netgraphics.add_update (SetChosenSteammon updated_steammon.species)
 
 let miss_handler g from toward (m:move) =
   let failed_move_result = {
@@ -670,14 +679,100 @@ let miss_handler g from toward (m:move) =
     effectiveness = Ineffective;
     effects = [];
   } in
-  Netgraphics.send_update (Move failed_move_result);
+  Netgraphics.add_update (Move failed_move_result);
   None
-  
-let use_move g c move_str : game_result option = 
+
+let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
+  let stab = 
+    match att_mon.first_type, att_mon.second_type with
+    | None, Some typ when typ = mv.element -> cSTAB_BONUS
+    | Some typ, None when typ = mv.element -> cSTAB_BONUS
+    | Some typ1, Some typ2 when typ1 = mv.element || typ2 = mv.element -> cSTAB_BONUS 
+    | _ -> 1. in
+  let (eff, type_mult) = calculate_type_matchup mv.element (def_mon.first_type, 
+							    def_mon.second_type) in
+  let burn = if att_mon.status = Some Burned then cBURN_WEAKNESS 
+	     else 1. in
+  let rand = 
+    float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
+  (stab *. type_mult *. burn *. rand, eff)
+
+let move_hits mv = 
+  match mv.target with
+  | User when mv.power = 0 -> true
+  | _ -> (Random.int 100) < mv.accuracy
+
+let get_target att def mv c =
+  match mv.target with
+  | User -> (att, c)
+  | Opponent -> (def, opp_color c)
+
+let do_damage g target damage target_color = 
+  if damage = 0 then ()
+  else
+    let new_hp = min (target.curr_hp - damage) 0 in 
+    GameState.set_hp g target_color target new_hp 
+
+let rec heal_status g color mon lst =
+  match lst with
+  | [] -> None
+  | hd::tl -> match mon.status with
+	      | Some x when x = hd -> GameState.set_status g color mon None;
+				      Some hd
+	      | _ -> heal_status g color mon tl
+
+let handle_effects g (effect: effect) target target_color damage: effect_result option =
+  match effect with
+  | InflictStatus stat -> GameState.set_status g target_color target (Some stat);
+			  Some (InflictedStatus stat)
+  | StatModifier (stat, value) -> GameState.set_stat_modifier g target_color target stat value;
+				  Some (StatModified (stat, value))
+  | RecoverPercent percent -> 
+     let new_hp = min(target.curr_hp + (int_of_float(
+	 (float_of_int target.max_hp) *. (float_of_int percent) *. 0.01))) target.max_hp in
+     GameState.set_hp g target_color target new_hp;
+     Some (Recovered (new_hp - target.curr_hp))
+  | Recoil percent -> 
+     let new_hp = min (target.curr_hp - (int_of_float(
+	 (float_of_int damage) *. (float_of_int percent) *. 0.01))) 0 in
+     GameState.set_hp g target_color target new_hp;
+     Some (Recoiled (target.curr_hp - new_hp))
+  | DamagePercent percent -> 
+    let new_hp = min (target.curr_hp - (int_of_float(
+	 (float_of_int damage) *. (float_of_int percent) *. 0.01))) 0 in
+     GameState.set_hp g target_color target new_hp;
+     Some (Damaged (target.curr_hp - new_hp))
+  | HealStatus lst -> (match heal_status g target_color target lst with
+		      | None -> None
+		      | Some stat -> Some (HealedStatus stat))
+  | RestorePP value -> GameState.set_incr_pp g target_color target value;
+			Some (RestoredPP value)
+
+let traverse_effects g (mv:move) att_mon def_mon color damage = 
+  let fate = Random.int 100 in
+  let (lst, target, prob) = 
+    match mv.effects with 
+    | None -> ([], User, 0)
+    | Some (x, y, z) -> (x,y,z) in
+  let (targ_mon, targ_color) = 
+    match target with
+    | User -> (att_mon, color)
+    | Opponent -> (def_mon, opp_color color) in
+  let rec heal lst2 = 
+    match lst2 with
+    | [] -> []
+    | hd::tl -> match handle_effects g hd targ_mon targ_color damage with
+		| None -> heal tl
+		| Some x -> (x, targ_color)::(heal tl) in
+  if fate < prob then
+    heal lst
+  else []
+
+let use_move g c move_str : game_result option =
   match (GameState.get_active_mon g c) with
   | None -> failwith "Called UseMove with no active steammon"
   | Some mon ->
-      (match (get_move mon move_str) with
+      (match (get_move mon move_str)  with
       | None -> None
       | Some (m, i) -> 
           if (move_fail m) then
@@ -686,14 +781,39 @@ let use_move g c move_str : game_result option =
             (match (GameState.get_active_mon g (opp_color c)) with
             | None -> None
             | Some opp_mon ->
-                (reduce_pp g c i; 
-                if (Random.int 100) < m.accuracy then
-                  failwith "Implement hitting move"
-                else 
-                  let targeted = if m.target = User then c else (opp_color c) in
-                  (*let targeted_mon = if targeted = c then mon else opp_mon in*)
-                  (*let eff = weakness mon.element opp_mon.element in *)
-                  miss_handler g c targeted m)))
+              (reduce_pp g c i; 
+              if move_hits m then
+                let opp_mon = 
+                  match GameState.get_active_mon g (opp_color c) with 
+                  | None -> failwith "Opponent has no Steammon"
+                  | Some mon -> mon in
+                    let (mult, eff) = calc_multiplier mon opp_mon m in
+                    let damage = 
+                      if m.power = 0 then 
+                        0 (*non damaging *)
+                      else if is_special m.element then 
+                        calculate_damage mon.spl_attack opp_mon.spl_defense m.power mult
+                      else calculate_damage mon.attack opp_mon.defense m.power mult in
+                    let (targ, targ_color) = get_target mon opp_mon m c in
+                    do_damage g targ damage targ_color;
+                    let effect_list = traverse_effects g m mon opp_mon c damage in
+                    let move_update = {
+                      name = m.name;
+                      element = m.element;
+                      from = opp_color targ_color;
+                      toward = targ_color;
+                      damage = damage;
+                      hit = Hit;
+                      effectiveness = eff;
+                      effects = effect_list; } in
+                    add_update (Move move_update);
+                    None
+              else 
+                let targeted = if m.target = User then c else (opp_color c) in
+                (*let targeted_mon = if targeted = c then mon else opp_mon in*)
+                (*let eff = weakness mon.element opp_mon.element in *)
+                miss_handler g c targeted m)))
+	          (* ************* NEED TO SEND UPDATE ********** *)
 
 (*Used to switch a steammon when a steammon has fainted and the given*)
 (*mon is a valid_steammon*)
@@ -702,7 +822,7 @@ let switch_active g c s : game_result option =
   let new_steammon = Table.find player_reserves s in
   GameState.remove_reserve_steammon g c new_steammon;
   GameState.set_active_mon g c (Some new_steammon);
-  Netgraphics.send_update (SetChosenSteammon new_steammon.species);
+  Netgraphics.add_update (SetChosenSteammon new_steammon.species);
   None
 
 (*Used when current steammon has fainted and player sends an invalid*)
@@ -716,7 +836,7 @@ let switch_active_arbitrary g c : game_result option =
   | Some new_steammon ->
       GameState.remove_reserve_steammon g c new_steammon;
       GameState.set_active_mon g c (Some new_steammon);
-      Netgraphics.send_update (SetChosenSteammon new_steammon.species);
+      Netgraphics.add_update (SetChosenSteammon new_steammon.species);
       None
 
 
@@ -752,12 +872,30 @@ let active_faint_check g c : bool =
               cost = s.cost;
         } in 
         GameState.add_reserve_steammon g c fainted_steammon;
-        Netgraphics.send_update 
+        Netgraphics.add_update 
           (UpdateSteammon (fainted_steammon.species, 0, s.max_hp, c));
         GameState.set_active_mon g c None;
         true)
       else
         false
+
+let failed_move g c mon move_str =
+  match (get_move mon move_str) with
+  | None -> ()
+  | Some (mv, _) ->
+      let m = {
+        name = mv.name;
+        element = mv.element;
+        from = c;
+        toward =  (if mv.target = User then c else (opp_color c));
+        damage = 0;
+        hit = (match mon.status with 
+              | None -> failwith "Failing non failing move"
+              | Some stat -> (Failed stat));
+        effectiveness = Ineffective;
+        effects = [];
+        } in
+      Netgraphics.add_update (Move m)
 
 let battle_action g c comm : game_result option = 
   let player_reserves = GameState.get_reserve_pool g c in
@@ -773,6 +911,7 @@ let battle_action g c comm : game_result option =
       | Action (UseItem (i, s)) -> (use_item g c i s); None
       | Action (UseMove s) when (GameState.get_can_use_moves g c) -> 
           use_move g c s
+      | Action (UseMove s) -> (failed_move g c mon s); None
       | Action (SwitchSteammon s) -> switch_steammon g c s
       | Action (SelectStarter s) -> switch_active g c s
       | _ -> None)
@@ -791,7 +930,7 @@ let battle_phase g rc bc : game_output =
     if (GameState.get_eff_speed g Red) > (GameState.get_eff_speed g Blue) 
     then (rc, bc, Red) 
     else (bc, rc, Blue) in
-  Netgraphics.send_update (SetFirstAttacker faster_color);
+  Netgraphics.add_update (SetFirstAttacker faster_color);
   let result = battle_action g faster_color faster_action in
   match result with
   | Some res -> (Some res, (game_datafication g), None, None)
