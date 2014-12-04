@@ -68,7 +68,28 @@ let team_phase g rc bc =
   GameState.set_phase g GameState.Draft;
   (None, (game_datafication g), r_pick_req, b_pick_req)
 
+(*First, check to see whose turn. Then, if PickSteammon is the command 
+   if no, then ignore and end with game option with nones, 
+   else check if requested steammon is
+    * availible and if the player has enough money. if no then get lowest steammon for player
+    else purchance for player
+    update draft_mon, player money, player reserve pool
+    update turn
+    get new state
+   Update phase when both teams have all pokemon
+   return game option*)
 
+(*The draft_phase is where the pickSteammon actions are handled
+*One pickSteammon action is chosen based on whose turn it is
+* If the action of that player is not a pickSteammon, draft_phase
+*sends out a game output with Nones for the commands and "acts" as if
+* it has not recieved anyting. If the player does not have enough money
+*for their requested steammon or if that steammon is not availible or 
+*does not exist, then the steammon with the lowest cost is chosen.
+*The steammon is purchased. And a pickRequest is sent to the other player
+*Once both teams have cNUM_PICKS steammon, an inventoryRequest is sent to 
+*the next player and the phase is then Inventory Phase
+*)
 let  draft_phase s r b =    
 (*Returns true if steammon is availible and player has enough money*)
   let valid_purchace smon color_p tbl : bool = 
