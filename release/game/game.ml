@@ -618,6 +618,9 @@ let perform_struggle g c mon =
   None
 
 let update_move (m:move) : move =
+  (*print_string "PP remaining: ";*)
+  (*print_int m.pp_remaining;*)
+  (*print_endline "";*)
   {
     name = m.name;
     element = m.element;
@@ -876,6 +879,24 @@ let active_faint_check g c : bool =
       else
         false
 
+let failed_move g c mon move_str =
+  match (get_move mon move_str) with
+  | None -> ()
+  | Some (mv, _) ->
+      let m = {
+        name = mv.name;
+        element = mv.element;
+        from = c;
+        toward =  (if mv.target = User then c else (opp_color c));
+        damage = 0;
+        hit = (match mon.status with 
+              | None -> failwith "Failing non failing move"
+              | Some stat -> (Failed stat));
+        effectiveness = Ineffective;
+        effects = [];
+        } in
+      Netgraphics.add_update (Move m)
+
 let battle_action g c comm : game_result option = 
   let player_reserves = GameState.get_reserve_pool g c in
   match (GameState.get_active_mon g c) with
@@ -890,6 +911,7 @@ let battle_action g c comm : game_result option =
       | Action (UseItem (i, s)) -> (use_item g c i s); None
       | Action (UseMove s) when (GameState.get_can_use_moves g c) -> 
           use_move g c s
+      | Action (UseMove s) -> (failed_move g c mon s); None
       | Action (SwitchSteammon s) -> switch_steammon g c s
       | Action (SelectStarter s) -> switch_active g c s
       | _ -> None)
