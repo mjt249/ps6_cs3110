@@ -687,6 +687,7 @@ let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
 	     else 1. in
   let rand = 
     float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
+  let _ = print_endline ("stab: " ^ string_of_float(stab) ^ " type_mult: " ^ (string_of_float type_mult) ^ " burn: " ^ string_of_float burn ^ " rand: " ^ string_of_float rand) in
   (stab *. type_mult *. burn *. rand, eff)
 
 let move_hits mv = 
