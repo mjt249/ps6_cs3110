@@ -696,7 +696,7 @@ let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
 	     else 1. in
   let rand = 
     float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
-  stab *. type_mult *. burn *. rand
+  (stab *. type_mult *. burn *. rand, eff)
 
 let move_hits mv = 
   match mv.target with
@@ -764,7 +764,7 @@ let traverse_effects g (mv:move) att_mon def_mon color damage =
     | [] -> []
     | hd::tl -> match handle_effects g hd targ_mon targ_color damage with
 		| None -> heal tl
-		| Some x -> x::(heal tl) in
+		| Some x -> (x, targ_color)::(heal tl) in
   if fate < prob then
     heal lst
   else []
@@ -788,7 +788,7 @@ let use_move g c move_str : game_result option =
 		    match GameState.get_active_mon g (opp_color c) with 
 		    | None -> failwith "Opponent has no Steammon"
 		    | Some mon -> mon in
-                  let mult = calc_multiplier mon opp_mon m in
+                  let (mult, eff) = calc_multiplier mon opp_mon m in
 		  let damage = 
 		    if m.power = 0 then 
 		      0 (*non damaging *)
@@ -798,14 +798,22 @@ let use_move g c move_str : game_result option =
 		  let (targ, targ_color) = get_target mon opp_mon m c in
 		  do_damage g targ damage targ_color;
 		  let effect_list = traverse_effects g m mon opp_mon c damage in
-		  ignore(effect_list);
-		  failwith "Not done"
-		  
+		  let move_update = {name = m.name;
+				     element = m.element;
+				     from = opp_color targ_color;
+				     toward = targ_color;
+				     damage = damage;
+				     hit = Hit;
+				     effectiveness = eff;
+				     effects = effect_list; } in
+		  add_update (Move move_update);
+		  failwith "Not done yet"
                 else 
                   let targeted = if m.target = User then c else (opp_color c) in
                   (*let targeted_mon = if targeted = c then mon else opp_mon in*)
                   (*let eff = weakness mon.element opp_mon.element in *)
                   miss_handler g c targeted m)))
+	          (* ************* NEED TO SEND UPDATE ********** *)
 
 (*Used to switch a steammon when a steammon has fainted and the given*)
 (*mon is a valid_steammon*)
