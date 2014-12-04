@@ -12,6 +12,23 @@ let name = "attacker"
 
 let _ = Random.self_init ()
 
+(*compares first by attack, then spl_attack, then cost *)
+let comp_by_atk mon1 mon2 =
+  if mon1.attack = mon2.attack then
+    if mon1.spl_attack = mon2.spl_attack then
+      if mon1.cost = mon2.cost then 0
+      else if mon1.cost > mon2.cost then 1
+      else -1
+    else if mon1.spl_attack > mon2.spl_attack then 1
+    else 0
+  else if mon1.attack > mon2.attack then 1
+  else -1
+
+let creds = ref Constants.cSTEAMMON_CREDITS
+
+let can_purchase mon = 
+  mon.cost <= !creds
+
 (* handle_request c r responds to a request r by returning an action. The color c 
  * allows the bot to know what color it is. *)
 let handle_request (c : color) (r : request) : action =
@@ -26,12 +43,16 @@ let handle_request (c : color) (r : request) : action =
           with _ -> (List.hd mons) in
           SelectStarter(pick.species)
     | PickRequest(_, _, _, sp) ->
-        (match sp with
-         | h::t ->
-            let length = List.length sp in
-            let my_pick = List.nth sp (Random.int length) in
-              PickSteammon(my_pick.species)
-         | [] -> failwith "no steammon to pick!")
+       let sorted = List.fast_sort comp_by_atk sp in
+       let rec pick_mon lst = 
+	 match lst with
+	 | h::[] -> PickSteammon(h.species) (* out of/low on credits *)
+         | h::t -> if can_purchase h then
+		     ((creds := !creds - h.cost);
+		      PickSteammon(h.species))
+		   else pick_mon t
+         | [] -> failwith "no steammon to pick!" in
+       pick_mon sorted
     | ActionRequest (gr) ->
         let (a1, b1) = gr in
         let my_team = if c = Red then a1 else b1 in

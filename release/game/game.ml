@@ -135,10 +135,11 @@ let team_phase g rc bc =
           (Blue,b) 
       in
       match color_p with      
-      | ( _ ,Action(PickSteammon nm)) -> let str =
-        if (not(valid_purchace nm color_p tbl)) then (get_lowest_steammon color_p tbl) 
-        else nm
-      in
+      | ( _ ,Action(PickSteammon nm)) -> 
+	 let str =
+           if (not(valid_purchace nm color_p tbl)) then (get_lowest_steammon color_p tbl) 
+           else nm
+	 in
         (purchace_steammon str color_p tbl)
       | (_,_) -> (None, (game_datafication s), None, None)
 
@@ -813,7 +814,7 @@ let use_move g c move_str : game_result option =
                   (*let targeted_mon = if targeted = c then mon else opp_mon in*)
                   (*let eff = weakness mon.element opp_mon.element in *)
                   miss_handler g c targeted m)))
-	          (* ************* NEED TO SEND UPDATE ********** *)
+
 
 (*Used to switch a steammon when a steammon has fainted and the given*)
 (*mon is a valid_steammon*)
