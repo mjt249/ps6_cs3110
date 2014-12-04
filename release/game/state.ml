@@ -49,14 +49,14 @@ module GameState = struct
   let init_red () = {
     inv = []; 
     active_mon = None;
-    steammons = None;
+    steammons = Some (Table.create 1);
     credits = cSTEAMMON_CREDITS; 
   }
 
   let init_blue () = {
     inv = []; 
     active_mon = None;
-    steammons = None;
+    steammons = Some (Table.create 1);
     credits = cSTEAMMON_CREDITS; 
   }
 
