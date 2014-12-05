@@ -1,6 +1,7 @@
 open Team
 open Definitions
 open Constants
+open Util
 
 (* Attention Student:
  * Do not change the arguments of handle_request. However, feel free to change 
@@ -8,14 +9,34 @@ open Constants
  *)
 
 (* Change this to the name of your bot. *)
-let name = "attacker"
+let name = "smartbot"
 
 let _ = Random.self_init ()
 
+let effective_damage mon (mv:move) = 
+  let stab = 
+    match mon.first_type, mon.second_type with
+    | None, Some typ when typ = mv.element -> cSTAB_BONUS
+    | Some typ, None when typ = mv.element -> cSTAB_BONUS
+    | Some typ1, Some typ2 when typ1 = mv.element || typ2 = mv.element -> cSTAB_BONUS 
+    | _ -> 1. in
+  if is_special mv.element then
+    if mv.accuracy > 70 then
+      int_of_float(float_of_int(mon.spl_attack * mv.power) *. stab)
+    else int_of_float(float_of_int(mon.spl_attack * mv.power * mv.accuracy / 100) *. stab)
+  else if mv.accuracy > 70 then
+    int_of_float(float_of_int(mon.attack * mv.power) *. stab)
+  else int_of_float(float_of_int(mon.spl_attack * mv.power * mv.accuracy / 100) *. stab)
+
+let best_move_eff_damage mon = 
+  max (max (effective_damage mon mon.first_move) (effective_damage mon mon.second_move))
+      (max (effective_damage mon mon.third_move) (effective_damage mon mon.fourth_move))
+
 let weighted_score mon = 
-  let (atk, spa, def, spd, spe) = (1,1,1,1,1) in 
+  let (atk, spa, def, spd, spe, hp, best_move) = (1,1,1,1,1,1,1) in 
   (mon.attack * atk) + (mon.spl_attack * spa) + (mon.defense * def) + 
-		 (mon.spl_defense * spd) + (mon.speed * spe) 
+    (mon.spl_defense * spd) + (mon.speed * spe) + (mon.max_hp * hp) +
+    ((best_move_eff_damage mon) * best_move)
 
 let modular_comp mon1 mon2 =
   let (score1, score2) = (weighted_score mon1, weighted_score mon2) in
@@ -49,6 +70,8 @@ let comp_by_power mv1 mv2 =
 
 let creds = ref Constants.cSTEAMMON_CREDITS
 
+let total_score = ref 0
+
 let can_purchase mon cred = 
   mon.cost <= cred
 
@@ -61,7 +84,7 @@ let handle_request (c : color) (r : request) : action =
         let (a1,b1) = gs in
         let my_team = if c = Red then a1 else b1 in
         let (mons, pack, credits) = my_team in
-        let sorted = List.rev(List.fast_sort comp_by_atk mons) in
+        let sorted = List.rev(List.fast_sort modular_comp mons) in
 	let pick = 
           try List.find(fun x -> x.curr_hp > 0) sorted 
           with _ -> (List.hd mons) in
@@ -70,12 +93,13 @@ let handle_request (c : color) (r : request) : action =
        let (a1,b1) = gs in
        let my_team = if c = Red then a1 else b1 in
        let (mons, pack, credits) = my_team in
-       let sorted = List.rev(List.fast_sort comp_by_atk sp) in
+       let sorted = List.rev(List.fast_sort modular_comp sp) in
        let rec pick_mon lst = 
 	 match lst with
 	 | h::[] -> PickSteammon(h.species) (* out of/low on credits *)
-         | h::t -> if can_purchase h credits then
-		      PickSteammon(h.species)
+         | h::t -> if can_purchase h credits then(
+		     (total_score := !total_score + weighted_score h);
+		     PickSteammon(h.species))
 		   else pick_mon t
          | [] -> failwith "no steammon to pick!" in
        pick_mon sorted
