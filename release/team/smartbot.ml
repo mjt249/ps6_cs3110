@@ -82,9 +82,14 @@ let rec switch_out mon_lst opp : steammon option=
   if cNUM_PICKS = 1 then None
   else match List.tl mon_lst with
        | [] -> None
-       | hd::tl -> if is_ineffective hd opp then
+       | hd::tl -> if is_ineffective hd opp && hd.curr_hp > 0 then
 		     switch_out tl opp
 		   else Some hd
+
+let movement_is_restricted mon = 
+  match mon.status with 
+  | Some x when x = Paralyzed || x = Asleep || x = Frozen || x = Confused -> true
+  | _ -> false
 
 (*compares first by attack, then spl_attack, then cost *)
 let comp_by_atk mon1 mon2 =
