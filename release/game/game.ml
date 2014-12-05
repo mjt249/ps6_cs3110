@@ -168,7 +168,7 @@ let  draft_phase s r b =
       else nm
     in
       (purchace_steammon str color_p tbl)
-    | (_,_) -> (None, (game_datafication s), None, None)
+    | (_,_) -> let str = (get_lowest_steammon color_p tbl) in (purchace_steammon str color_p tbl)
 
 let stock_inventories g rc bc =
   let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 
@@ -183,8 +183,7 @@ let stock_inventories g rc bc =
       GameState.set_inv g c inv in
   let error_wrapper (c: color) = function
     | Action (PickInventory inv) -> stock_inventory_of c inv
-    | DoNothing -> stock_inventory_of c default_inv
-    | _ -> failwith "Neither PickInventory nor DoNothing" in
+    | _ -> stock_inventory_of c default_inv in
   error_wrapper Red rc;
   error_wrapper Blue bc;
   GameState.set_phase g GameState.Battle;

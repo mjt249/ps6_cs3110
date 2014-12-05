@@ -20,9 +20,10 @@ let handle_request (c : color) (r : request) : action =
   match nbr with
     | 0 -> SendTeamName(name)
     | 1 -> SelectStarter("Imaginary species")
-    | 2 ->    PickSteammon("Imaginary species")
+    | 2 -> PickSteammon("Imaginary species")
     | 3 -> UseMove("Imaginary Move")
 	  | 4 -> PickInventory(
 					[cNUM_ETHER;cNUM_MAX_POTION;cNUM_REVIVE;cNUM_FULL_HEAL;
 	 				 cNUM_XATTACK;cNUM_XDEFENSE;cNUM_XSPEED])
+    |_-> failwith "what is with this generator?"
 let () = run_bot handle_request
