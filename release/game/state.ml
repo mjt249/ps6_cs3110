@@ -36,6 +36,7 @@ module GameState = struct
     mutable blue : player;
     mutable draft_mons : steammon Table.t;
     mutable turn: color;
+    mutable second_turn: color * bool;
     mutable phase : phase;
   }
 
@@ -66,6 +67,7 @@ module GameState = struct
     draft_mons = Initialization.mon_table;
     turn = Red;
     phase = TeamName;
+    second_turn = (Red,false);
     }
 
   let get_name s c = 
@@ -131,6 +133,8 @@ module GameState = struct
 
 
   let get_turn s : color = s.turn
+
+  let get_second_turn s : color * bool = s.second_turn
 
 
   let get_phase s = 
@@ -346,6 +350,9 @@ module GameState = struct
 
   let set_turn s c = 
       s.turn <- c
+
+  let set_second_turn s t =
+      s.second_turn <- t
 
   let set_stat_modifier s c mon stat value = 
     let new_mod =

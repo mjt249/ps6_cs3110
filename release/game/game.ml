@@ -56,6 +56,7 @@ let team_phase g rc bc =
   let r_pick_req = 
     (if draft_pick = 0 then
       (GameState.set_turn g Red;
+       GameState.set_second_turn g (Blue,false);
       Some (Request (PickRequest (Red, (game_datafication g), 
         (GameState.get_move_list g), (GameState.get_base_mons g)))))
     else 
@@ -63,6 +64,7 @@ let team_phase g rc bc =
   let b_pick_req = 
     (if draft_pick = 1 then
       (GameState.set_turn g Blue;
+      GameState.set_second_turn g (Red,false);
       Some (Request (PickRequest (Blue, (game_datafication g), 
         (GameState.get_move_list g), (GameState.get_base_mons g)))))
     else
@@ -71,6 +73,18 @@ let team_phase g rc bc =
   (None, (game_datafication g), r_pick_req, b_pick_req)
 
 
+
+(*The draft_phase is where the pickSteammon actions are handled
+*One pickSteammon action is chosen based on whose turn it is
+* If the action of that player is not a pickSteammon, draft_phase
+*sends out a game output with Nones for the commands and "acts" as if
+* it has not recieved anyting. If the player does not have enough money
+*for their requested steammon or if that steammon is not availible or 
+*does not exist, then the steammon with the lowest cost is chosen.
+*The steammon is purchased. And a pickRequest is sent to the other player
+*Once both teams have cNUM_PICKS steammon, an inventoryRequest is sent to 
+*the next player and the phase is then Inventory Phase
+*)
 let  draft_phase s r b =    
 (*Returns true if steammon is availible and player has enough money*)
   let valid_purchace smon color_p tbl : bool = 
@@ -107,16 +121,35 @@ let  draft_phase s r b =
         
       let datafif = game_datafication s in
       let finished = GameState.get_draft_finished s in
-        match (finished, fst(color_p)) with
-        |(false, Red) -> GameState.set_turn s Blue;
+      let snd_check = GameState.get_second_turn s in
+        match (finished, fst(color_p), snd_check) with
+        |(false, Red, (_,true)) -> GameState.set_turn s Blue;
                         let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
                         (GameState.get_move_list s), (GameState.get_base_mons s)))) in
                         (None, datafif, None, b_req)
-        |(false, Blue) -> GameState.set_turn s Red;
+        |(false, Blue, (_, true)) -> GameState.set_turn s Red;
                         let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
                         (GameState.get_move_list s), (GameState.get_base_mons s)))) in
                         (None, datafif, r_req, None)
-        |(true, _) ->   GameState.set_phase s GameState.Inventory;
+        |(false, Red, (Blue,false)) -> GameState.set_turn s Blue;
+                        let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, None, b_req)
+        |(false, Blue, (Red, false)) -> GameState.set_turn s Red;
+                        let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, r_req, None)
+        |(false, Red, (Red, false)) -> GameState.set_turn s Red;
+                        GameState.set_second_turn s (Red, true);
+                        let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, r_req, None)
+        |(false, Blue, (Blue, false)) -> GameState.set_turn s Blue;
+                        GameState.set_second_turn s (Blue, true);
+                        let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, None, b_req)
+        |(true, _, (_,_)) ->   GameState.set_phase s GameState.Inventory;
                         let inv_req = Some (Request (PickInventoryRequest(datafif))) in
                         (None, datafif, inv_req, inv_req)
      in
@@ -135,7 +168,7 @@ let  draft_phase s r b =
       else nm
     in
       (purchace_steammon str color_p tbl)
-    | (_,_) -> (None, (game_datafication s), None, None)
+    | (_,_) -> let str = (get_lowest_steammon color_p tbl) in (purchace_steammon str color_p tbl)
 
 let stock_inventories g rc bc =
   let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 
@@ -150,8 +183,7 @@ let stock_inventories g rc bc =
       GameState.set_inv g c inv in
   let error_wrapper (c: color) = function
     | Action (PickInventory inv) -> stock_inventory_of c inv
-    | DoNothing -> stock_inventory_of c default_inv
-    | _ -> failwith "Neither PickInventory nor DoNothing" in
+    | _ -> stock_inventory_of c default_inv in
   error_wrapper Red rc;
   error_wrapper Blue bc;
   GameState.set_phase g GameState.Battle;
