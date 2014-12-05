@@ -47,6 +47,28 @@ let modular_comp mon1 mon2 =
   else if score1 > score2 then 1
   else -1
 
+let max_eff eff1 eff2 = 
+  match eff1, eff2 with
+  | Ineffective, _ -> eff2
+  | _, Ineffective -> eff1
+  | SuperEffective, _ -> eff1
+  | _, SuperEffective -> eff2
+  | NotVeryEffective, _ -> eff2
+  | _, NotVeryEffective -> eff1
+  | Regular, _ -> eff2
+
+let is_ineffective att_mon def_mon = 
+  let (eff1,_) = calculate_type_matchup att_mon.first_move.element 
+					(def_mon.first_type, def_mon.second_type) in  
+  let (eff2,_) = calculate_type_matchup att_mon.second_move.element 
+					(def_mon.first_type, def_mon.second_type) in 
+  let (eff3,_) = calculate_type_matchup att_mon.third_move.element 
+					(def_mon.first_type, def_mon.second_type) in 
+  let (eff4,_) = calculate_type_matchup att_mon.fourth_move.element 
+					(def_mon.first_type, def_mon.second_type) in 
+  max_eff (max_eff eff1 eff2 ) (max_eff eff3 eff4 )
+ 
+
 (*compares first by attack, then spl_attack, then cost *)
 let comp_by_atk mon1 mon2 =
   if mon1.attack = mon2.attack then
@@ -68,9 +90,8 @@ let comp_by_power mv1 mv2 =
   else if mv1.power > mv2.power then 1
   else -1
 
-let creds = ref Constants.cSTEAMMON_CREDITS
-
 let total_score = ref 0
+let num_dead = ref 0
 
 let can_purchase mon cred = 
   mon.cost <= cred
@@ -120,7 +141,13 @@ let handle_request (c : color) (r : request) : action =
 			   UseMove(hd.name)
 			 else find_available_move tl 
 	     | _ -> failwith "WHAT HAPPENED TO MY MOVES?????" in
-	   find_available_move sorted
+	   (* if is_ineffective then
+	     if weighted_score h >= !total_score / cNUM_PICKS then
+	       (* switch out *)
+	     else 
+	       (* use item *) 
+	   else *)
+	     find_available_move sorted
 	| _ -> failwith "WHAT IN THE NAME OF ZARDOZ HAPPENED HERE")
     | PickInventoryRequest (gr) -> PickInventory(
 				       [cNUM_ETHER;cNUM_MAX_POTION;cNUM_REVIVE;cNUM_FULL_HEAL;
