@@ -673,6 +673,7 @@ let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
 	     else 1. in
   let rand = 
     float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
+  let _ = print_endline ("stab: " ^ string_of_float(stab) ^ " type_mult: " ^ (string_of_float type_mult) ^ " burn: " ^ string_of_float burn ^ " rand: " ^ string_of_float rand) in
   (stab *. type_mult *. burn *. rand, eff)
 
 let move_hits mv = 
@@ -780,11 +781,6 @@ let use_move g c move_str : game_result option =
           else
             if m.target = User then
               (let mon = reduce_pp g c i in
-              print_string "Self move ";
-              print_int i;
-              print_string " Steammon ";
-              print_string mon.species;
-              print_endline "";
               let opp_mon = mon in
               let (mult, eff) = calc_multiplier mon opp_mon m in
               let damage = 
@@ -793,18 +789,13 @@ let use_move g c move_str : game_result option =
                 else if is_special m.element then 
                   calculate_damage mon.spl_attack opp_mon.spl_defense m.power mult
                 else calculate_damage mon.attack opp_mon.defense m.power mult in
-              print_string "Move: ";
-              print_string m.name;
-              print_string " Damage: ";
-              print_int damage;
-              print_endline "";
               let (targ, targ_color) = get_target mon opp_mon m c in
               do_damage g targ damage targ_color;
               let effect_list = traverse_effects g m mon opp_mon c damage in
               let move_update = {
                 name = m.name;
                 element = m.element;
-                from = opp_color targ_color;
+                from = targ_color;
                 toward = targ_color;
                 damage = damage;
                 hit = Hit;
@@ -829,11 +820,6 @@ let use_move g c move_str : game_result option =
                       else if is_special m.element then 
                         calculate_damage mon.spl_attack opp_mon.spl_defense m.power mult
                       else calculate_damage mon.attack opp_mon.defense m.power mult in
-                    print_string "Move: ";
-                    print_string m.name;
-                    print_string " Damage: ";
-                    print_int damage;
-                    print_endline "";
                     let (targ, targ_color) = get_target mon opp_mon m c in
                     do_damage g targ damage targ_color;
                     let effect_list = traverse_effects g m mon opp_mon c damage in
