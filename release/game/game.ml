@@ -642,7 +642,8 @@ let reduce_pp g c i =
             mods = s.mods;
             cost = s.cost;
       } in 
-    GameState.set_active_mon g c (Some updated_steammon)
+      GameState.set_active_mon g c (Some updated_steammon);
+      updated_steammon
     (*Netgraphics.add_update (SetChosenSteammon updated_steammon.species)*)
 
 let miss_handler g from toward (m:move) =
@@ -771,18 +772,53 @@ let perform_struggle g c mon =
 let use_move g c move_str : game_result option =
   match (GameState.get_active_mon g c) with
   | None -> failwith "Called UseMove with no active steammon"
-  | Some mon ->
-      (match (get_move mon move_str)  with
+  | Some smon ->
+      (match (get_move smon move_str)  with
       | None -> None
       | Some (m, i) -> 
           if (move_fail m) then
-            perform_struggle g c mon
+            perform_struggle g c smon
           else
-            (match (GameState.get_active_mon g (opp_color c)) with
+            if m.target = User then
+              (let mon = reduce_pp g c i in
+              print_string "Self move ";
+              print_int i;
+              print_string " Steammon ";
+              print_string mon.species;
+              print_endline "";
+              let opp_mon = mon in
+              let (mult, eff) = calc_multiplier mon opp_mon m in
+              let damage = 
+                if m.power = 0 then 
+                  0 (*non damaging *)
+                else if is_special m.element then 
+                  calculate_damage mon.spl_attack opp_mon.spl_defense m.power mult
+                else calculate_damage mon.attack opp_mon.defense m.power mult in
+              print_string "Move: ";
+              print_string m.name;
+              print_string " Damage: ";
+              print_int damage;
+              print_endline "";
+              let (targ, targ_color) = get_target mon opp_mon m c in
+              do_damage g targ damage targ_color;
+              let effect_list = traverse_effects g m mon opp_mon c damage in
+              let move_update = {
+                name = m.name;
+                element = m.element;
+                from = opp_color targ_color;
+                toward = targ_color;
+                damage = damage;
+                hit = Hit;
+                effectiveness = eff;
+                effects = effect_list; } in
+              add_update (UpdateSteammon (mon.species, mon.curr_hp, mon.max_hp, c));
+              add_update (Move move_update);
+              None)
+            else ((match (GameState.get_active_mon g (opp_color c)) with
             | None -> None
             | Some opp_mon ->
-              (reduce_pp g c i; 
               if move_hits m then
+                (let mon = reduce_pp g c i in
                 let opp_mon = 
                   match GameState.get_active_mon g (opp_color c) with 
                   | None -> failwith "Opponent has no Steammon"
@@ -820,7 +856,7 @@ let use_move g c move_str : game_result option =
                       effects = effect_list; } in
                     add_update (UpdateSteammon (mon.species, mon.curr_hp, mon.max_hp, c));
                     add_update (Move move_update);
-                    None
+                    None)
               else 
                 let targeted = if m.target = User then c else (opp_color c) in
                 (*let targeted_mon = if targeted = c then mon else opp_mon in*)
