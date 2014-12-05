@@ -56,6 +56,7 @@ let team_phase g rc bc =
   let r_pick_req = 
     (if draft_pick = 0 then
       (GameState.set_turn g Red;
+       GameState.set_second_turn g (Blue,false);
       Some (Request (PickRequest (Red, (game_datafication g), 
         (GameState.get_move_list g), (GameState.get_base_mons g)))))
     else 
@@ -63,6 +64,7 @@ let team_phase g rc bc =
   let b_pick_req = 
     (if draft_pick = 1 then
       (GameState.set_turn g Blue;
+      GameState.set_second_turn g (Red,false);
       Some (Request (PickRequest (Blue, (game_datafication g), 
         (GameState.get_move_list g), (GameState.get_base_mons g)))))
     else
@@ -119,16 +121,35 @@ let  draft_phase s r b =
         
       let datafif = game_datafication s in
       let finished = GameState.get_draft_finished s in
-        match (finished, fst(color_p)) with
-        |(false, Red) -> GameState.set_turn s Blue;
+      let snd_check = GameState.get_second_turn s in
+        match (finished, fst(color_p), snd_check) with
+        |(false, Red, (_,true)) -> GameState.set_turn s Blue;
                         let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
                         (GameState.get_move_list s), (GameState.get_base_mons s)))) in
                         (None, datafif, None, b_req)
-        |(false, Blue) -> GameState.set_turn s Red;
+        |(false, Blue, (_, true)) -> GameState.set_turn s Red;
                         let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
                         (GameState.get_move_list s), (GameState.get_base_mons s)))) in
                         (None, datafif, r_req, None)
-        |(true, _) ->   GameState.set_phase s GameState.Inventory;
+        |(false, Red, (Blue,false)) -> GameState.set_turn s Blue;
+                        let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, None, b_req)
+        |(false, Blue, (Red, false)) -> GameState.set_turn s Red;
+                        let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, r_req, None)
+        |(false, Red, (Red, false)) -> GameState.set_turn s Red;
+                        GameState.set_second_turn s (Red, true);
+                        let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, r_req, None)
+        |(false, Blue, (Blue, false)) -> GameState.set_turn s Blue;
+                        GameState.set_second_turn s (Blue, true);
+                        let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                        (None, datafif, None, b_req)
+        |(true, _, (_,_)) ->   GameState.set_phase s GameState.Inventory;
                         let inv_req = Some (Request (PickInventoryRequest(datafif))) in
                         (None, datafif, inv_req, inv_req)
      in

@@ -33,7 +33,7 @@ module GameState : sig
   val get_can_use_moves: state -> color -> bool
 
   val get_turn: state -> color
-  val get_second_turn: state -> bool
+  val get_second_turn: state -> color * bool
 
   val set_name: state -> color -> string -> unit
 
@@ -51,6 +51,7 @@ module GameState : sig
   
   val set_draft_mons: state -> steammon Table.t -> unit
   val set_turn: state -> color -> unit
+  val set_second_turn: state -> color * bool -> unit
 
   val add_reserve_steammon: state -> color -> steammon -> unit
   val remove_reserve_steammon: state -> color -> steammon -> unit
