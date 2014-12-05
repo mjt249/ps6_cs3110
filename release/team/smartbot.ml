@@ -276,12 +276,12 @@ let handle_request (c : color) (r : request) : action =
 		    if m.accuracy >= 70 then
                       calculate_damage h.spl_attack 
 				       opp.spl_defense m.power mult
-		    else (calculate_damage h.spl_attack 
-					   opp.spl_defense m.power mult)*m.accuracy
-		  else if m.accuracy < 70 then
-                    calculate_damage h.spl_attack 
-				     opp.spl_defense m.power mult
-		  else (calculate_damage h.spl_attack 
+          else (calculate_damage h.spl_attack 
+               opp.spl_defense m.power mult)*m.accuracy
+        else if m.accuracy < 70 then
+                      calculate_damage h.spl_attack 
+               opp.spl_defense m.power mult
+        else (calculate_damage h.spl_attack 
 					 opp.spl_defense m.power mult)*m.accuracy in
 	     (calc_damage m1) - (calc_damage mv2) in
 	   let mv_lst = [h.first_move;h.second_move;h.third_move;h.fourth_move] in 
