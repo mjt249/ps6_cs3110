@@ -13,6 +13,51 @@ let name = "smartbot"
 
 let _ = Random.self_init ()
 
+let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
+  let stab = 
+    match att_mon.first_type, att_mon.second_type with
+      | None, Some typ when typ = mv.element -> cSTAB_BONUS
+      | Some typ, None when typ = mv.element -> cSTAB_BONUS
+      | Some typ1, Some typ2 when typ1 = mv.element || typ2 = mv.element -> cSTAB_BONUS 
+      | _ -> 1. in
+    let (eff, type_mult) = calculate_type_matchup mv.element (def_mon.first_type, 
+                        def_mon.second_type) in
+    let burn = if att_mon.status = Some Burned then cBURN_WEAKNESS else 1. in
+    let rand = float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
+    (stab *. type_mult *. burn *. rand, eff) 
+
+let find_most_damage (gr: game_status_data) (c:color): move= 
+  let (a1, b1) = gr in
+  let my_team = if c = Red then a1 else b1 in
+  let opp_team = if c = Blue then a1 else b1 in
+  let (my_mons, my_pack, my_credits) = my_team in
+  let (opp_mons, opp_pack, opp_credits) = opp_team in
+  let my_active_mon = List.hd(my_mons) in
+  let opp_active_mon = List.hd(opp_mons) in
+  let move_list = [my_active_mon.first_move; my_active_mon.second_move; 
+                     my_active_mon.third_move; my_active_mon.fourth_move] in
+  let get_move_mult (m: move) = 
+    let (multiplier, eff) = calc_multiplier my_active_mon opp_active_mon m in
+    multiplier in
+  let calc_damage (m:move) = 
+    match m.target with
+    | User -> -1
+    | Opponent ->
+        let mult = get_move_mult m in
+        if m.power = 0 then 0 (*non damaging *)
+        else if is_special m.element then 
+          if m.accuracy >= 70 then
+            calculate_damage my_active_mon.spl_attack opp_active_mon.spl_defense m.power mult
+          else (calculate_damage my_active_mon.spl_attack opp_active_mon.spl_defense m.power mult)*m.accuracy
+        else if m.accuracy < 70 then
+            calculate_damage my_active_mon.spl_attack opp_active_mon.spl_defense m.power mult
+        else (calculate_damage my_active_mon.spl_attack opp_active_mon.spl_defense m.power mult)*m.accuracy in
+      let damage_list = List.map calc_damage move_list in
+      let damage_tagged_moves =  List.fold_left2 (fun lst damage mov -> (damage, mov)::lst) [] damage_list move_list in 
+      let sorted_tagged_lst = List.sort (fun (d1, m1) (d2, m2) -> d1 - d2) damage_tagged_moves in
+      let sorted_moves = List.map (fun (damage, mov) -> mov) sorted_tagged_lst in
+  List.hd(sorted_moves)
+
 let effective_damage mon (mv:move) = 
   let stab = 
     match mon.first_type, mon.second_type with
@@ -33,7 +78,7 @@ let best_move_eff_damage mon =
       (max (effective_damage mon mon.third_move) (effective_damage mon mon.fourth_move))
 
 let weighted_score mon = 
-  let (atk, spa, def, spd, spe, hp, best_move) = (1,1,1,1,1,1,1) in 
+  let (atk, spa, def, spd, spe, hp, best_move) = (1,1,1,30,1,5,10) in 
   (mon.attack * atk) + (mon.spl_attack * spa) + (mon.defense * def) + 
     (mon.spl_defense * spd) + (mon.speed * spe) + (mon.max_hp * hp) +
     ((best_move_eff_damage mon) * best_move)
@@ -125,9 +170,14 @@ let rec switch_out mon_lst opp : steammon option=
   if cNUM_PICKS = 1 then None
   else match List.tl mon_lst with
        | [] -> None
-       | hd::tl -> if is_ineffective hd opp then
+       | hd::tl -> if is_ineffective hd opp && hd.curr_hp > 0 then
 		     switch_out tl opp
 		   else Some hd
+
+let movement_is_restricted mon = 
+  match mon.status with 
+  | Some x when x = Paralyzed || x = Asleep || x = Frozen || x = Confused -> true
+  | _ -> false
 
 (*compares first by attack, then spl_attack, then cost *)
 let comp_by_atk mon1 mon2 =
@@ -187,6 +237,9 @@ let handle_request (c : color) (r : request) : action =
     | ActionRequest (gr) ->
         let (a1, b1) = gr in
         let my_team = if c = Red then a1 else b1 in
+	let opponent_team = if c = Red then b1 else a1 in
+	let (opp_mons, _, _) = opponent_team in
+	let opp = List.hd opp_mons in
         let (mons, pack, credits) = my_team in
         (match mons with
         | h::t ->
@@ -209,6 +262,51 @@ let handle_request (c : color) (r : request) : action =
        else *)
          find_available_move sorted
     | _ -> failwith "WHAT IN THE NAME OF ZARDOZ HAPPENED HERE")
+	   let compare_moves (m1: move) (mv2: move) : int =
+	     let get_move_mult (m: move) =
+               let (multiplier, eff) = calc_multiplier h opp m in
+               multiplier in
+	     let calc_damage (m:move) =
+               match m.target with
+               | User -> -1
+               | Opponent ->
+		  let mult = get_move_mult m in
+		  if m.power = 0 then 0 (*non damaging *)
+		  else if is_special m.element then
+		    if m.accuracy >= 70 then
+                      calculate_damage h.spl_attack 
+				       opp.spl_defense m.power mult
+		    else (calculate_damage h.spl_attack 
+					   opp.spl_defense m.power mult)*m.accuracy
+		  else if m.accuracy < 70 then
+                    calculate_damage h.spl_attack 
+				     opp.spl_defense m.power mult
+		  else (calculate_damage h.spl_attack 
+					 opp.spl_defense m.power mult)*m.accuracy in
+	     (calc_damage m1) - (calc_damage mv2) in
+	   let mv_lst = [h.first_move;h.second_move;h.third_move;h.fourth_move] in 
+	   let sorted = List.rev(List.fast_sort compare_moves mv_lst) in
+	   let rec find_available_move (lst: move list) = 
+	     match lst with 
+	     | hd::[] -> let _ = print_endline (h.species ^ " used " ^ (hd.name)) in
+			 UseMove(hd.name)
+	     | hd::tl -> if hd.pp_remaining > 0 then
+			   let _ = print_endline (h.species ^ " used " ^ (hd.name)) in
+			   UseMove(hd.name)
+			 else find_available_move tl 
+	     | _ -> failwith "WHAT HAPPENED TO MY MOVES?????" in
+	   if is_ineffective h opp then
+	     if weighted_score h >= !total_score / cNUM_PICKS then
+	       (* switch out *)
+               match switch_out mons opp with
+               | None -> find_available_move sorted
+               | Some monster -> failwith "TODO"
+	     else 
+	       (* use item *)
+	       failwith "TODO"
+	   else 
+	     find_available_move sorted
+	| _ -> failwith "WHAT IN THE NAME OF ZARDOZ HAPPENED HERE")
     | PickInventoryRequest (gr) -> PickInventory(
 				       [cNUM_ETHER;cNUM_MAX_POTION;cNUM_REVIVE;cNUM_FULL_HEAL;
 	 				cNUM_XATTACK;cNUM_XDEFENSE;cNUM_XSPEED])
