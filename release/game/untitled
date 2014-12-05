@@ -1,0 +1,75 @@
+  let  draft_phase s r b : game_output = 
+     
+(*Returns true if steammon is availible and player has enough money*)
+    let valid_purchace (smon:string) color_p : bool = 
+        if (Table.mem tbl smon) then 
+        let poke = Table.find tbl smon in
+        let cost = poke.cost in
+        let monies = GameState.get_creds s color_p in
+        if( monies >= cost) then true
+      else false
+      
+
+
+    let get_lowest_steammon color_p: string =
+     let cost_checker (lowest_poke:steammon) (current_poke:steammon) : steammon=
+        if (lowest_poke.cost <= poke.cost) then lowest
+      else poke.cost
+    in
+     GameState.set_creds s color_p 0;
+     let lst = hash_to_list tbl in
+     match lst with 
+     hd::tl -> List.fold_left cost_checker hd.cost lst
+     | _ failwith "Ran Out of Pokemon"
+     
+
+
+    let purchace_steammon (smon:string) color_p =
+      let poke = Table.find tbl smon in
+      let () = Table.remove tbl smon in
+      GameState.add_reserve_steammon s color_p poke;
+      let monies = GameState.get_creds s color_p in
+      if (!(monies = 0)) then GameState.set_creds s color_p (monies - poke.cost)
+    in
+      let datafif = game_datafication s in
+      if (get_draft_finished s) 
+      then (None, datafif, Some PickInventoryRequest(datafif), Some PickInventoryRequest(datafif))
+      if (color_p = color(Red)) then GameState.set_turn color(Blue);
+      (None, (game_datafication s), None, Some PickRequest(color(Blue), datafif, (GameState.get_move_list g), (GameState.get_base_mons g)))
+    else GameState.set_turn color(Red);
+      PickRequest of color * game_status_data * move_set * steam_pool 
+      (None, (game_datafication s),Some PickRequest(color(Red), datafif, (GameState.get_move_list g), (GameState.get_base_mons g)) ,None)
+
+
+
+    let tbl = GameState.get_draft_mons s in
+    let requester = GameState.get_turn s in
+      if (requester = color(Red)) then 
+        let color_p = color(Red)
+        let chosenP = r
+      else
+       let color_p = color(Blue)
+       let chosenP = b 
+    in
+    match chosenP with
+    | PickSteammon nm -> 
+       if (!(valid_purchace smon)) then nm = get_lowest_steammon s in
+
+      purchace_steammon nm chosenP;
+     in game_output
+    | _ -> game_output
+   
+
+   (* Note, when sending updated list of pokemons in request, create ref   game command command *)
+
+   (*  First, check to see whose turn. Then, if PickSteammon is the command 
+   if no, then ignore and end with game option with nones, 
+   else check if requested steammon is
+    * availible and if the player has enough money. if no then get lowest steammon for player
+    else purchance for player
+    update draft_mon, player money, player reserve pool
+    update turn
+    get new state
+   Update phase when both teams have all pokemon
+   return game option
+   *)
