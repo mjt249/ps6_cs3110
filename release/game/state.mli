@@ -33,7 +33,7 @@ module GameState : sig
   val get_can_use_moves: state -> color -> bool
 
   val get_turn: state -> color
-
+  val get_second_turn: state -> bool
 
   val set_name: state -> color -> string -> unit
 
