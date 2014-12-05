@@ -12,6 +12,19 @@ let name = "attacker"
 
 let _ = Random.self_init ()
 
+let modular_comp mon1 mon2 =
+  let (atk, spa, def, spd, spe) = (1,1,1,1,1) in 
+  let score1 = (mon1.attack * atk) + (mon1.spl_attack * spa) + (mon1.defense * def) + 
+		 (mon1.spl_defense * spd) + (mon1.speed * spe) in
+  let score2 = (mon2.attack * atk) + (mon2.spl_attack * spa) + (mon2.defense * def) + 
+		 (mon2.spl_defense * spd) + (mon2.speed * spe) in
+  if score1 = score2 then 
+    if mon1.cost = mon2.cost then 0
+    else if mon1.cost < mon2.cost then 1
+    else -1
+  else if score1 > score2 then 1
+  else -1
+
 (*compares first by attack, then spl_attack, then cost *)
 let comp_by_atk mon1 mon2 =
   if mon1.attack = mon2.attack then
