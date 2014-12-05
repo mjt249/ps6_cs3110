@@ -55,14 +55,16 @@ let team_phase g rc bc =
   let draft_pick = Random.int 2 in
   let r_pick_req = 
     (if draft_pick = 0 then
+      (GameState.set_turn g Red;
       Some (Request (PickRequest (Red, (game_datafication g), 
-        (GameState.get_move_list g), (GameState.get_base_mons g))))
+        (GameState.get_move_list g), (GameState.get_base_mons g)))))
     else 
       None) in
   let b_pick_req = 
     (if draft_pick = 1 then
+      (GameState.set_turn g Blue;
       Some (Request (PickRequest (Blue, (game_datafication g), 
-        (GameState.get_move_list g), (GameState.get_base_mons g))))
+        (GameState.get_move_list g), (GameState.get_base_mons g)))))
     else
       None) in
   GameState.set_phase g GameState.Draft;
