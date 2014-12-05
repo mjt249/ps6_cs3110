@@ -13,6 +13,51 @@ let name = "smartbot"
 
 let _ = Random.self_init ()
 
+let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
+  let stab = 
+    match att_mon.first_type, att_mon.second_type with
+      | None, Some typ when typ = mv.element -> cSTAB_BONUS
+      | Some typ, None when typ = mv.element -> cSTAB_BONUS
+      | Some typ1, Some typ2 when typ1 = mv.element || typ2 = mv.element -> cSTAB_BONUS 
+      | _ -> 1. in
+    let (eff, type_mult) = calculate_type_matchup mv.element (def_mon.first_type, 
+                        def_mon.second_type) in
+    let burn = if att_mon.status = Some Burned then cBURN_WEAKNESS else 1. in
+    let rand = float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
+    (stab *. type_mult *. burn *. rand, eff) 
+
+let find_most_damage (gr: game_status_data) (c:color): move= 
+  let (a1, b1) = gr in
+  let my_team = if c = Red then a1 else b1 in
+  let opp_team = if c = Blue then a1 else b1 in
+  let (my_mons, my_pack, my_credits) = my_team in
+  let (opp_mons, opp_pack, opp_credits) = opp_team in
+  let my_active_mon = List.hd(my_mons) in
+  let opp_active_mon = List.hd(opp_mons) in
+  let move_list = [my_active_mon.first_move; my_active_mon.second_move; 
+                     my_active_mon.third_move; my_active_mon.fourth_move] in
+  let get_move_mult (m: move) = 
+    let (multiplier, eff) = calc_multiplier my_active_mon opp_active_mon m in
+    multiplier in
+  let calc_damage (m:move) = 
+    match m.target with
+    | User -> -1
+    | Opponent ->
+        let mult = get_move_mult m in
+        if m.power = 0 then 0 (*non damaging *)
+        else if is_special m.element then 
+          if m.accuracy >= 70 then
+            calculate_damage my_active_mon.spl_attack opp_active_mon.spl_defense m.power mult
+          else (calculate_damage my_active_mon.spl_attack opp_active_mon.spl_defense m.power mult)*m.accuracy
+        else if m.accuracy < 70 then
+            calculate_damage my_active_mon.spl_attack opp_active_mon.spl_defense m.power mult
+        else (calculate_damage my_active_mon.spl_attack opp_active_mon.spl_defense m.power mult)*m.accuracy in
+      let damage_list = List.map calc_damage move_list in
+      let damage_tagged_moves =  List.fold_left2 (fun lst damage mov -> (damage, mov)::lst) [] damage_list move_list in 
+      let sorted_tagged_lst = List.sort (fun (d1, m1) (d2, m2) -> d1 - d2) damage_tagged_moves in
+      let sorted_moves = List.map (fun (damage, mov) -> mov) sorted_tagged_lst in
+  List.hd(sorted_moves)
+
 let effective_damage mon (mv:move) = 
   let stab = 
     match mon.first_type, mon.second_type with
