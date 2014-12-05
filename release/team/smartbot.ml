@@ -78,7 +78,7 @@ let best_move_eff_damage mon =
       (max (effective_damage mon mon.third_move) (effective_damage mon mon.fourth_move))
 
 let weighted_score mon = 
-  let (atk, spa, def, spd, spe, hp, best_move) = (1,1,1,1,1,1,1) in 
+  let (atk, spa, def, spd, spe, hp, best_move) = (1,1,1,30,1,5,10) in 
   (mon.attack * atk) + (mon.spl_attack * spa) + (mon.defense * def) + 
     (mon.spl_defense * spd) + (mon.speed * spe) + (mon.max_hp * hp) +
     ((best_move_eff_damage mon) * best_move)
@@ -194,11 +194,36 @@ let handle_request (c : color) (r : request) : action =
     | ActionRequest (gr) ->
         let (a1, b1) = gr in
         let my_team = if c = Red then a1 else b1 in
+	let opponent_team = if c = Red then b1 else a1 in
+	let (opp_mons, _, _) = opponent_team in
+	let opp = List.hd opp_mons in
         let (mons, pack, credits) = my_team in
         (match mons with
         | h::t ->
+	   let compare_moves (m1: move) (mv2: move) : int =
+	     let get_move_mult (m: move) =
+               let (multiplier, eff) = calc_multiplier h opp m in
+               multiplier in
+	     let calc_damage (m:move) =
+               match m.target with
+               | User -> -1
+               | Opponent ->
+		  let mult = get_move_mult m in
+		  if m.power = 0 then 0 (*non damaging *)
+		  else if is_special m.element then
+		    if m.accuracy >= 70 then
+                      calculate_damage h.spl_attack 
+				       opp.spl_defense m.power mult
+		    else (calculate_damage h.spl_attack 
+					   opp.spl_defense m.power mult)*m.accuracy
+		  else if m.accuracy < 70 then
+                    calculate_damage h.spl_attack 
+				     opp.spl_defense m.power mult
+		  else (calculate_damage h.spl_attack 
+					 opp.spl_defense m.power mult)*m.accuracy in
+	     (calc_damage m1) - (calc_damage mv2) in
 	   let mv_lst = [h.first_move;h.second_move;h.third_move;h.fourth_move] in 
-	   let sorted = List.rev(List.fast_sort comp_by_power mv_lst) in
+	   let sorted = List.rev(List.fast_sort compare_moves mv_lst) in
 	   let rec find_available_move (lst: move list) = 
 	     match lst with 
 	     | hd::[] -> let _ = print_endline (h.species ^ " used " ^ (hd.name)) in
@@ -208,12 +233,16 @@ let handle_request (c : color) (r : request) : action =
 			   UseMove(hd.name)
 			 else find_available_move tl 
 	     | _ -> failwith "WHAT HAPPENED TO MY MOVES?????" in
-	   (* if is_ineffective then
+	   if is_ineffective h opp then
 	     if weighted_score h >= !total_score / cNUM_PICKS then
 	       (* switch out *)
+               match switch_out mons opp with
+               | None -> find_available_move sorted
+               | Some monster -> failwith "TODO"
 	     else 
-	       (* use item *) 
-	   else *)
+	       (* use item *)
+	       failwith "TODO"
+	   else 
 	     find_available_move sorted
 	| _ -> failwith "WHAT IN THE NAME OF ZARDOZ HAPPENED HERE")
     | PickInventoryRequest (gr) -> PickInventory(
