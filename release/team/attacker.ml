@@ -12,6 +12,12 @@ let name = "attacker"
 
 let _ = Random.self_init ()
 
+let modular_comp mon1 mon2 =
+  let (atk, spa, def, spd, spe) = (10,10,1,1,100) in 
+  let score1 = (mon1.attack * atk) + (mon1.spl_attack * spa) + (mon1.defense * def) + 
+		 (mon1.spl_defense * spd) + (mon1.speed * spe) in
+  let score2 = (mon2.attack * atk) + (mon2.spl_attack * spa) + (mon2.defense * def) + 
+		 (mon2.spl_defense * spd) + (mon2.speed * spe) in
 let weighted_score mon = 
   let (atk, spa, def, spd, spe) = (1,1,1,1,1) in 
   (mon.attack * atk) + (mon.spl_attack * spa) + (mon.defense * def) + 
@@ -61,7 +67,7 @@ let handle_request (c : color) (r : request) : action =
         let (a1,b1) = gs in
         let my_team = if c = Red then a1 else b1 in
         let (mons, pack, credits) = my_team in
-        let sorted = List.rev(List.fast_sort comp_by_atk mons) in
+        let sorted = List.rev(List.fast_sort modular_comp mons) in
 	let pick = 
           try List.find(fun x -> x.curr_hp > 0) sorted 
           with _ -> (List.hd mons) in
@@ -70,7 +76,8 @@ let handle_request (c : color) (r : request) : action =
        let (a1,b1) = gs in
        let my_team = if c = Red then a1 else b1 in
        let (mons, pack, credits) = my_team in
-       let sorted = List.rev(List.fast_sort comp_by_atk sp) in
+       let sorted = List.rev(List.fast_sort modular_comp sp) in
+
        let rec pick_mon lst = 
 	 match lst with
 	 | h::[] -> PickSteammon(h.species) (* out of/low on credits *)

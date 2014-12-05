@@ -803,6 +803,9 @@ let perform_struggle g c mon =
   Netgraphics.add_update (Move struggle_result);
   None
 
+let useless_move g c mv = 
+  (GameState.get_active_mon g (opp_color c) = None) && (mv.target = Opponent)
+
 let use_move g c move_str : game_result option =
   match (GameState.get_active_mon g c) with
   | None -> failwith "Called UseMove with no active steammon"
@@ -810,7 +813,9 @@ let use_move g c move_str : game_result option =
       (match (get_move smon move_str)  with
       | None -> None
       | Some (m, i) -> 
-          if (move_fail m) then
+          if (useless_move g c m) then
+            None
+          else if (move_fail m) then
             perform_struggle g c smon
           else
             if m.target = User then
@@ -902,9 +907,9 @@ let switch_active_arbitrary g c : game_result option =
 (* Checks whether the active steammon fainted by an action immediately
  * prior. (Status effect, Move, Inv use etc). Moves the fainted 
  * steammon to the reserve pool after resetting its modifiers.  *)
-let active_faint_check g c : unit = 
+let active_faint_check g c : bool = 
   match (GameState.get_active_mon g c) with
-  | None -> ()
+  | None -> false
   | Some s -> 
       (*print_string "Active steammon: ";*)
       (*print_string s.species;*)
@@ -938,10 +943,11 @@ let active_faint_check g c : unit =
         GameState.add_reserve_steammon g c fainted_steammon;
         Netgraphics.add_update 
           (UpdateSteammon (fainted_steammon.species, 0, s.max_hp, c));
-        GameState.set_active_mon g c None
+        GameState.set_active_mon g c None;
+        true
         )
       else
-        ()
+        false
 
 let failed_move g c mon move_str =
   match (get_move mon move_str) with
@@ -961,7 +967,10 @@ let failed_move g c mon move_str =
         } in
       Netgraphics.add_update (Move m)
 
-let battle_action g c comm : game_result option = 
+let battle_action g c comm recent_hit : game_result option = 
+  if recent_hit then
+    None
+  else(
   let player_reserves = GameState.get_reserve_pool g c in
   match (GameState.get_active_mon g c) with
   (* Active steammon has fainted, require SelectStarter *)
@@ -977,7 +986,7 @@ let battle_action g c comm : game_result option =
           use_move g c s
       | Action (UseMove s) -> (failed_move g c mon s); None
       | Action (SwitchSteammon s) -> switch_steammon g c s
-      | _ -> None)
+      | _ -> None))
 
 let battle_phase g rc bc : game_output = 
   (* Apply the status effects, handle the outstanding actions and
@@ -994,16 +1003,17 @@ let battle_phase g rc bc : game_output =
     then (rc, bc, Red) 
     else (bc, rc, Blue) in
   Netgraphics.add_update (SetFirstAttacker faster_color);
-  let result = battle_action g faster_color faster_action in
+  let result = battle_action g faster_color faster_action false in
   match result with
   | Some res -> (Some res, (game_datafication g), None, None)
   | None -> 
-      active_faint_check g faster_color;
-      let result2 = battle_action g (opp_color faster_color) slower_action in
+      let recent_hit = active_faint_check g (opp_color faster_color) in
+      let result2 = battle_action g (opp_color faster_color) slower_action recent_hit in
       match result2 with
       | Some res -> (Some res, (game_datafication g), None, None)
       | None ->
-          active_faint_check g (opp_color faster_color);
+          ignore (active_faint_check g (opp_color faster_color));
+          ignore (active_faint_check g faster_color);
           (match (GameState.get_active_mon g Red) with
           | Some mon -> handle_end_status g mon Red
           | None -> () );
