@@ -1,0 +1,1427 @@
+commit 8edf5e789316fca2ec4b62baa8f8ae591b3e28d8
+Merge: f31d0ae 568bb82
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 23:11:26 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit f31d0aee158e96d6ca38d6f1a8acfb8607aa4d18
+Merge: 8bd4949 f235974
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 23:11:09 2014 -0500
+
+    fuck....
+
+commit 568bb82c9e4699720bffa4bd307b58305ae4bada
+Merge: a88ac59 0853db1
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 23:03:21 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit a88ac59fbfc678791de8a387d254be84bfd71941
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 23:02:55 2014 -0500
+
+    self target damages pushed down
+
+ release/team/tired.ml | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
+
+commit 0853db1cffb2a6dd76425ff354192c51eb74c9f3
+Merge: 1bc9b21 f235974
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 22:58:04 2014 -0500
+
+    Merge branch 'master' of github.com:mjt249/ps6_cs3110
+
+commit 1bc9b21f1bdce2a36513d518c3271daf2f99296c
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 22:58:00 2014 -0500
+
+    with switchout
+
+ release/team/smartbot.ml | 35 ++++++++++++++++++++++++++---------
+ 1 file changed, 26 insertions(+), 9 deletions(-)
+
+commit 8bd49497caa850245362c149f51e4a408f3f5fff
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 22:28:19 2014 -0500
+
+    merge error
+
+ release/game/who_won.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 36a69986ab128962f27394f85c08895c9e1e4c91
+Merge: 3016fd5 f235974
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 22:12:51 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit f235974041c36e69356d570135fb965481ab5690
+Merge: 690d3d4 c80f71e
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 22:11:55 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 690d3d44a6d570ffd93194f0d228474cad332baf
+Merge: 7a65136 a7c8a07
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 22:11:39 2014 -0500
+
+    fianting updates
+
+commit 3016fd5eae5a751c22864a48c2000ce0b08a67a2
+Merge: d53d283 c80f71e
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 22:08:22 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit c80f71ea7c4ad87352653673f0ea773df879ce25
+Merge: f43462a a7c8a07
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 22:07:56 2014 -0500
+
+    Merge branch 'master' of github.com:mjt249/ps6_cs3110
+
+commit f43462a2c02988e647eb89f303ef5de99f7bdb03
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 22:07:51 2014 -0500
+
+    about to handle ineffective case
+
+ release/team/smartbot.ml | 33 ++++++++++++++++++++++++++++++---
+ 1 file changed, 30 insertions(+), 3 deletions(-)
+
+commit a7c8a078c0910186a0bc612c73056c47ca5674ef
+Merge: 534f9ee 4ac8fbe
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 22:03:23 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 534f9eee14dcfc9f0789ca0b9fbf127a13d660eb
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 22:03:04 2014 -0500
+
+    fixes inventory
+
+ release/game/game                  | Bin 192343 -> 192274 bytes
+ release/game/game.ml               |   5 ++---
+ release/game/who_won.txt           |   2 +-
+ release/team/random_request_bot    | Bin 0 -> 148241 bytes
+ release/team/random_request_bot.ml |   3 ++-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+commit d53d283261fa4ecf4851bd7b5c7ad9d53e6f1db7
+Merge: e82315b 4ac8fbe
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 22:02:58 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 7a65136ba2ad0afa068e2c061b6a8b234d090015
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 22:02:49 2014 -0500
+
+    Fixed fainting switch problem
+
+ release/game/game.ml     | 32 +++++++++++++++++++++-----------
+ release/team/attacker.ml |  7 ++++---
+ 2 files changed, 25 insertions(+), 14 deletions(-)
+
+commit 4ac8fbe6bbc08cf4a7c4c3ec131d0ca20a432114
+Merge: cbc7e5e f987039
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 21:28:19 2014 -0500
+
+    Merge branch 'master' of github.com:mjt249/ps6_cs3110
+
+commit cbc7e5e1d1c0497f6ae1ad74c540ec2589243479
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 21:27:19 2014 -0500
+
+    started smartbot
+
+ release/team/attacker.ml |  11 ++--
+ release/team/smartbot.ml | 128 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 134 insertions(+), 5 deletions(-)
+
+commit f987039b41fe8bd4f31ede770da0f4cfdad2d2a6
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 21:19:58 2014 -0500
+
+    second turn problem fixed
+
+ release/game/game      | Bin 190962 -> 192343 bytes
+ release/game/game.ml   |  29 +++++++++++++++++++++++++----
+ release/game/state.ml  |   8 ++++----
+ release/game/state.mli |   3 ++-
+ 4 files changed, 31 insertions(+), 9 deletions(-)
+
+commit 5ceec0f57aedee5ac7e3419b715f47f61c8e5be0
+Merge: ff8634e 75dae3f
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 20:37:43 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit ff8634e2b4987b897a464d06dab358fd95b32298
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 20:37:22 2014 -0500
+
+    fixing second turn problem
+
+ release/game/game.ml     | 11 +----------
+ release/game/state.ml    |  7 +++++++
+ release/game/state.mli   |  2 +-
+ release/game/who_won.txt |  1 +
+ 4 files changed, 10 insertions(+), 11 deletions(-)
+
+commit 75dae3f806c54b82ebfed146db68f6152749612b
+Merge: 3a6f645 ca667ef
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 20:36:13 2014 -0500
+
+    Merge branch 'master' of github.com:mjt249/ps6_cs3110
+
+commit 3a6f645301eb250192ed469af1aa1ccdecfb5bf3
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 20:36:10 2014 -0500
+
+    added modular comparison
+
+ release/team/attacker.ml | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+commit ca667efbe48bce7018cc088fdbef4662446ec2a5
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 20:33:46 2014 -0500
+
+    Changes to randomness of draft phase
+
+ release/game/game.ml | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+commit e82315bc2875ace22f744418d86fc18d094eeccb
+Merge: 324d0ce 070da61
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 20:17:29 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 219c26c252d8594cff47dab3a132fbd5b2ec9a0e
+Merge: dd89238 070da61
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 20:16:55 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 070da613569e627e041e948e2abdaaaf0bf56b1a
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 20:16:53 2014 -0500
+
+    Working self attack graphics update
+
+ release/game/game.ml | 26 ++------------------------
+ 1 file changed, 2 insertions(+), 24 deletions(-)
+
+commit dd89238dc58a2839c2dc435289ce81533143a87f
+Merge: 72e6965 922b442
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 20:02:11 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 922b442bbe9d767c79c577dc3f1b995e4a0017ec
+Merge: 8e90fee 57260f5
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 19:05:04 2014 -0500
+
+    Merge branch 'master' of github.com:mjt249/ps6_cs3110
+
+commit 8e90feedcd5f0dbee3ab344100f14e57908bda32
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 19:03:32 2014 -0500
+
+    Fixed modifer issue
+
+ release/game/game.ml  |   9 ++-
+ release/game/state.ml | 174 +++++++++++++++-----------------------------------
+ 2 files changed, 60 insertions(+), 123 deletions(-)
+
+commit 57260f56af1c932e999aa68066597b3fb946dbdd
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 18:55:06 2014 -0500
+
+    Fixed infinite fights
+
+ release/game/game.ml | 50 +++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 43 insertions(+), 7 deletions(-)
+
+commit 324d0ce030f224d0b92a73ce439bef178110095c
+Merge: 0e57801 57260f5
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 18:48:50 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 72e6965a305ed9ab143f6774dbb276ea5b9bd809
+Merge: 22835a9 e0c0201
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 18:17:43 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 22835a9cc0baa139c27f7a1274d479fdc0073d0a
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Thu Dec 4 18:13:33 2014 -0500
+
+    comments for draft phase and random_request_bot
+
+ release/game/game                  | Bin 0 -> 190962 bytes
+ release/game/game.ml               |  23 +++++++++++-
+ release/game/untitled              |  75 +++++++++++++++++++++++++++++++++++++
+ release/team/babybot               | Bin 0 -> 149068 bytes
+ release/team/random_request_bot.ml |  28 ++++++++++++++
+ 5 files changed, 125 insertions(+), 1 deletion(-)
+
+commit d62aa3d686ea29176bc753f69d4f997675b87e37
+Merge: 86fc10a e0c0201
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 18:10:46 2014 -0500
+
+    Merge branch 'master' of github.com:mjt249/ps6_cs3110
+
+commit 86fc10a968dc4c125f2c66ba12c9a6a3c03ea8c4
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 18:10:44 2014 -0500
+
+    added print statement to mult
+
+ release/game/game.ml | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit e0c020194a48b7d5210c250d4c4cbde03aa6fda1
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 18:06:08 2014 -0500
+
+    Updating intermediate health
+
+ release/game/game.ml | 78 ++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 45 insertions(+), 33 deletions(-)
+
+commit 926d928dd49d9acd36687f158a15837e0b90c3d6
+Merge: 1f63d8e d6188ef
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 16:49:32 2014 -0500
+
+    Merge branch 'master' of github.com:mjt249/ps6_cs3110
+
+commit 1f63d8e287ffb4ac00bd248562e7631f80a6b081
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 16:49:25 2014 -0500
+
+    changed mins to maxes
+
+ release/game/game.ml | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit d6188ef92ebad4c7d6c93556ef742e17e4df7584
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 16:44:28 2014 -0500
+
+    Fixed infinite fights
+
+ release/game/game.ml | 37 +++++--------------------------------
+ 1 file changed, 5 insertions(+), 32 deletions(-)
+
+commit ebb85c955595df13d276823e9f83096dd23174bd
+Merge: 5247f49 56e3688
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 16:41:58 2014 -0500
+
+    Merge branch 'master' of github.com:mjt249/ps6_cs3110
+
+commit 5247f4976e38797ca2fed641beb83856608f60fa
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 16:41:53 2014 -0500
+
+    Fixed hp min of 0 and hp - damage thing
+
+ release/game/game.ml     |  3 ++-
+ release/team/attacker.ml | 10 +++++-----
+ release/team/babybot.ml  |  8 ++++----
+ 3 files changed, 11 insertions(+), 10 deletions(-)
+
+commit e86b1a0aa167f0ce286a45956629b06be3a81eb5
+Merge: fa156e2 56e3688
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 16:18:40 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 0e5780180d62b8de4d0f6a6bce9e5266afa3763d
+Merge: 56e3688 fa156e2
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 15:50:30 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit 56e368812be9641d0ce3332c70d4477c4364fd82
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 15:45:24 2014 -0500
+
+    game_from_data attempt #2
+
+ release/game/game.ml  | 25 +++++++++++++++----------
+ release/game/state.ml | 11 ++---------
+ 2 files changed, 17 insertions(+), 19 deletions(-)
+
+commit 268631647c9b633c8bef5fb5907a9c09ed4dbd1d
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 15:42:29 2014 -0500
+
+    game_from_data updates steammons
+
+ release/game/game.ml   | 24 ++++++++++++++++++++++--
+ release/game/state.ml  |  6 ++++++
+ release/game/state.mli |  1 +
+ 3 files changed, 29 insertions(+), 2 deletions(-)
+
+commit fa156e2d010b22a84384ea54d765ccff0ddb29a7
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 14:14:31 2014 -0500
+
+    Updates to fainting handling
+
+ release/game/game.ml  | 25 +++++++++++++++----------
+ release/game/state.ml | 11 ++---------
+ 2 files changed, 17 insertions(+), 19 deletions(-)
+
+commit e87166efcb99cc28258b55096eab354abd541bd2
+Merge: afe3b1a 7de8545
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 14:07:58 2014 -0500
+
+    merged
+
+commit afe3b1ac7cd178d34a8637703ab31c06aa76ce64
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 14:04:41 2014 -0500
+
+    Added movechoice to attacker
+
+ release/team/attacker.ml | 41 +++++++++++++++++++++++++----------------
+ 1 file changed, 25 insertions(+), 16 deletions(-)
+
+commit ac7db86c2f0c5980e792fe4d78e1fa57a986c2da
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 13:35:35 2014 -0500
+
+    removed ref, changed StarterRequest to get best available
+
+ release/team/attacker.ml | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+commit 7de8545b28090b24684c058ff4b6e9ea45e27558
+Merge: 0dc1b75 1a685a0
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 13:21:35 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110
+
+commit f8dd50f3845f70fa78cce28769c08e8675d92373
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 13:21:20 2014 -0500
+
+    changed draft strategy for attacker
+
+ release/game/game.ml     | 11 ++++++-----
+ release/team/attacker.ml | 33 +++++++++++++++++++++++++++------
+ 2 files changed, 33 insertions(+), 11 deletions(-)
+
+commit 0dc1b758c9dde761de3ce7d891d8b9f588a53dee
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Thu Dec 4 13:21:19 2014 -0500
+
+    commented out problem steammons
+
+ release/game/steammon.csv | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+commit 1a685a04c734fc3c4445e2fdb75a58d3cc514f11
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 13:01:33 2014 -0500
+
+    Added failed move updates
+
+ release/game/game.ml | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+commit 638ecdb14d65d680ba7c626a8182282eb35b2184
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Thu Dec 4 12:11:27 2014 -0500
+
+    Working game with inf loops on self buffs
+
+ release/game/game.ml  | 219 +++++++++++++++++++++++++-------------------------
+ release/game/state.ml |   4 +-
+ 2 files changed, 110 insertions(+), 113 deletions(-)
+
+commit 777901b4b57d4cc109df023e36cec56d37c781b9
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 05:08:44 2014 -0500
+
+    Sending one update
+
+ release/game/game.ml | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+commit a9b3c483fbf24f4ce8df05540826a15da98530c0
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 04:56:11 2014 -0500
+
+    added effect handling, just need to do move update
+
+ release/game/game.ml   |  65 ++++++++++++++++++--
+ release/game/state.ml  | 158 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ release/game/state.mli |   2 +
+ 3 files changed, 220 insertions(+), 5 deletions(-)
+
+commit affee6c17fd1a0a8c365785cdabb9d1f8235eb1e
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 02:47:41 2014 -0500
+
+    hp updated from hit, now about to process effects
+
+ release/game/game.ml | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
+
+commit ab42f19ce75dd34e12809def50ab7642aad02b2b
+Merge: 3b37a56 e801b50
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 02:20:30 2014 -0500
+
+    move that hits in progress
+
+commit 3b37a5627714a2b65a1f6f099afb9fe1dcfc8c94
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Thu Dec 4 00:21:10 2014 -0500
+
+    added gui updates to status effects
+
+ release/game/game.ml | 41 +++++++++++++++++++++++++----------------
+ 1 file changed, 25 insertions(+), 16 deletions(-)
+
+commit e801b50af4561a7be4e57629169b4e0e294c79f9
+Merge: d2af1a7 161ec20
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Wed Dec 3 22:56:23 2014 -0500
+
+    Updates to UseMove
+
+commit d2af1a7188edf59ab953994bf4c79bb32d865c0f
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Wed Dec 3 22:53:54 2014 -0500
+
+    Updates to UseMove
+
+ release/game/game.ml   | 123 +++++++++++++++++++++++++++++++++++++++++++++----
+ release/game/state.ml  |   1 +
+ release/game/state.mli |   1 +
+ 3 files changed, 115 insertions(+), 10 deletions(-)
+
+commit 161ec203abe1a519c8fb71162fd136b6c84af687
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Wed Dec 3 22:38:05 2014 -0500
+
+    Graphics updates to draft phase
+
+ release/game/game.ml | 39 ++++++++++++++++++++-------------------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
+
+commit 3bc909a17116df3f88353cbc983b0cc99c6b8f2b
+Merge: 519ba54 335a45f
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Wed Dec 3 21:50:35 2014 -0500
+
+    Merge pull request #1 from mjt249/Madeleine
+    
+    Madeleine
+
+commit 335a45f468b9e010134117aece5cea07c80923a8
+Merge: 578b9fc 519ba54
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Wed Dec 3 21:31:43 2014 -0500
+
+    Merge branch 'master' of https://github.com/mjt249/ps6_cs3110 into Madeleine
+
+commit 578b9fcfdc190ed7829aa07fe5459813ad3864f9
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Wed Dec 3 21:15:21 2014 -0500
+
+    phase switch added
+
+ release/game/game.ml   | 66 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ release/game/state.ml  | 23 ++++++++++++++----
+ release/game/state.mli | 22 ++++++-----------
+ 3 files changed, 91 insertions(+), 20 deletions(-)
+
+commit 519ba54b9f40878b561e5ff202d5d45ac86edd2e
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Wed Dec 3 20:10:26 2014 -0500
+
+    fixes in use_item
+
+ release/game/game.ml | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
+
+commit b2ddc92c247a159812476aac0a362e3051910ba7
+Merge: 558a681 76152de
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Wed Dec 3 19:36:01 2014 -0500
+
+    Merged UseMove to master
+
+commit 558a681cc4df9f196a921cf71b63720b9e1c2032
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Wed Dec 3 19:32:25 2014 -0500
+
+    Started UseMove
+
+ release/game/game.ml | 151 +++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 135 insertions(+), 16 deletions(-)
+
+commit 76152de00972d9152c4655799a14ee8ffab1a8ac
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Wed Dec 3 19:27:43 2014 -0500
+
+    use_item
+
+ release/game/game.ml | 269 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 267 insertions(+), 2 deletions(-)
+
+commit 7eda13df8f19b0d95149dc962cc2a35c84acdd39
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Wed Dec 3 17:14:00 2014 -0500
+
+    files
+
+ release/game/game.ml | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+commit 3f01367476810917006fcd134413b0f93c59018a
+Merge: e28d227 f3576b8
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Wed Dec 3 17:02:42 2014 -0500
+
+    jf
+
+commit e28d227ba8d2bd16e9778a54726a305a7e27316f
+Merge: ff65cd9 9bdb0b3
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Wed Dec 3 16:51:40 2014 -0500
+
+    just to pull
+
+commit f3576b89f009d5b84cb017020591a2f91435a6cb
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Wed Dec 3 16:26:18 2014 -0500
+
+    Updated battle_phase information
+
+ release/game/game.ml   | 229 +++++++++++++++++++++++++++++++++----------------
+ release/game/state.ml  |  14 +--
+ release/game/state.mli |   2 +-
+ 3 files changed, 163 insertions(+), 82 deletions(-)
+
+commit ff65cd945850f57a597682cd03dde2e1ef56ce92
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Wed Dec 3 16:25:07 2014 -0500
+
+    bleh
+
+ release/game/state.ml | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+commit 9bdb0b341f84e92fd2071dad6c2472719b4f9e08
+Merge: 9f0e56f 85f71f2
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Wed Dec 3 14:31:10 2014 -0500
+
+    Battle phase resolution
+
+commit 85f71f233a4154ac236119103e9bf214252e3998
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Wed Dec 3 14:28:31 2014 -0500
+
+    cash, not credits
+
+ release/game/game.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 9f0e56f6fd31b1f2cadc1fa5467fb972726bb179
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Wed Dec 3 14:26:26 2014 -0500
+
+    Starter phase comple
+
+ release/game/game.ml   | 36 +++++++++++++++++++++++-------------
+ release/game/state.ml  |  2 +-
+ release/game/state.mli |  2 +-
+ 3 files changed, 25 insertions(+), 15 deletions(-)
+
+commit a3cb1fa57c655984f34999918dc987cf6ff66780
+Author: Jay Jung <cj329@cornell.edu>
+Date:   Wed Dec 3 14:11:40 2014 -0500
+
+    inventory
+
+ release/game/game.ml | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+commit 45706dcc3d240b97240900349b3e5880fd262c80
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Wed Dec 3 13:40:48 2014 -0500
+
+    Handle_step forwards commands to phase sub-functions now. Each sub-function is responsible for error handling
+
+ release/game/game.ml   | 185 +++++++++++++++++++++----------------------------
+ release/game/state.ml  |  15 +---
+ release/game/state.mli |   2 -
+ 3 files changed, 81 insertions(+), 121 deletions(-)
+
+commit eb8c5ea1366d7b226d78a6362adb3bd1c844f095
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Wed Dec 3 05:42:18 2014 -0500
+
+    added statues stuff for end
+
+ release/game/game.ml   | 19 +++++++++++++++--
+ release/game/state.ml  | 55 ++++++++++++++++++++++++++++++++++++++++++++++----
+ release/game/state.mli |  4 ++++
+ 3 files changed, 72 insertions(+), 6 deletions(-)
+
+commit 979be5f5232984595cbebb4adacf02034d71a17f
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Wed Dec 3 04:58:36 2014 -0500
+
+    beginning status conds compiles
+
+ release/game/game.ml   | 61 +++++++++++++++------------------
+ release/game/state.ml  | 93 ++++++++++++++++++++++++++++++++++++++++----------
+ release/game/state.mli |  5 +++
+ 3 files changed, 108 insertions(+), 51 deletions(-)
+
+commit 0a54a5ebac599b0eb544deb78f5181c1f9459b9a
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 23:55:13 2014 -0500
+
+    Comments to the battle phase
+
+ release/game/game.ml | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+commit e7f55ce23cb4f286336dccb616e1d8f85660fe46
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 23:45:19 2014 -0500
+
+    Started battle phase
+
+ release/game/game.ml   |  83 +++++++++++++++++++++++------
+ release/game/state.ml  | 140 ++++++++++++++++++++++++++++++++++---------------
+ release/game/state.mli |  25 +++++++--
+ 3 files changed, 184 insertions(+), 64 deletions(-)
+
+commit d302f9f9c33eda766edbbbc99438b383136e26ba
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 18:20:03 2014 -0500
+
+    Refactored action handler
+
+ release/game/game.ml | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+commit 34e235f6dbe0e39e6490e4ca1e5d2c8d9291ebe4
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 18:15:40 2014 -0500
+
+    Updates to battle_phase
+
+ release/game/game.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit e9694f477cdcc5b9ad0b9b01c69302ef3f470342
+Merge: 4c33ca6 833f1e4
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 18:05:52 2014 -0500
+
+    Merged refactoring of action_handler
+
+commit 4c33ca63d967a123f3c4747b8e38a17aff34f53c
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 17:59:55 2014 -0500
+
+    Refactored action handler
+
+ release/game/game.ml     | 19 ++++++++--------
+ release/game/state.ml    |  8 +++++++
+ release/game/state.mli   |  3 +++
+ release/team/attacker.ml | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 78 insertions(+), 9 deletions(-)
+
+commit 833f1e4f6883730f0b90d5ea41e6bda243aa7b96
+Merge: 1643a8e f2bee1d
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Tue Dec 2 17:36:59 2014 -0500
+
+    updated state
+
+commit 14f2c83b6383f0be5c76f64b91a974d3337adf0b
+Merge: f7f0f6e f2bee1d
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Tue Dec 2 16:51:40 2014 -0500
+
+    bleh
+
+commit f7f0f6e0d9d6c340bc4e8c91855da1f4ae382dbe
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Tue Dec 2 16:47:19 2014 -0500
+
+    bleh
+
+ release/game/game.ml  | 2 +-
+ release/game/state.ml | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit 1643a8e8daaabdc9fcf21ade617813f391d58189
+Author: Connor Daly <cgd37@cornell.edi>
+Date:   Tue Dec 2 16:26:46 2014 -0500
+
+    Connor night one finished
+
+ release/game/game.ml  | 34 ++++++++++++++++++++++++++++++++++
+ release/game/state.ml | 25 +++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
+
+commit f2bee1df8b174ccaef105bb92f6c04d60a5855f7
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 12:39:53 2014 -0500
+
+    Added game_from_data
+
+ release/game/game.ml | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+commit 8bc6f02a2743294538c31ab44b1f3ea26860197d
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 12:13:12 2014 -0500
+
+    Datafication method added
+
+ release/game/game.ml   | 16 ++++++++++------
+ release/game/state.ml  | 18 +++++++++++++++++-
+ release/game/state.mli |  4 ++++
+ 3 files changed, 31 insertions(+), 7 deletions(-)
+
+commit db052c99544eb7ce4908e7e3189565ac9ce3de6e
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Tue Dec 2 10:11:36 2014 -0500
+
+    more draft_phase
+
+ release/game/game.ml   | 69 ++++++++++++++++++++++++++++++++++++--------------
+ release/game/state.ml  | 56 ++++++++++++++++++++++++++++++++++------
+ release/game/state.mli |  4 +++
+ 3 files changed, 102 insertions(+), 27 deletions(-)
+
+commit ef49899632220a6ce4ee7c8b94dc240cc535893f
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 09:57:13 2014 -0500
+
+    Completed initialization phase
+
+ release/game/game.ml  | 8 +++++++-
+ release/game/state.ml | 7 +++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+commit f6feb317c7f8509552e7e295b18abf0d394e6439
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Tue Dec 2 09:43:45 2014 -0500
+
+    Refactored gamestate functions to take in a color variable
+
+ release/game/game.ml   |  7 +++----
+ release/game/state.ml  | 38 ++++++++++++++++++++++++++------------
+ release/game/state.mli | 18 ++++++------------
+ 3 files changed, 35 insertions(+), 28 deletions(-)
+
+commit d62b1b53785cd33aa6381ef27f0a4fa78a1276df
+Merge: 7d7a9fa 5887d66
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Tue Dec 2 09:40:58 2014 -0500
+
+    draft phase work
+
+commit 45f4caf63fb041f97ea233db8f0d9ea90d739348
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 22:51:41 2014 -0500
+
+    Completed default_action
+
+ release/game/game.ml   | 4 +++-
+ release/game/state.mli | 4 ++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+commit 17e270313958c84670e7dbe9a74f41ce61b02a2d
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 22:45:25 2014 -0500
+
+    Updated action handling
+
+ release/game/game.ml  | 58 ++++++++++++++++++++++++++++++++++++---------------
+ release/game/state.ml | 17 +++++++++++++++
+ 2 files changed, 58 insertions(+), 17 deletions(-)
+
+commit 2e10799dba0c0e956a39ae26c38a0bf713559b4b
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 21:13:05 2014 -0500
+
+    Expected action
+
+ release/game/state.ml | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
+
+commit 7d7a9fa76d47233d3badf9b499c97e1263bc5579
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Mon Dec 1 21:05:04 2014 -0500
+
+    draft phase work
+
+ release/game/game.ml  |  8 ++++++++
+ release/game/state.ml | 14 ++++++++++++++
+ 2 files changed, 22 insertions(+)
+
+commit 5887d66779278eab53f5bb14e802675c03cc08de
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 20:46:54 2014 -0500
+
+    Updates to state representation
+
+ release/game/game.ml   | 40 +++++++++++++++++++++++-----------------
+ release/game/state.ml  | 14 ++++++++++++++
+ release/game/state.mli |  5 +++++
+ 3 files changed, 42 insertions(+), 17 deletions(-)
+
+commit 6a7e21893a2c0eec5500301c056b426cd3c635f3
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 19:43:22 2014 -0500
+
+    Game module function signatures clarification
+
+ release/game/game.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 06986f154ce4a5f7fde55e3d59a29f78b35e90cb
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 19:40:51 2014 -0500
+
+    Added clarifications in state module
+
+ release/game/game.ml   | 4 ++++
+ release/game/state.ml  | 6 ++++++
+ release/game/state.mli | 2 ++
+ 3 files changed, 12 insertions(+)
+
+commit 609b7fb30cd71aeb59afdf4d366f3f06f6949420
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 19:35:34 2014 -0500
+
+    Update the state representation
+
+ release/game/build_game.sh |  2 +-
+ release/game/game.ml       | 12 ++++++++----
+ release/game/state.ml      | 29 +++++++++++++++++++++++------
+ release/game/state.mli     |  8 ++++++++
+ 4 files changed, 40 insertions(+), 11 deletions(-)
+
+commit b9bae093215feef7fd55132751cd98b418d78821
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 18:57:57 2014 -0500
+
+    updating team names in GUI
+
+ release/game/game.ml | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+commit f571b3c13363656511fb72e10ab89d78b741fc2b
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 16:19:43 2014 -0500
+
+    Compilable state module
+
+ release/game/game.ml   | 32 +++++++++++++++++++++++++-------
+ release/game/state.ml  | 13 +++++++++----
+ release/game/state.mli |  5 ++++-
+ 3 files changed, 38 insertions(+), 12 deletions(-)
+
+commit 9738e5b1e8d8248098d4d393b5c5fad0957dbd91
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 15:03:56 2014 -0500
+
+    Changes state to be modular
+
+ release/game/state.ml  | 6 ++++--
+ release/game/state.mli | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+commit 4e79d61bccf98dd56fa4d4fe01244201adc90cef
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 14:24:16 2014 -0500
+
+    Modified state and added init_game basics
+
+ release/game/game.ml   | 12 +++++++-----
+ release/game/state.ml  |  4 +++-
+ release/game/state.mli |  4 +---
+ 3 files changed, 11 insertions(+), 9 deletions(-)
+
+commit f2782af0d11e9e0dd63d1c9e7509834e6dfcb8c7
+Author: sheroze1123 <mss385@cornell.edu>
+Date:   Mon Dec 1 13:56:38 2014 -0500
+
+    Skeleton of state
+
+ release/game/state.ml  | 1 +
+ release/game/state.mli | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+commit f7089c0845a62b34b1a3fdbf8c04c9dc40b24390
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Sat Nov 22 12:59:07 2014 -0500
+
+    source code added
+
+ release/game/build_game.sh              |   9 +
+ release/game/game.ml                    |  33 +++
+ release/game/game.mli                   |  40 ++++
+ release/game/initialization.ml          | 120 ++++++++++
+ release/game/initialization.mli         |  16 ++
+ release/game/moves.csv                  | 333 +++++++++++++++++++++++++++
+ release/game/netgraphics.ml             | 123 ++++++++++
+ release/game/netgraphics.mli            |  16 ++
+ release/game/server.ml                  | 244 ++++++++++++++++++++
+ release/game/steammon.csv               | 390 ++++++++++++++++++++++++++++++++
+ release/gui/data/background.jpg         | Bin 0 -> 82739 bytes
+ release/gui/data/pokeball.png           | Bin 0 -> 63424 bytes
+ release/gui/data/pokemon/abra.png       | Bin 0 -> 821 bytes
+ release/gui/data/pokemon/absol.png      | Bin 0 -> 1204 bytes
+ release/gui/data/pokemon/aerodactyl.png | Bin 0 -> 1228 bytes
+ release/gui/data/pokemon/aggron.png     | Bin 0 -> 1549 bytes
+ release/gui/data/pokemon/aipom.png      | Bin 0 -> 878 bytes
+ release/gui/data/pokemon/alakazam.png   | Bin 0 -> 1148 bytes
+ release/gui/data/pokemon/altaria.png    | Bin 0 -> 1072 bytes
+ release/gui/data/pokemon/ampharos.png   | Bin 0 -> 993 bytes
+ release/gui/data/pokemon/anorith.png    | Bin 0 -> 942 bytes
+ release/gui/data/pokemon/arbok.png      | Bin 0 -> 1175 bytes
+ release/gui/data/pokemon/arcanine.png   | Bin 0 -> 1508 bytes
+ release/gui/data/pokemon/ariados.png    | Bin 0 -> 1152 bytes
+ release/gui/data/pokemon/armaldo.png    | Bin 0 -> 1575 bytes
+ release/gui/data/pokemon/aron.png       | Bin 0 -> 526 bytes
+ release/gui/data/pokemon/articuno.png   | Bin 0 -> 1377 bytes
+ release/gui/data/pokemon/azumarill.png  | Bin 0 -> 830 bytes
+ release/gui/data/pokemon/azurill.png    | Bin 0 -> 815 bytes
+ release/gui/data/pokemon/bagon.png      | Bin 0 -> 711 bytes
+ release/gui/data/pokemon/baltoy.png     | Bin 0 -> 554 bytes
+ release/gui/data/pokemon/banette.png    | Bin 0 -> 776 bytes
+ release/gui/data/pokemon/barboach.png   | Bin 0 -> 795 bytes
+ release/gui/data/pokemon/bayleef.png    | Bin 0 -> 1125 bytes
+ release/gui/data/pokemon/beautifly.png  | Bin 0 -> 929 bytes
+ release/gui/data/pokemon/beedrill.png   | Bin 0 -> 1181 bytes
+ release/gui/data/pokemon/beldum.png     | Bin 0 -> 687 bytes
+ release/gui/data/pokemon/bellossom.png  | Bin 0 -> 733 bytes
+ release/gui/data/pokemon/bellsprout.png | Bin 0 -> 727 bytes
+ release/gui/data/pokemon/blastoise.png  | Bin 0 -> 1422 bytes
+ release/gui/data/pokemon/blaziken.png   | Bin 0 -> 1335 bytes
+ release/gui/data/pokemon/blissey.png    | Bin 0 -> 1112 bytes
+ release/gui/data/pokemon/breloom.png    | Bin 0 -> 1134 bytes
+ release/gui/data/pokemon/bulbasaur.png  | Bin 0 -> 723 bytes
+ release/gui/data/pokemon/butterfree.png | Bin 0 -> 981 bytes
+ release/gui/data/pokemon/cacnea.png     | Bin 0 -> 925 bytes
+ release/gui/data/pokemon/cacturne.png   | Bin 0 -> 1235 bytes
+ release/gui/data/pokemon/camerupt.png   | Bin 0 -> 1113 bytes
+ release/gui/data/pokemon/carvanha.png   | Bin 0 -> 941 bytes
+ release/gui/data/pokemon/cascoon.png    | Bin 0 -> 687 bytes
+ release/gui/data/pokemon/castform.png   | Bin 0 -> 1075 bytes
+ release/gui/data/pokemon/caterpie.png   | Bin 0 -> 680 bytes
+ release/gui/data/pokemon/celebi.png     | Bin 0 -> 715 bytes
+ release/gui/data/pokemon/chansey.png    | Bin 0 -> 906 bytes
+ release/gui/data/pokemon/charizard.png  | Bin 0 -> 1491 bytes
+ release/gui/data/pokemon/charmander.png | Bin 0 -> 799 bytes
+ release/gui/data/pokemon/charmeleon.png | Bin 0 -> 1044 bytes
+ release/gui/data/pokemon/chikorita.png  | Bin 0 -> 692 bytes
+ release/gui/data/pokemon/chimecho.png   | Bin 0 -> 648 bytes
+ release/gui/data/pokemon/chinchou.png   | Bin 0 -> 805 bytes
+ release/gui/data/pokemon/clamperl.png   | Bin 0 -> 837 bytes
+ release/gui/data/pokemon/claydol.png    | Bin 0 -> 1013 bytes
+ release/gui/data/pokemon/clefable.png   | Bin 0 -> 897 bytes
+ release/gui/data/pokemon/clefairy.png   | Bin 0 -> 745 bytes
+ release/gui/data/pokemon/cleffa.png     | Bin 0 -> 557 bytes
+ release/gui/data/pokemon/cloyster.png   | Bin 0 -> 1164 bytes
+ release/gui/data/pokemon/combusken.png  | Bin 0 -> 1145 bytes
+ release/gui/data/pokemon/corphish.png   | Bin 0 -> 977 bytes
+ release/gui/data/pokemon/corsola.png    | Bin 0 -> 814 bytes
+ release/gui/data/pokemon/cradily.png    | Bin 0 -> 1165 bytes
+ release/gui/data/pokemon/crawdaunt.png  | Bin 0 -> 1384 bytes
+ release/gui/data/pokemon/crobat.png     | Bin 0 -> 1044 bytes
+ release/gui/data/pokemon/croconaw.png   | Bin 0 -> 993 bytes
+ release/gui/data/pokemon/cubone.png     | Bin 0 -> 824 bytes
+ release/gui/data/pokemon/cyndaquil.png  | Bin 0 -> 709 bytes
+ release/gui/data/pokemon/delcatty.png   | Bin 0 -> 1042 bytes
+ release/gui/data/pokemon/delibird.png   | Bin 0 -> 1037 bytes
+ release/gui/data/pokemon/dewgong.png    | Bin 0 -> 1006 bytes
+ release/gui/data/pokemon/diglett.png    | Bin 0 -> 575 bytes
+ release/gui/data/pokemon/ditto.png      | Bin 0 -> 510 bytes
+ release/gui/data/pokemon/dodrio.png     | Bin 0 -> 1465 bytes
+ release/gui/data/pokemon/doduo.png      | Bin 0 -> 1007 bytes
+ release/gui/data/pokemon/donphan.png    | Bin 0 -> 1196 bytes
+ release/gui/data/pokemon/dragonair.png  | Bin 0 -> 988 bytes
+ release/gui/data/pokemon/dragonite.png  | Bin 0 -> 1520 bytes
+ release/gui/data/pokemon/dratini.png    | Bin 0 -> 753 bytes
+ release/gui/data/pokemon/drowzee.png    | Bin 0 -> 959 bytes
+ release/gui/data/pokemon/dugtrio.png    | Bin 0 -> 822 bytes
+ release/gui/data/pokemon/dunsparce.png  | Bin 0 -> 854 bytes
+ release/gui/data/pokemon/dusclops.png   | Bin 0 -> 1020 bytes
+ release/gui/data/pokemon/duskull.png    | Bin 0 -> 791 bytes
+ release/gui/data/pokemon/dustox.png     | Bin 0 -> 954 bytes
+ release/gui/data/pokemon/eevee.png      | Bin 0 -> 785 bytes
+ release/gui/data/pokemon/ekans.png      | Bin 0 -> 840 bytes
+ release/gui/data/pokemon/electabuzz.png | Bin 0 -> 1270 bytes
+ release/gui/data/pokemon/electrike.png  | Bin 0 -> 701 bytes
+ release/gui/data/pokemon/electrode.png  | Bin 0 -> 659 bytes
+ release/gui/data/pokemon/elekid.png     | Bin 0 -> 887 bytes
+ release/gui/data/pokemon/entei.png      | Bin 0 -> 1742 bytes
+ release/gui/data/pokemon/espeon.png     | Bin 0 -> 894 bytes
+ release/gui/data/pokemon/exeggcute.png  | Bin 0 -> 1135 bytes
+ release/gui/data/pokemon/exeggutor.png  | Bin 0 -> 1359 bytes
+ release/gui/data/pokemon/exploud.png    | Bin 0 -> 1516 bytes
+ release/gui/data/pokemon/farfetch'd.png | Bin 0 -> 961 bytes
+ release/gui/data/pokemon/fearow.png     | Bin 0 -> 1285 bytes
+ release/gui/data/pokemon/feebas.png     | Bin 0 -> 745 bytes
+ release/gui/data/pokemon/feraligatr.png | Bin 0 -> 1487 bytes
+ release/gui/data/pokemon/flaaffy.png    | Bin 0 -> 905 bytes
+ release/gui/data/pokemon/flareon.png    | Bin 0 -> 957 bytes
+ release/gui/data/pokemon/flygon.png     | Bin 0 -> 1410 bytes
+ release/gui/data/pokemon/forretress.png | Bin 0 -> 1099 bytes
+ release/gui/data/pokemon/furret.png     | Bin 0 -> 897 bytes
+ release/gui/data/pokemon/gardevoir.png  | Bin 0 -> 1036 bytes
+ release/gui/data/pokemon/gastly.png     | Bin 0 -> 997 bytes
+ release/gui/data/pokemon/gengar.png     | Bin 0 -> 1008 bytes
+ release/gui/data/pokemon/geodude.png    | Bin 0 -> 674 bytes
+ release/gui/data/pokemon/girafarig.png  | Bin 0 -> 1174 bytes
+ release/gui/data/pokemon/glalie.png     | Bin 0 -> 1063 bytes
+ release/gui/data/pokemon/gligar.png     | Bin 0 -> 1217 bytes
+ release/gui/data/pokemon/gloom.png      | Bin 0 -> 963 bytes
+ release/gui/data/pokemon/golbat.png     | Bin 0 -> 1019 bytes
+ release/gui/data/pokemon/goldeen.png    | Bin 0 -> 979 bytes
+ release/gui/data/pokemon/golduck.png    | Bin 0 -> 1155 bytes
+ release/gui/data/pokemon/golem.png      | Bin 0 -> 1218 bytes
+ release/gui/data/pokemon/gorebyss.png   | Bin 0 -> 873 bytes
+ release/gui/data/pokemon/granbull.png   | Bin 0 -> 983 bytes
+ release/gui/data/pokemon/graveler.png   | Bin 0 -> 1137 bytes
+ release/gui/data/pokemon/grimer.png     | Bin 0 -> 878 bytes
+ release/gui/data/pokemon/groudon.png    | Bin 0 -> 1706 bytes
+ release/gui/data/pokemon/grovyle.png    | Bin 0 -> 1308 bytes
+ release/gui/data/pokemon/growlithe.png  | Bin 0 -> 979 bytes
+ release/gui/data/pokemon/grumpig.png    | Bin 0 -> 1111 bytes
+ release/gui/data/pokemon/gulpin.png     | Bin 0 -> 577 bytes
+ release/gui/data/pokemon/gyarados.png   | Bin 0 -> 1594 bytes
+ release/gui/data/pokemon/hariyama.png   | Bin 0 -> 1317 bytes
+ release/gui/data/pokemon/haunter.png    | Bin 0 -> 1101 bytes
+ release/gui/data/pokemon/heracross.png  | Bin 0 -> 1118 bytes
+ release/gui/data/pokemon/hitmonchan.png | Bin 0 -> 934 bytes
+ release/gui/data/pokemon/hitmonlee.png  | Bin 0 -> 1159 bytes
+ release/gui/data/pokemon/hitmontop.png  | Bin 0 -> 1030 bytes
+ release/gui/data/pokemon/ho-oh.png      | Bin 0 -> 1763 bytes
+ release/gui/data/pokemon/hoothoot.png   | Bin 0 -> 722 bytes
+ release/gui/data/pokemon/hoppip.png     | Bin 0 -> 767 bytes
+ release/gui/data/pokemon/horsea.png     | Bin 0 -> 688 bytes
+ release/gui/data/pokemon/houndoom.png   | Bin 0 -> 1133 bytes
+ release/gui/data/pokemon/houndour.png   | Bin 0 -> 806 bytes
+ release/gui/data/pokemon/huntail.png    | Bin 0 -> 1105 bytes
+ release/gui/data/pokemon/hypno.png      | Bin 0 -> 1145 bytes
+ release/gui/data/pokemon/igglybuff.png  | Bin 0 -> 532 bytes
+ release/gui/data/pokemon/illumise.png   | Bin 0 -> 1006 bytes
+ release/gui/data/pokemon/ivysaur.png    | Bin 0 -> 1010 bytes
+ release/gui/data/pokemon/jigglypuff.png | Bin 0 -> 699 bytes
+ release/gui/data/pokemon/jirachi.png    | Bin 0 -> 863 bytes
+ release/gui/data/pokemon/jolteon.png    | Bin 0 -> 1100 bytes
+ release/gui/data/pokemon/jumpluff.png   | Bin 0 -> 932 bytes
+ release/gui/data/pokemon/jynx.png       | Bin 0 -> 1362 bytes
+ release/gui/data/pokemon/kabuto.png     | Bin 0 -> 619 bytes
+ release/gui/data/pokemon/kabutops.png   | Bin 0 -> 1108 bytes
+ release/gui/data/pokemon/kadabra.png    | Bin 0 -> 1287 bytes
+ release/gui/data/pokemon/kakuna.png     | Bin 0 -> 621 bytes
+ release/gui/data/pokemon/kangaskhan.png | Bin 0 -> 1384 bytes
+ release/gui/data/pokemon/kecleon.png    | Bin 0 -> 1036 bytes
+ release/gui/data/pokemon/kingdra.png    | Bin 0 -> 1190 bytes
+ release/gui/data/pokemon/kingler.png    | Bin 0 -> 1452 bytes
+ release/gui/data/pokemon/kirlia.png     | Bin 0 -> 850 bytes
+ release/gui/data/pokemon/koffing.png    | Bin 0 -> 906 bytes
+ release/gui/data/pokemon/krabby.png     | Bin 0 -> 800 bytes
+ release/gui/data/pokemon/kyogre.png     | Bin 0 -> 1298 bytes
+ release/gui/data/pokemon/lairon.png     | Bin 0 -> 1090 bytes
+ release/gui/data/pokemon/lanturn.png    | Bin 0 -> 989 bytes
+ release/gui/data/pokemon/lapras.png     | Bin 0 -> 1055 bytes
+ release/gui/data/pokemon/larvitar.png   | Bin 0 -> 684 bytes
+ release/gui/data/pokemon/latias.png     | Bin 0 -> 1171 bytes
+ release/gui/data/pokemon/latios.png     | Bin 0 -> 1270 bytes
+ release/gui/data/pokemon/ledian.png     | Bin 0 -> 1049 bytes
+ release/gui/data/pokemon/ledyba.png     | Bin 0 -> 882 bytes
+ release/gui/data/pokemon/lickitung.png  | Bin 0 -> 1034 bytes
+ release/gui/data/pokemon/lileep.png     | Bin 0 -> 924 bytes
+ release/gui/data/pokemon/linoone.png    | Bin 0 -> 931 bytes
+ release/gui/data/pokemon/lombre.png     | Bin 0 -> 843 bytes
+ release/gui/data/pokemon/lotad.png      | Bin 0 -> 682 bytes
+ release/gui/data/pokemon/loudred.png    | Bin 0 -> 1251 bytes
+ release/gui/data/pokemon/ludicolo.png   | Bin 0 -> 1333 bytes
+ release/gui/data/pokemon/lugia.png      | Bin 0 -> 1305 bytes
+ release/gui/data/pokemon/lunatone.png   | Bin 0 -> 893 bytes
+ release/gui/data/pokemon/luvdisc.png    | Bin 0 -> 452 bytes
+ release/gui/data/pokemon/machamp.png    | Bin 0 -> 1494 bytes
+ release/gui/data/pokemon/machoke.png    | Bin 0 -> 1078 bytes
+ release/gui/data/pokemon/machop.png     | Bin 0 -> 744 bytes
+ release/gui/data/pokemon/magby.png      | Bin 0 -> 726 bytes
+ release/gui/data/pokemon/magcargo.png   | Bin 0 -> 986 bytes
+ release/gui/data/pokemon/magikarp.png   | Bin 0 -> 990 bytes
+ release/gui/data/pokemon/magmar.png     | Bin 0 -> 1382 bytes
+ release/gui/data/pokemon/magnemite.png  | Bin 0 -> 565 bytes
+ release/gui/data/pokemon/magneton.png   | Bin 0 -> 1168 bytes
+ release/gui/data/pokemon/makuhita.png   | Bin 0 -> 855 bytes
+ release/gui/data/pokemon/manectric.png  | Bin 0 -> 937 bytes
+ release/gui/data/pokemon/mankey.png     | Bin 0 -> 942 bytes
+ release/gui/data/pokemon/mantine.png    | Bin 0 -> 1276 bytes
+ release/gui/data/pokemon/mareep.png     | Bin 0 -> 810 bytes
+ release/gui/data/pokemon/marill.png     | Bin 0 -> 776 bytes
+ release/gui/data/pokemon/marowak.png    | Bin 0 -> 1018 bytes
+ release/gui/data/pokemon/marshtomp.png  | Bin 0 -> 995 bytes
+ release/gui/data/pokemon/masquerain.png | Bin 0 -> 1012 bytes
+ release/gui/data/pokemon/mawile.png     | Bin 0 -> 1033 bytes
+ release/gui/data/pokemon/medicham.png   | Bin 0 -> 964 bytes
+ release/gui/data/pokemon/meditite.png   | Bin 0 -> 763 bytes
+ release/gui/data/pokemon/meganium.png   | Bin 0 -> 1446 bytes
+ release/gui/data/pokemon/meowth.png     | Bin 0 -> 882 bytes
+ release/gui/data/pokemon/metagross.png  | Bin 0 -> 1227 bytes
+ release/gui/data/pokemon/metang.png     | Bin 0 -> 1229 bytes
+ release/gui/data/pokemon/metapod.png    | Bin 0 -> 569 bytes
+ release/gui/data/pokemon/mew.png        | Bin 0 -> 736 bytes
+ release/gui/data/pokemon/mewtwo.png     | Bin 0 -> 1175 bytes
+ release/gui/data/pokemon/mightyena.png  | Bin 0 -> 1201 bytes
+ release/gui/data/pokemon/milotic.png    | Bin 0 -> 1281 bytes
+ release/gui/data/pokemon/miltank.png    | Bin 0 -> 1062 bytes
+ release/gui/data/pokemon/minun.png      | Bin 0 -> 695 bytes
+ release/gui/data/pokemon/misdreavus.png | Bin 0 -> 820 bytes
+ release/gui/data/pokemon/moltres.png    | Bin 0 -> 1613 bytes
+ release/gui/data/pokemon/mr.mime.png    | Bin 0 -> 1138 bytes
+ release/gui/data/pokemon/mudkip.png     | Bin 0 -> 750 bytes
+ release/gui/data/pokemon/muk.png        | Bin 0 -> 1159 bytes
+ release/gui/data/pokemon/murkrow.png    | Bin 0 -> 856 bytes
+ release/gui/data/pokemon/natu.png       | Bin 0 -> 548 bytes
+ release/gui/data/pokemon/nidoking.png   | Bin 0 -> 1386 bytes
+ release/gui/data/pokemon/nidoqueen.png  | Bin 0 -> 1260 bytes
+ release/gui/data/pokemon/nidoran.png    | Bin 0 -> 792 bytes
+ release/gui/data/pokemon/nidorina.png   | Bin 0 -> 935 bytes
+ release/gui/data/pokemon/nidorino.png   | Bin 0 -> 1035 bytes
+ release/gui/data/pokemon/nincada.png    | Bin 0 -> 804 bytes
+ release/gui/data/pokemon/ninetales.png  | Bin 0 -> 1165 bytes
+ release/gui/data/pokemon/ninjask.png    | Bin 0 -> 999 bytes
+ release/gui/data/pokemon/noctowl.png    | Bin 0 -> 994 bytes
+ release/gui/data/pokemon/nosepass.png   | Bin 0 -> 762 bytes
+ release/gui/data/pokemon/numel.png      | Bin 0 -> 783 bytes
+ release/gui/data/pokemon/nuzleaf.png    | Bin 0 -> 836 bytes
+ release/gui/data/pokemon/octillery.png  | Bin 0 -> 893 bytes
+ release/gui/data/pokemon/oddish.png     | Bin 0 -> 619 bytes
+ release/gui/data/pokemon/omanyte.png    | Bin 0 -> 751 bytes
+ release/gui/data/pokemon/omastar.png    | Bin 0 -> 1081 bytes
+ release/gui/data/pokemon/onix.png       | Bin 0 -> 1203 bytes
+ release/gui/data/pokemon/paras.png      | Bin 0 -> 719 bytes
+ release/gui/data/pokemon/parasect.png   | Bin 0 -> 981 bytes
+ release/gui/data/pokemon/pelipper.png   | Bin 0 -> 1025 bytes
+ release/gui/data/pokemon/persian.png    | Bin 0 -> 1061 bytes
+ release/gui/data/pokemon/phanpy.png     | Bin 0 -> 644 bytes
+ release/gui/data/pokemon/pichu.png      | Bin 0 -> 606 bytes
+ release/gui/data/pokemon/pidgeot.png    | Bin 0 -> 1431 bytes
+ release/gui/data/pokemon/pidgeotto.png  | Bin 0 -> 966 bytes
+ release/gui/data/pokemon/pidgey.png     | Bin 0 -> 909 bytes
+ release/gui/data/pokemon/pikachu.png    | Bin 0 -> 807 bytes
+ release/gui/data/pokemon/piloswine.png  | Bin 0 -> 869 bytes
+ release/gui/data/pokemon/pineco.png     | Bin 0 -> 882 bytes
+ release/gui/data/pokemon/pinsir.png     | Bin 0 -> 1147 bytes
+ release/gui/data/pokemon/plusle.png     | Bin 0 -> 737 bytes
+ release/gui/data/pokemon/politoed.png   | Bin 0 -> 953 bytes
+ release/gui/data/pokemon/poliwag.png    | Bin 0 -> 700 bytes
+ release/gui/data/pokemon/poliwhirl.png  | Bin 0 -> 971 bytes
+ release/gui/data/pokemon/poliwrath.png  | Bin 0 -> 989 bytes
+ release/gui/data/pokemon/ponyta.png     | Bin 0 -> 1113 bytes
+ release/gui/data/pokemon/poochyena.png  | Bin 0 -> 829 bytes
+ release/gui/data/pokemon/porygon.png    | Bin 0 -> 748 bytes
+ release/gui/data/pokemon/porygon2.png   | Bin 0 -> 749 bytes
+ release/gui/data/pokemon/primeape.png   | Bin 0 -> 1086 bytes
+ release/gui/data/pokemon/psyduck.png    | Bin 0 -> 786 bytes
+ release/gui/data/pokemon/pupitar.png    | Bin 0 -> 818 bytes
+ release/gui/data/pokemon/quagsire.png   | Bin 0 -> 969 bytes
+ release/gui/data/pokemon/quilava.png    | Bin 0 -> 887 bytes
+ release/gui/data/pokemon/qwilfish.png   | Bin 0 -> 770 bytes
+ release/gui/data/pokemon/raichu.png     | Bin 0 -> 1137 bytes
+ release/gui/data/pokemon/raikou.png     | Bin 0 -> 1531 bytes
+ release/gui/data/pokemon/ralts.png      | Bin 0 -> 597 bytes
+ release/gui/data/pokemon/rapidash.png   | Bin 0 -> 1309 bytes
+ release/gui/data/pokemon/raticate.png   | Bin 0 -> 1036 bytes
+ release/gui/data/pokemon/rattata.png    | Bin 0 -> 697 bytes
+ release/gui/data/pokemon/rayquaza.png   | Bin 0 -> 1413 bytes
+ release/gui/data/pokemon/regice.png     | Bin 0 -> 1178 bytes
+ release/gui/data/pokemon/regirock.png   | Bin 0 -> 1293 bytes
+ release/gui/data/pokemon/registeel.png  | Bin 0 -> 1230 bytes
+ release/gui/data/pokemon/relicanth.png  | Bin 0 -> 1008 bytes
+ release/gui/data/pokemon/remoraid.png   | Bin 0 -> 675 bytes
+ release/gui/data/pokemon/rhydon.png     | Bin 0 -> 1385 bytes
+ release/gui/data/pokemon/rhyhorn.png    | Bin 0 -> 1076 bytes
+ release/gui/data/pokemon/roselia.png    | Bin 0 -> 996 bytes
+ release/gui/data/pokemon/sableye.png    | Bin 0 -> 858 bytes
+ release/gui/data/pokemon/salamence.png  | Bin 0 -> 1222 bytes
+ release/gui/data/pokemon/sandshrew.png  | Bin 0 -> 825 bytes
+ release/gui/data/pokemon/sandslash.png  | Bin 0 -> 1134 bytes
+ release/gui/data/pokemon/sceptile.png   | Bin 0 -> 1464 bytes
+ release/gui/data/pokemon/scizor.png     | Bin 0 -> 1358 bytes
+ release/gui/data/pokemon/scyther.png    | Bin 0 -> 1316 bytes
+ release/gui/data/pokemon/seadra.png     | Bin 0 -> 1037 bytes
+ release/gui/data/pokemon/seaking.png    | Bin 0 -> 1307 bytes
+ release/gui/data/pokemon/sealeo.png     | Bin 0 -> 979 bytes
+ release/gui/data/pokemon/seedot.png     | Bin 0 -> 672 bytes
+ release/gui/data/pokemon/seel.png       | Bin 0 -> 900 bytes
+ release/gui/data/pokemon/sentret.png    | Bin 0 -> 813 bytes
+ release/gui/data/pokemon/seviper.png    | Bin 0 -> 1180 bytes
+ release/gui/data/pokemon/sharpedo.png   | Bin 0 -> 1026 bytes
+ release/gui/data/pokemon/shedinja.png   | Bin 0 -> 882 bytes
+ release/gui/data/pokemon/shelgon.png    | Bin 0 -> 836 bytes
+ release/gui/data/pokemon/shellder.png   | Bin 0 -> 658 bytes
+ release/gui/data/pokemon/shiftry.png    | Bin 0 -> 1299 bytes
+ release/gui/data/pokemon/shroomish.png  | Bin 0 -> 665 bytes
+ release/gui/data/pokemon/shuckle.png    | Bin 0 -> 788 bytes
+ release/gui/data/pokemon/shuppet.png    | Bin 0 -> 588 bytes
+ release/gui/data/pokemon/silcoon.png    | Bin 0 -> 726 bytes
+ release/gui/data/pokemon/skarmory.png   | Bin 0 -> 1368 bytes
+ release/gui/data/pokemon/skiploom.png   | Bin 0 -> 688 bytes
+ release/gui/data/pokemon/skitty.png     | Bin 0 -> 892 bytes
+ release/gui/data/pokemon/slaking.png    | Bin 0 -> 1362 bytes
+ release/gui/data/pokemon/slakoth.png    | Bin 0 -> 822 bytes
+ release/gui/data/pokemon/slowbro.png    | Bin 0 -> 1326 bytes
+ release/gui/data/pokemon/slowking.png   | Bin 0 -> 1056 bytes
+ release/gui/data/pokemon/slowpoke.png   | Bin 0 -> 829 bytes
+ release/gui/data/pokemon/slugma.png     | Bin 0 -> 730 bytes
+ release/gui/data/pokemon/smeargle.png   | Bin 0 -> 1028 bytes
+ release/gui/data/pokemon/smoochum.png   | Bin 0 -> 688 bytes
+ release/gui/data/pokemon/sneasel.png    | Bin 0 -> 969 bytes
+ release/gui/data/pokemon/snorlax.png    | Bin 0 -> 1152 bytes
+ release/gui/data/pokemon/snorunt.png    | Bin 0 -> 770 bytes
+ release/gui/data/pokemon/snubbull.png   | Bin 0 -> 814 bytes
+ release/gui/data/pokemon/solrock.png    | Bin 0 -> 1282 bytes
+ release/gui/data/pokemon/spearow.png    | Bin 0 -> 783 bytes
+ release/gui/data/pokemon/spheal.png     | Bin 0 -> 709 bytes
+ release/gui/data/pokemon/spinarak.png   | Bin 0 -> 733 bytes
+ release/gui/data/pokemon/spinda.png     | Bin 0 -> 609 bytes
+ release/gui/data/pokemon/spoink.png     | Bin 0 -> 662 bytes
+ release/gui/data/pokemon/squirtle.png   | Bin 0 -> 819 bytes
+ release/gui/data/pokemon/stantler.png   | Bin 0 -> 1186 bytes
+ release/gui/data/pokemon/starmie.png    | Bin 0 -> 1135 bytes
+ release/gui/data/pokemon/staryu.png     | Bin 0 -> 845 bytes
+ release/gui/data/pokemon/steelix.png    | Bin 0 -> 1253 bytes
+ release/gui/data/pokemon/sudowoodo.png  | Bin 0 -> 880 bytes
+ release/gui/data/pokemon/suicune.png    | Bin 0 -> 1525 bytes
+ release/gui/data/pokemon/sunflora.png   | Bin 0 -> 962 bytes
+ release/gui/data/pokemon/sunkern.png    | Bin 0 -> 627 bytes
+ release/gui/data/pokemon/surskit.png    | Bin 0 -> 583 bytes
+ release/gui/data/pokemon/swablu.png     | Bin 0 -> 788 bytes
+ release/gui/data/pokemon/swalot.png     | Bin 0 -> 878 bytes
+ release/gui/data/pokemon/swampert.png   | Bin 0 -> 1507 bytes
+ release/gui/data/pokemon/swellow.png    | Bin 0 -> 1095 bytes
+ release/gui/data/pokemon/swinub.png     | Bin 0 -> 532 bytes
+ release/gui/data/pokemon/taillow.png    | Bin 0 -> 713 bytes
+ release/gui/data/pokemon/tangela.png    | Bin 0 -> 1042 bytes
+ release/gui/data/pokemon/tauros.png     | Bin 0 -> 1349 bytes
+ release/gui/data/pokemon/teddiursa.png  | Bin 0 -> 693 bytes
+ release/gui/data/pokemon/tentacool.png  | Bin 0 -> 765 bytes
+ release/gui/data/pokemon/tentacruel.png | Bin 0 -> 1278 bytes
+ release/gui/data/pokemon/togepi.png     | Bin 0 -> 537 bytes
+ release/gui/data/pokemon/togetic.png    | Bin 0 -> 742 bytes
+ release/gui/data/pokemon/torchic.png    | Bin 0 -> 733 bytes
+ release/gui/data/pokemon/torkoal.png    | Bin 0 -> 1273 bytes
+ release/gui/data/pokemon/totodile.png   | Bin 0 -> 787 bytes
+ release/gui/data/pokemon/trapinch.png   | Bin 0 -> 597 bytes
+ release/gui/data/pokemon/treecko.png    | Bin 0 -> 882 bytes
+ release/gui/data/pokemon/tropius.png    | Bin 0 -> 1554 bytes
+ release/gui/data/pokemon/typhlosion.png | Bin 0 -> 1121 bytes
+ release/gui/data/pokemon/tyranitar.png  | Bin 0 -> 1490 bytes
+ release/gui/data/pokemon/tyrogue.png    | Bin 0 -> 756 bytes
+ release/gui/data/pokemon/umbreon.png    | Bin 0 -> 889 bytes
+ release/gui/data/pokemon/unown.png      | Bin 0 -> 300 bytes
+ release/gui/data/pokemon/ursaring.png   | Bin 0 -> 1213 bytes
+ release/gui/data/pokemon/vaporeon.png   | Bin 0 -> 1102 bytes
+ release/gui/data/pokemon/venomoth.png   | Bin 0 -> 1307 bytes
+ release/gui/data/pokemon/venonat.png    | Bin 0 -> 979 bytes
+ release/gui/data/pokemon/venusaur.png   | Bin 0 -> 1556 bytes
+ release/gui/data/pokemon/vibrava.png    | Bin 0 -> 948 bytes
+ release/gui/data/pokemon/victreebel.png | Bin 0 -> 1156 bytes
+ release/gui/data/pokemon/vigoroth.png   | Bin 0 -> 1197 bytes
+ release/gui/data/pokemon/vileplume.png  | Bin 0 -> 988 bytes
+ release/gui/data/pokemon/volbeat.png    | Bin 0 -> 1039 bytes
+ release/gui/data/pokemon/voltorb.png    | Bin 0 -> 539 bytes
+ release/gui/data/pokemon/vulpix.png     | Bin 0 -> 966 bytes
+ release/gui/data/pokemon/wailmer.png    | Bin 0 -> 808 bytes
+ release/gui/data/pokemon/wailord.png    | Bin 0 -> 1003 bytes
+ release/gui/data/pokemon/walrein.png    | Bin 0 -> 1325 bytes
+ release/gui/data/pokemon/wartortle.png  | Bin 0 -> 1061 bytes
+ release/gui/data/pokemon/weedle.png     | Bin 0 -> 655 bytes
+ release/gui/data/pokemon/weepinbell.png | Bin 0 -> 872 bytes
+ release/gui/data/pokemon/weezing.png    | Bin 0 -> 1329 bytes
+ release/gui/data/pokemon/whiscash.png   | Bin 0 -> 972 bytes
+ release/gui/data/pokemon/whismur.png    | Bin 0 -> 703 bytes
+ release/gui/data/pokemon/wigglytuff.png | Bin 0 -> 972 bytes
+ release/gui/data/pokemon/wingull.png    | Bin 0 -> 662 bytes
+ release/gui/data/pokemon/wobbuffet.png  | Bin 0 -> 911 bytes
+ release/gui/data/pokemon/wooper.png     | Bin 0 -> 641 bytes
+ release/gui/data/pokemon/wurmple.png    | Bin 0 -> 718 bytes
+ release/gui/data/pokemon/wynaut.png     | Bin 0 -> 724 bytes
+ release/gui/data/pokemon/xatu.png       | Bin 0 -> 830 bytes
+ release/gui/data/pokemon/yanma.png      | Bin 0 -> 996 bytes
+ release/gui/data/pokemon/zangoose.png   | Bin 0 -> 1170 bytes
+ release/gui/data/pokemon/zapdos.png     | Bin 0 -> 1256 bytes
+ release/gui/data/pokemon/zigzagoon.png  | Bin 0 -> 1087 bytes
+ release/gui/data/pokemon/zubat.png      | Bin 0 -> 831 bytes
+ release/gui/gui_client.jar              | Bin 0 -> 24040 bytes
+ release/shared/connection.ml            |  75 ++++++
+ release/shared/connection.mli           |  33 +++
+ release/shared/constants.ml             |  86 +++++++
+ release/shared/definitions.ml           | 231 +++++++++++++++++++
+ release/shared/thread_pool.ml           | 110 +++++++++
+ release/shared/thread_pool.mli          |  22 ++
+ release/shared/util.ml                  | 344 ++++++++++++++++++++++++++++
+ release/shared/util.mli                 |  96 ++++++++
+ release/team/babybot.ml                 |  57 +++++
+ release/team/build_team.sh              |  11 +
+ release/team/team.ml                    | 130 +++++++++++
+ 408 files changed, 2519 insertions(+)
+
+commit 849532c5081d5947dd4daa5bfa301f30fa6a0c36
+Author: mjt249 <mjt249@cornell.edu>
+Date:   Sat Nov 22 12:50:49 2014 -0500
+
+    first commit
+
+ README.md | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)

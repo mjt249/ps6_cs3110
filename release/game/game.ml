@@ -115,43 +115,46 @@ let  draft_phase s r b =
       let () = Table.remove tbl smon in
       GameState.set_draft_mons s tbl;
       GameState.add_reserve_steammon s (fst(color_p)) poke; 
-      Netgraphics.add_update (UpdateSteammon (poke.species, poke.curr_hp, poke.max_hp, (fst(color_p))));
+      Netgraphics.add_update 
+         (UpdateSteammon 
+             (poke.species, poke.curr_hp, poke.max_hp, (fst(color_p))));
       let monies = GameState.get_creds s (fst(color_p)) in
-        if (not(monies = 0)) then GameState.set_creds s (fst(color_p)) (monies - poke.cost);
+        if (not(monies = 0)) then 
+           GameState.set_creds s (fst(color_p)) (monies - poke.cost);
         
       let datafif = game_datafication s in
       let finished = GameState.get_draft_finished s in
       let snd_check = GameState.get_second_turn s in
         match (finished, fst(color_p), snd_check) with
         |(false, Red, (_,true)) -> GameState.set_turn s Blue;
-                        let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
-                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
-                        (None, datafif, None, b_req)
+            let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+            (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+                 (None, datafif, None, b_req)
         |(false, Blue, (_, true)) -> GameState.set_turn s Red;
-                        let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
-                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
-                        (None, datafif, r_req, None)
+            let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+            (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+            (None, datafif, r_req, None)
         |(false, Red, (Blue,false)) -> GameState.set_turn s Blue;
-                        let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
-                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
-                        (None, datafif, None, b_req)
+            let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+            (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+            (None, datafif, None, b_req)
         |(false, Blue, (Red, false)) -> GameState.set_turn s Red;
-                        let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
-                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
-                        (None, datafif, r_req, None)
+            let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+            (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+            (None, datafif, r_req, None)
         |(false, Red, (Red, false)) -> GameState.set_turn s Red;
-                        GameState.set_second_turn s (Red, true);
-                        let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
-                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
-                        (None, datafif, r_req, None)
+            GameState.set_second_turn s (Red, true);
+            let r_req = Some (Request (PickRequest (Red, (game_datafication s), 
+            (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+            (None, datafif, r_req, None)
         |(false, Blue, (Blue, false)) -> GameState.set_turn s Blue;
-                        GameState.set_second_turn s (Blue, true);
-                        let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
-                        (GameState.get_move_list s), (GameState.get_base_mons s)))) in
-                        (None, datafif, None, b_req)
+            GameState.set_second_turn s (Blue, true);
+            let b_req = Some (Request (PickRequest (Blue, (game_datafication s), 
+            (GameState.get_move_list s), (GameState.get_base_mons s)))) in
+            (None, datafif, None, b_req)
         |(true, _, (_,_)) ->   GameState.set_phase s GameState.Inventory;
-                        let inv_req = Some (Request (PickInventoryRequest(datafif))) in
-                        (None, datafif, inv_req, inv_req)
+            let inv_req = Some (Request (PickInventoryRequest(datafif))) in
+             (None, datafif, inv_req, inv_req)
      in
 
     let tbl = GameState.get_draft_mons s in
@@ -164,11 +167,13 @@ let  draft_phase s r b =
     in
     match color_p with      
     | ( _ ,Action(PickSteammon nm)) -> let str =
-      if (not(valid_purchace nm color_p tbl)) then (get_lowest_steammon color_p tbl) 
+      if (not(valid_purchace nm color_p tbl)) then 
+         (get_lowest_steammon color_p tbl) 
       else nm
     in
       (purchace_steammon str color_p tbl)
-    | (_,_) -> let str = (get_lowest_steammon color_p tbl) in (purchace_steammon str color_p tbl)
+    | (_,_) -> let str = (get_lowest_steammon color_p tbl) in 
+       (purchace_steammon str color_p tbl)
 
 let stock_inventories g rc bc =
   let cost_lst = [cCOST_ETHER; cCOST_MAXPOTION; cCOST_FULLHEAL; cCOST_REVIVE; 
@@ -176,7 +181,8 @@ let stock_inventories g rc bc =
   let default_inv = [cNUM_ETHER; cNUM_MAX_POTION; cNUM_REVIVE; cNUM_FULL_HEAL; 
                      cNUM_XATTACK; cNUM_XDEFENSE; cNUM_XSPEED] in
   let stock_inventory_of (c: color) (inv: inventory) = 
-    let cost = List.fold_left2 (fun worth item total -> worth*item + total) 0 cost_lst inv in
+    let cost = 
+       List.fold_left2 (fun worth item total -> worth*item + total) 0 cost_lst inv in
     if cost > cINITIAL_CASH then 
       GameState.set_inv g c default_inv
     else
@@ -187,7 +193,8 @@ let stock_inventories g rc bc =
   error_wrapper Red rc;
   error_wrapper Blue bc;
   GameState.set_phase g GameState.Battle;
-  (None, game_datafication g, Some (Request (StarterRequest (game_datafication g))), Some (Request (StarterRequest (game_datafication g))))
+  (None, game_datafication g, Some (Request (StarterRequest (game_datafication g))),
+      Some (Request (StarterRequest (game_datafication g))))
 
 
 (****** STARTER PHASE BEGIN ******)
@@ -288,7 +295,8 @@ let handle_end_status g mon team : unit =
      GameState.set_hp g team mon (max((GameState.get_curr_hp g team) - damage) 0);
      add_update (AdditionalEffects [(DamagedByStatus (damage, Poisoned), team)])
   | Some Burned -> 
-     let damage = int_of_float((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE) in
+     let damage = 
+       int_of_float((float_of_int(GameState.get_max_hp g team)) *. cBURN_DAMAGE) in
      GameState.set_hp g team mon (max((GameState.get_curr_hp g team) - damage) 0);
      add_update (AdditionalEffects [(DamagedByStatus (damage, Burned), team)])
 
@@ -313,7 +321,8 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
   (*match item*)
     match i with 
 
-    | Ether -> let new_inv = List.mapi (fun i a -> if i = 0 then a else (a - 1)) inv in
+    | Ether -> let new_inv = 
+       List.mapi (fun i a -> if i = 0 then a else (a - 1)) inv in
       GameState.set_inv g c new_inv;
       if ((target_mon.curr_hp > 0) && ((List.nth inv 0) > 0)) then
 
@@ -353,14 +362,17 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
           Table.replace res_pool mon_string new_mon
       else ()
 
-    | MaxPotion -> let new_inv = List.mapi (fun i a -> if i = 1 then a else (a - 1)) inv in
+    | MaxPotion -> let new_inv = 
+        List.mapi (fun i a -> if i = 1 then a else (a - 1)) inv in
       GameState.set_inv g c new_inv;
      (*not fainted. can use max potion*)
       if ((target_mon.curr_hp > 0) && ((List.nth inv 1) > 0)) then
         let new_max_potion_mon mon = 
           (*send CHANGE in health*)
-          Netgraphics.add_update(Item("MaxPotion", Recovered (mon.max_hp - mon.curr_hp) , c, mon_string));
-          Netgraphics.add_update(UpdateSteammon(mon.species, mon.max_hp, mon.max_hp, c));
+          Netgraphics.add_update(Item("MaxPotion", 
+              Recovered (mon.max_hp - mon.curr_hp) , c, mon_string));
+          Netgraphics.add_update(
+               UpdateSteammon(mon.species, mon.max_hp, mon.max_hp, c));
           { species = mon.species; 
             curr_hp = mon.max_hp; 
             max_hp = mon.max_hp;
@@ -385,7 +397,8 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
       (*fainted mon. can't use max potion*)
       else ()
 
-    | Revive -> let new_inv = List.mapi (fun i a -> if i = 2 then a else (a - 1)) inv in
+    | Revive -> let new_inv = 
+       List.mapi (fun i a -> if i = 2 then a else (a - 1)) inv in
       GameState.set_inv g c new_inv;
      (*fainted. can use revive*)
       if ((target_mon.curr_hp <= 0) && ((List.nth inv 2) > 0)) then
@@ -393,7 +406,8 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
           let new_hp = mon.max_hp/2 in
           (*send CHANGE in health*)
           Netgraphics.add_update(Item("Revive", Recovered new_hp, c, mon_string));
-          Netgraphics.add_update(UpdateSteammon(mon.species, new_hp, mon.max_hp, c));
+          Netgraphics.add_update(
+            UpdateSteammon(mon.species, new_hp, mon.max_hp, c));
           { species = mon.species; 
             curr_hp = new_hp; 
             max_hp = mon.max_hp;
@@ -419,7 +433,8 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
       else ()
 
 
-  | FullHeal -> let new_inv = List.mapi (fun i a -> if i = 3 then a else (a - 1))  inv in
+  | FullHeal -> let new_inv = 
+     List.mapi (fun i a -> if i = 3 then a else (a - 1))  inv in
     GameState.set_inv g c new_inv;
     if ((target_mon.curr_hp > 0) && ((List.nth inv 3) > 0)) then
       (match target_mon.status with
@@ -427,7 +442,8 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
       | None -> ()
       (*has an inflicted status*)
       | Some inflicted_status ->
-          Netgraphics.add_update(Item("FullHeal", HealedStatus inflicted_status, c, mon_string));
+          Netgraphics.add_update(
+            Item("FullHeal", HealedStatus inflicted_status, c, mon_string));
           let new_fullheal_mon mon = 
           { species = mon.species; 
             curr_hp = mon.curr_hp; 
@@ -452,13 +468,15 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
           Table.replace res_pool mon_string new_mon)
       else ()
 
-  | XAttack -> let new_inv = List.mapi (fun i a -> if i = 4 then a else (a - 1)) inv in
+  | XAttack -> let new_inv = 
+     List.mapi (fun i a -> if i = 4 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
     if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 4) > 0)) then
       let new_xattack_mon mon = 
         let new_mods mods = 
           let new_attack_mod = max mods.attack_mod 6 in
-          Netgraphics.add_update(Item("XAttack", StatModified (Atk, (new_attack_mod - mods.attack_mod)), c, mon_string));
+          Netgraphics.add_update(Item("XAttack", 
+            StatModified (Atk, (new_attack_mod - mods.attack_mod)), c, mon_string));
           { attack_mod = new_attack_mod;
           defense_mod = mods.defense_mod;
           spl_attack_mod = mods.spl_attack_mod;
@@ -485,13 +503,17 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
       GameState.set_active_mon g c (Some new_mon)
     else ()
 
-  | XDefense -> let new_inv = List.mapi (fun i a -> if i = 5 then a else (a - 1)) inv in
+  | XDefense -> let new_inv = 
+    List.mapi (fun i a -> if i = 5 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
-    if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 5) > 0)) then
+    if (is_active_mon && (target_mon.curr_hp > 0) && 
+        ((List.nth inv 5) > 0)) then
       let new_xdefense_mon mon = 
         let new_mods mods = 
           let new_defense_mod = max mods.defense_mod 6 in
-          Netgraphics.add_update(Item("XDefense", StatModified (Def, (new_defense_mod - mods.defense_mod)), c, mon_string));
+          Netgraphics.add_update(
+            Item("XDefense", StatModified (Def,
+             (new_defense_mod - mods.defense_mod)), c, mon_string));
           { attack_mod = mods.attack_mod;
           defense_mod = new_defense_mod;
           spl_attack_mod = mods.spl_attack_mod;
@@ -518,13 +540,16 @@ let use_item (g: game) (c: color) (i: item) (mon_string: string) =
       GameState.set_active_mon g c (Some new_mon)
     else ()
 
-  | XSpeed -> let new_inv = List.mapi (fun i a -> if i = 6 then a else (a - 1)) inv in
+  | XSpeed -> let new_inv = 
+     List.mapi (fun i a -> if i = 6 then a else (a - 1)) inv in
     GameState.set_inv g c new_inv;
     if (is_active_mon && (target_mon.curr_hp > 0) && ((List.nth inv 6) > 0)) then
       let new_xspeed_mon mon = 
         let new_mods mods = 
           let new_speed_mod = max mods.speed_mod 6 in
-          Netgraphics.add_update(Item("XSpeed", StatModified (Spe, (new_speed_mod - mods.speed_mod)), c, mon_string));
+          Netgraphics.add_update(
+            Item("XSpeed", StatModified (Spe,
+             (new_speed_mod - mods.speed_mod)), c, mon_string));
           { attack_mod = mods.attack_mod;
           defense_mod = mods.defense_mod;
           spl_attack_mod = mods.spl_attack_mod;
@@ -560,6 +585,7 @@ let rec faint_check (lst:steammon list) : steammon option =
   | h::[] -> None
   | h::t when h.curr_hp > 0 -> Some h
   | h::t -> faint_check t
+
 
 let switch_steammon g c mon : game_result option = 
   let player_reserves = GameState.get_reserve_pool g c in
@@ -706,8 +732,11 @@ let calc_multiplier (att_mon: steammon) (def_mon: steammon) (mv: move) =
   let burn = if att_mon.status = Some Burned then cBURN_WEAKNESS 
 	     else 1. in
   let rand = 
-    float_of_int((Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
-  let _ = print_endline ("stab: " ^ string_of_float(stab) ^ " type_mult: " ^ (string_of_float type_mult) ^ " burn: " ^ string_of_float burn ^ " rand: " ^ string_of_float rand) in
+    float_of_int(
+      (Random.int (101 - cMIN_DAMAGE_RANGE)) + cMIN_DAMAGE_RANGE)  /. 100. in
+  let _ = print_endline ("stab: " ^ string_of_float(stab) 
+    ^ " type_mult: " ^ (string_of_float type_mult) ^ " burn: " ^ 
+    string_of_float burn ^ " rand: " ^ string_of_float rand) in
   (stab *. type_mult *. burn *. rand, eff)
 
 let move_hits mv = 
@@ -724,7 +753,8 @@ let do_damage g target damage target_color =
   if damage = 0 then ()
   else
     let new_hp = max (target.curr_hp - damage) 0 in 
-    let _ = print_endline ("Old HP: " ^ string_of_int(target.curr_hp) ^ " New HP: " ^ (string_of_int new_hp)) in
+    let _ = print_endline ("Old HP: " ^ 
+      string_of_int(target.curr_hp) ^ " New HP: " ^ (string_of_int new_hp)) in
     GameState.set_hp g target_color target new_hp 
 
 let rec heal_status g color mon lst =
@@ -739,7 +769,8 @@ let handle_effects g (effect: effect) target target_color damage: effect_result 
   match effect with
   | InflictStatus stat -> GameState.set_status g target_color target (Some stat);
 			  Some (InflictedStatus stat)
-  | StatModifier (stat, value) -> GameState.set_stat_modifier g target_color target stat value;
+  | StatModifier (stat, value) -> 
+         GameState.set_stat_modifier g target_color target stat value;
 				  Some (StatModified (stat, value))
   | RecoverPercent percent -> 
      let new_hp = min(target.curr_hp + (int_of_float(
@@ -1008,7 +1039,8 @@ let battle_phase g rc bc : game_output =
   | Some res -> (Some res, (game_datafication g), None, None)
   | None -> 
       let recent_hit = active_faint_check g (opp_color faster_color) in
-      let result2 = battle_action g (opp_color faster_color) slower_action recent_hit in
+      let result2 = 
+         battle_action g (opp_color faster_color) slower_action recent_hit in
       match result2 with
       | Some res -> (Some res, (game_datafication g), None, None)
       | None ->
