@@ -58,16 +58,33 @@ let max_eff eff1 eff2 =
   | Regular, _ -> eff2
 
 let is_ineffective att_mon def_mon = 
-  let (eff1,_) = calculate_type_matchup att_mon.first_move.element 
-					(def_mon.first_type, def_mon.second_type) in  
-  let (eff2,_) = calculate_type_matchup att_mon.second_move.element 
-					(def_mon.first_type, def_mon.second_type) in 
-  let (eff3,_) = calculate_type_matchup att_mon.third_move.element 
-					(def_mon.first_type, def_mon.second_type) in 
-  let (eff4,_) = calculate_type_matchup att_mon.fourth_move.element 
-					(def_mon.first_type, def_mon.second_type) in 
-  max_eff (max_eff eff1 eff2 ) (max_eff eff3 eff4 )
+  let (eff1,_) = if att_mon.first_move.power > 0 then 
+		   calculate_type_matchup att_mon.first_move.element 
+					(def_mon.first_type, def_mon.second_type) 
+		 else (Ineffective, 0.) in  
+  let (eff2,_) = if att_mon.second_move.power > 0 then
+		   calculate_type_matchup att_mon.second_move.element 
+					(def_mon.first_type, def_mon.second_type) 
+		 else (Ineffective, 0.) in 
+  let (eff3,_) = if att_mon.third_move.power > 0 then 
+		   calculate_type_matchup att_mon.third_move.element 
+					(def_mon.first_type, def_mon.second_type) 
+		 else (Ineffective, 0.) in 
+  let (eff4,_) = if att_mon.fourth_move.power > 0 then
+		   calculate_type_matchup att_mon.fourth_move.element 
+					(def_mon.first_type, def_mon.second_type) 
+		 else (Ineffective, 0.) in 
+  (max_eff (max_eff eff1 eff2 ) (max_eff eff3 eff4 )) = Ineffective
  
+(* going to be an option type *)
+(* assuming active steammon is ineffective *)
+let rec switch_out mon_lst opp : steammon option= 
+  if cNUM_PICKS = 1 then None
+  else match List.tl mon_lst with
+       | [] -> None
+       | hd::tl -> if is_ineffective hd opp then
+		     switch_out tl opp
+		   else Some hd
 
 (*compares first by attack, then spl_attack, then cost *)
 let comp_by_atk mon1 mon2 =
