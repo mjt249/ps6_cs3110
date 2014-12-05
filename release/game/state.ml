@@ -348,128 +348,58 @@ module GameState = struct
       s.turn <- c
 
   let set_stat_modifier s c mon stat value = 
-    match stat with 
-    | Atk -> let new_mon = { species = mon.species; 
-			     curr_hp = mon.curr_hp; 
-			     max_hp = mon.max_hp;
-			     first_type = mon.first_type;
-			     second_type = mon.second_type;
-			     first_move = mon.first_move;
-			     second_move = mon.second_move;
-			     third_move = mon.third_move;
-			     fourth_move = mon.fourth_move;
-			     attack = value;
-			     spl_attack = mon.spl_attack;
-			     defense = mon.defense;
-			     spl_defense = mon.spl_defense;
-			     speed = mon.speed;
-			     status = mon.status;
-			     mods = mon.mods;
-			     cost = mon.cost } in
-	     (match c with
-	     | Red -> (match s.red.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON 
-		       | Some x -> x.mon <- new_mon)
-	     | Blue -> match s.blue.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON
-		       | Some x -> x.mon <- new_mon)
-    | Def -> let new_mon = { species = mon.species; 
-			     curr_hp = mon.curr_hp; 
-			     max_hp = mon.max_hp;
-			     first_type = mon.first_type;
-			     second_type = mon.second_type;
-			     first_move = mon.first_move;
-			     second_move = mon.second_move;
-			     third_move = mon.third_move;
-			     fourth_move = mon.fourth_move;
-			     attack = mon.attack;
-			     spl_attack = mon.spl_attack;
-			     defense = value;
-			     spl_defense = mon.spl_defense;
-			     speed = mon.speed;
-			     status = mon.status;
-			     mods = mon.mods;
-			     cost = mon.cost } in
-	     (match c with
-	     | Red -> (match s.red.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON 
-		       | Some x -> x.mon <- new_mon)
-	     | Blue -> match s.blue.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON
-		       | Some x -> x.mon <- new_mon)
-    | SpA -> let new_mon = { species = mon.species; 
-			     curr_hp = mon.curr_hp; 
-			     max_hp = mon.max_hp;
-			     first_type = mon.first_type;
-			     second_type = mon.second_type;
-			     first_move = mon.first_move;
-			     second_move = mon.second_move;
-			     third_move = mon.third_move;
-			     fourth_move = mon.fourth_move;
-			     attack = mon.attack;
-			     spl_attack = value;
-			     defense = mon.defense;
-			     spl_defense = mon.spl_defense;
-			     speed = mon.speed;
-			     status = mon.status;
-			     mods = mon.mods;
-			     cost = mon.cost } in
-	     (match c with
-	     | Red -> (match s.red.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON 
-		       | Some x -> x.mon <- new_mon)
-	     | Blue -> match s.blue.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON
-		       | Some x -> x.mon <- new_mon)
-    | SpD -> let new_mon = { species = mon.species; 
-			     curr_hp = mon.curr_hp; 
-			     max_hp = mon.max_hp;
-			     first_type = mon.first_type;
-			     second_type = mon.second_type;
-			     first_move = mon.first_move;
-			     second_move = mon.second_move;
-			     third_move = mon.third_move;
-			     fourth_move = mon.fourth_move;
-			     attack = mon.attack;
-			     spl_attack = mon.spl_attack;
-			     defense = mon.defense;
-			     spl_defense = value;
-			     speed = mon.speed;
-			     status = mon.status;
-			     mods = mon.mods;
-			     cost = mon.cost } in
-	     (match c with
-	     | Red -> (match s.red.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON 
-		       | Some x -> x.mon <- new_mon)
-	     | Blue -> match s.blue.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON
-		       | Some x -> x.mon <- new_mon)
-    | Spe -> let new_mon = { species = mon.species; 
-			     curr_hp = mon.curr_hp; 
-			     max_hp = mon.max_hp;
-			     first_type = mon.first_type;
-			     second_type = mon.second_type;
-			     first_move = mon.first_move;
-			     second_move = mon.second_move;
-			     third_move = mon.third_move;
-			     fourth_move = mon.fourth_move;
-			     attack = mon.attack;
-			     spl_attack = mon.spl_attack;
-			     defense = mon.defense;
-			     spl_defense = mon.spl_defense;
-			     speed = value;
-			     status = mon.status;
-			     mods = mon.mods;
-			     cost = mon.cost } in
-	     (match c with
-	     | Red -> (match s.red.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON 
-		       | Some x -> x.mon <- new_mon)
-	     | Blue -> match s.blue.active_mon with
-		       | None -> raise NO_ACTIVE_STEAMMON
-		       | Some x -> x.mon <- new_mon)
-
+    let new_mod =
+      match stat with 
+      | Atk -> { attack_mod = value;
+		 defense_mod = mon.mods.defense_mod;
+		 spl_attack_mod = mon.mods.spl_attack_mod;
+		 spl_defense_mod = mon.mods.spl_defense_mod;
+		 speed_mod = mon.mods.speed_mod }
+      | Def -> { attack_mod = mon.mods.attack_mod;
+		 defense_mod = value;
+		 spl_attack_mod = mon.mods.spl_attack_mod;
+		 spl_defense_mod = mon.mods.spl_defense_mod;
+		 speed_mod = mon.mods.speed_mod }
+      | SpA -> { attack_mod = mon.mods.attack_mod;
+		 defense_mod = mon.mods.defense_mod;
+		 spl_attack_mod = value;
+		 spl_defense_mod = mon.mods.spl_defense_mod;
+		 speed_mod = mon.mods.speed_mod }
+      | SpD -> { attack_mod = mon.mods.attack_mod;
+		 defense_mod = mon.mods.defense_mod;
+		 spl_attack_mod = mon.mods.spl_attack_mod;
+		 spl_defense_mod = value;
+		 speed_mod = mon.mods.speed_mod }
+      | Spe -> { attack_mod = mon.mods.attack_mod;
+		 defense_mod = mon.mods.defense_mod;
+		 spl_attack_mod = mon.mods.spl_attack_mod;
+		 spl_defense_mod = mon.mods.spl_defense_mod;
+		 speed_mod = value } in
+    let new_mon = { species = mon.species; 
+		    curr_hp = mon.curr_hp; 
+		    max_hp = mon.max_hp;
+		    first_type = mon.first_type;
+		    second_type = mon.second_type;
+		    first_move = mon.first_move;
+		    second_move = mon.second_move;
+		    third_move = mon.third_move;
+		    fourth_move = mon.fourth_move;
+		    attack = mon.attack;
+		    spl_attack = mon.spl_attack;
+		    defense = mon.defense;
+		    spl_defense = mon.spl_defense;
+		    speed = mon.speed;
+		    status = mon.status;
+		    mods = new_mod;
+		    cost = mon.cost } in
+    (match c with
+     | Red -> (match s.red.active_mon with
+	       | None -> raise NO_ACTIVE_STEAMMON 
+	       | Some x -> x.mon <- new_mon)
+     | Blue -> match s.blue.active_mon with
+	       | None -> raise NO_ACTIVE_STEAMMON
+	       | Some x -> x.mon <- new_mon)
+    
   let set_incr_pp s c mon incr =
     let incr_pp (mv:move): move = { name = mv.name;
 			     element = mv.element;

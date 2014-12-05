@@ -788,7 +788,8 @@ let use_move g c move_str : game_result option =
                   | None -> failwith "Opponent has no Steammon"
                   | Some mon -> mon in
                     let (mult, eff) = calc_multiplier mon opp_mon m in
-                    let damage = 
+                    assert (mult >= 0.);
+		    let damage = 
                       if m.power = 0 then 
                         0 (*non damaging *)
                       else if is_special m.element then 
@@ -799,6 +800,12 @@ let use_move g c move_str : game_result option =
                     print_string " Damage: ";
                     print_int damage;
                     print_endline "";
+		    assert (mon.spl_attack >= 0);
+		    assert (opp_mon.spl_defense >= 0);
+		    assert (mon.attack >= 0);
+		    assert (opp_mon.defense >= 0);
+		    assert (m.power >= 0);
+		    assert (damage >= 0);
                     let (targ, targ_color) = get_target mon opp_mon m c in
                     do_damage g targ damage targ_color;
                     let effect_list = traverse_effects g m mon opp_mon c damage in
